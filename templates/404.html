@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/404.css' %}" />
+{% endblock %}
+{% block content %}
+    <lottie-player style="margin: auto auto; width: 30vw;" src="{% static 'assets/animations/404.json' %}" background="transparent" speed="1" style="width: 100%; height: 100%;" loop autoplay></lottie-player>
+    <h1 style="text-align: center; font-family: Poppins; margin-top: -2rem margin-bottom: 1rem">ERROR: PAGE NOT FOUND</h1>      
+{% endblock %}
+{% block js %}
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script> 
+{% endblock %}

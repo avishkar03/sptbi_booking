@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block Title %}Success{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="alert alert-success">
+                <h2><i class="bi bi-check-circle"></i> Success!</h2>
+                <p>Your operation was completed successfully.</p>
+                <div class="mt-4">
+                    <a href="{% url 'booking:booking' %}" class="btn btn-primary">Back to Booking</a>
+                    <a href="{% url 'booking:profile' %}" class="btn btn-outline-primary ml-2">View Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

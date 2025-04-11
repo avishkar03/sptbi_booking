@@ -1,0 +1,188 @@
+/* Booking Container */
+.booking-container {
+    padding: 20px;
+    max-width: 100%;
+    margin: 0 auto;
+    background-color: #fff;
+}
+
+/* Booking Header */
+.booking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 10px 0;
+}
+
+.booking-header h2 {
+    margin: 0;
+    color: #1e3a8a;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.date-navigation {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.nav-btn {
+    padding: 5px 10px;
+    background-color: #1e3a8a;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.nav-btn:hover {
+    background-color: #1e40af;
+}
+
+.current-date {
+    font-weight: 500;
+    color: #1e3a8a;
+    padding: 0 15px;
+}
+
+/* Table Styles */
+.table-responsive {
+    overflow-x: auto;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.booking-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    min-width: 800px;
+}
+
+/* Header Styles */
+.booking-table thead {
+    background-color: #1e3a8a;
+    color: white;
+}
+
+.booking-table th {
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 500;
+    white-space: nowrap;
+    border: 1px solid #2d4373;
+}
+
+.time-slot-header {
+    width: 120px;
+    background-color: #1e3a8a;
+}
+
+.room-header {
+    min-width: 200px;
+}
+
+/* Cell Styles */
+.booking-table td {
+    padding: 12px 15px;
+    border: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+.time-slot {
+    font-weight: 500;
+    color: #4b5563;
+    background-color: #f8fafc;
+}
+
+.booking-cell {
+    position: relative;
+    height: 50px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.booking-cell:hover {
+    background-color: #f3f4f6;
+}
+
+.booking-cell.booked {
+    background-color: #e5e7eb;
+    cursor: not-allowed;
+}
+
+.booking-info {
+    font-size: 0.875rem;
+    color: #4b5563;
+    font-weight: 500;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .booking-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .booking-header h2 {
+        font-size: 1.25rem;
+    }
+    
+    .table-responsive {
+        margin: 0 -20px;
+        border-radius: 0;
+    }
+    
+    .booking-table {
+        border-left: none;
+        border-right: none;
+    }
+    
+    .date-navigation {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* Header Left Section */
+.header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.floor-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.floor-selector select {
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 0.9rem;
+    color: #1e3a8a;
+    cursor: pointer;
+    min-width: 150px;
+}
+
+.floor-selector select:focus {
+    outline: none;
+    border-color: #1e3a8a;
+    box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.1);
+} 

@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Anuphan:wght@500&display=swap');
+body {
+  font-family: Anuphan;
+  margin: 0 !important;
+  padding: 0;
+}
+
+#bookingForm .custom-btn {
+  width: 130px;
+  height: 40px;
+  color: #fff;
+  /* border-radius: 5px; */
+  padding: 10px 25px;
+  font-weight: 500;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+   /* box-shadow:inset 2px 2px 2px 0px rgba(255,255,255,.5),
+   7px 7px 20px 0px rgba(0,0,0,.1),
+   4px 4px 5px 0px rgba(0,0,0,.1); */
+  outline: none;
+}
+
+#bookingForm .custom-btn {
+  background-color: #1c4386;
+  line-height: 42px;
+  padding: 0;
+  border: none;
+}
+#bookingForm .custom-btn span {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+#bookingForm .custom-btn:before,
+#bookingForm .custom-btn:after {
+  position: absolute;
+  content: "";
+  right: 0;
+  bottom: 0;
+  background: #1c4386;
+  /* box-shadow:  4px 4px 6px 0 rgba(255,255,255,.5),
+              -4px -4px 6px 0 rgba(116, 125, 136, .2), 
+    inset -4px -4px 6px 0 rgba(255,255,255,.5),
+    inset 4px 4px 6px 0 rgba(116, 125, 136, .3); */
+  transition: all 0.3s ease;
+}
+#bookingForm .custom-btn:before{
+   height: 0%;
+   width: 2px;
+}
+#bookingForm .custom-btn:after {
+  width: 0%;
+  height: 2px;
+}
+#bookingForm .custom-btn:hover:before {
+  height: 100%;
+}
+#bookingForm .custom-btn:hover:after {
+  width: 100%;
+}
+#bookingForm .custom-btn:hover{
+  background: transparent;
+}
+#bookingForm .custom-btn span:hover{
+  color: #1c4386;
+}
+#bookingForm .custom-btn span:before,
+#bookingForm .custom-btn span:after {
+  position: absolute;
+  content: "";
+  left: 0;
+  top: 0;
+  background: #1c4386;
+  /*box-shadow:  4px 4px 6px 0 rgba(255,255,255,.5),
+              -4px -4px 6px 0 rgba(116, 125, 136, .2), 
+    inset -4px -4px 6px 0 rgba(255,255,255,.5),
+    inset 4px 4px 6px 0 rgba(116, 125, 136, .3);*/
+  transition: all 0.3s ease;
+}
+#bookingForm .custom-btn span:before {
+  width: 2px;
+  height: 0%;
+}
+#bookingForm .custom-btn span:after {
+  height: 2px;
+  width: 0%;
+}
+#bookingForm .custom-btn span:hover:before {
+  height: 100%;
+}
+#bookingForm .custom-btn span:hover:after {
+  width: 100%;
+}
+
+#bookingForm button {
+    font-family: Poppins;
+    background-color: #1c4386;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    /* border-radius: 4px; */
+    cursor: pointer;
+}
+
+
+.h {
+  display: flex;
+  justify-content: center;
+  color: white;
+  background-color: #1c4386;
+  align-items: center;
+  font-family: Anuphan;
+  text-align: center;
+  padding: 15px;
+  height:80px;
+}
+
+#header {
+  font-family: Anuphan;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+  position: relative;
+}
+
+
+#header form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 10px;
+  height: 100%;
+}
+
+#header .date-picker-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+#header button {
+  border: none;
+  color:black;
+  font-size: 30px;
+  /* margin: 0.25rem 0; */
+  /* padding: 0 10px; */
+}
+
+#header button:hover{
+  background: #1c4386;
+  border: none;
+  color:black;
+  font-size: 30px;
+  transition: 0.3s ease-in-out;
+  cursor: pointer;
+  /* margin: 0.25rem 0; */
+  /* padding: 0 10px; */
+}
+
+#header button i {
+  border: none;
+  color:#1c4386;
+  font-size: 24px !important;
+  /* padding: 0 10px; */
+}
+
+#header button i:hover {
+  border: none;
+  color:#fff;
+  font-size: 24px !important;
+  transition: 0.3s ease-in-out;
+  cursor: pointer;
+  /* padding: 0 10px; */
+}
+
+#prevBtn{
+  /* border: 4px #1c4386 solid !important; */
+  border-radius: 50%;
+  margin-left: 20px;
+}
+
+#nextBtn{
+  /* border: 4px #1c4386 solid !important; */
+  border-radius: 50%;
+  margin-right: 20px;
+}
+
+#header h3 {
+  margin: 10px;
+}
+
+
+table {
+  font-family: Anuphan;
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 0;
+  margin-left: 0;
+  margin-right: 0;
+  border: none;
+}
+
+th,
+td {
+  text-align: center;
+  border: 1px solid #d3d3d3 !important;
+  padding: 0.5rem;
+}
+
+th {
+  color: #1c4386;
+}
+
+td {
+  cursor: pointer;
+}
+
+td.selected {
+  background-color: #1c4386 !important;
+  border-top: #1c4386 !important;
+  border-bottom: 1px solid #1c4386 !important;
+
+}
+
+#bookingForm {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* #bookBtn {
+  font-family: Poppins;
+  font-size: 16px;
+  padding: 10px 20px;
+  background-color: #1c4386;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 20px;
+}*/
+
+#bookBtn:hover {
+  background-color: white;
+  color: #1c4386;
+  border: 1px solid #1c4386;
+  transition: 0.3s ease-in-out;
+} 
+
+.slot{
+  width: 10%;
+}
+
+.list i{
+  margin-left:10%;
+}
+
+.non-slot{
+  width:20%;
+}
+
+/* Modal Styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.4); /* Black with opacity */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be customized */
+}
+
+.modal-buttons {
+  text-align: right;
+  margin-top: 10px;
+}
+
+/* Style for the textarea */
+.reason {
+  display: block;
+  width: 30%;
+  padding: 5px;
+  margin-left: 35% !important;
+  margin-bottom: 20px !important;
+}
+
+.logo{
+  height: 100%;
+}
+
+.logo img {
+  max-height: 100%;
+}
+
+.myDate{
+  width: 200px;
+  font-size: 16px;
+}

@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block Title %} Floor 2 {% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+    <button id="prev-day" style="background: none; border: none; cursor: pointer;">
+        <i class="bi bi-caret-left-fill" style="font-size: 1.5rem; color: #000;"></i>
+    </button>
+    <h2 id="current-date" style="margin: 0 20px; font-size: 1.2rem;">{{ current_date }}</h2>
+    <button id="next-day" style="background: none; border: none; cursor: pointer;">
+        <i class="bi bi-caret-right-fill" style="font-size: 1.5rem; color: #000;"></i>
+    </button>
+</div>
+<div style="display: flex; justify-content: center;">
+    <table id="floor2-table" class="table table-bordered" style="width: 90%; text-align: center;">
+        <thead class="thead-dark">
+            <tr>
+                <th>Time Slot</th>
+                <th>Meeting Room 1 - 2nd Floor</th>
+                <th>Meeting Room 2 - 2nd Floor</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for time in time_slots %}
+            <tr>
+                <td>{{ time }}</td>
+                <td class="slot" data-time="{{ time }}" data-room="Meeting Room 1 - 2nd Floor"></td>
+                <td class="slot" data-time="{{ time }}" data-room="Meeting Room 2 - 2nd Floor"></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if user.is_authenticated %}
+<button id="add-column" style="margin: 10px; padding: 3px 8px; font-size: 0.8rem; border-radius: 5px; background-color: #007bff; color: white; border: none; cursor: pointer;">+ Add Column</button>
+{% endif %}
+
+<script>
+    const currentDateElement = document.getElementById('current-date');
+    const prevDayButton = document.getElementById('prev-day');
+    const nextDayButton = document.getElementById('next-day');
+
+    let currentDate = new Date();
+
+    function updateDateDisplay() {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        currentDateElement.textContent = currentDate.toLocaleDateString('en-US', options);
+    }
+
+    prevDayButton.addEventListener('click', () => {
+        currentDate.setDate(currentDate.getDate() - 1);
+        updateDateDisplay();
+    });
+
+    nextDayButton.addEventListener('click', () => {
+        currentDate.setDate(currentDate.getDate() + 1);
+        updateDateDisplay();
+    });
+
+    // Initialize the current date display
+    updateDateDisplay();
+
+    // JavaScript to handle slot selection
+    document.querySelectorAll('.slot').forEach(slot => {
+        slot.addEventListener('click', function() {
+            // Remove background color from all slots
+            document.querySelectorAll('.slot').forEach(s => s.style.backgroundColor = '');
+
+            // Highlight the selected slot with the new color
+            this.style.backgroundColor = '#1c4386';
+        });
+    });
+
+    const addColumnButton = document.getElementById('add-column');
+    const table = document.getElementById('floor2-table');
+
+    addColumnButton.addEventListener('click', () => {
+        const headerRow = table.querySelector('thead tr');
+        const bodyRows = table.querySelectorAll('tbody tr');
+
+        // Add a new header cell for Meeting Room 1
+        const newHeader1 = document.createElement('th');
+        newHeader1.textContent = 'Meeting Room 1 - 2nd Floor';
+
+        // Add a remove icon for the column
+        {% if user.is_authenticated %}
+        const removeIcon1 = document.createElement('i');
+        removeIcon1.className = 'bi bi-x-circle'; // Bootstrap icon class
+        removeIcon1.style.marginLeft = '10px';
+        removeIcon1.style.cursor = 'pointer';
+        removeIcon1.style.display = 'none'; // Initially hidden
+        removeIcon1.addEventListener('click', () => removeColumn(newHeader1.cellIndex));
+        newHeader1.appendChild(removeIcon1);
+
+        // Show the icon on hover
+        newHeader1.addEventListener('mouseover', () => {
+            removeIcon1.style.display = 'inline';
+        });
+        newHeader1.addEventListener('mouseout', () => {
+            removeIcon1.style.display = 'none';
+        });
+        {% endif %}
+
+        headerRow.appendChild(newHeader1);
+
+        // Add a new header cell for Meeting Room 2
+        const newHeader2 = document.createElement('th');
+        newHeader2.textContent = 'Meeting Room 2 - 2nd Floor';
+
+        {% if user.is_authenticated %}
+        const removeIcon2 = document.createElement('i');
+        removeIcon2.className = 'bi bi-x-circle';
+        removeIcon2.style.marginLeft = '10px';
+        removeIcon2.style.cursor = 'pointer';
+        removeIcon2.style.display = 'none';
+        removeIcon2.addEventListener('click', () => removeColumn(newHeader2.cellIndex));
+        newHeader2.appendChild(removeIcon2);
+
+        newHeader2.addEventListener('mouseover', () => {
+            removeIcon2.style.display = 'inline';
+        });
+        newHeader2.addEventListener('mouseout', () => {
+            removeIcon2.style.display = 'none';
+        });
+        {% endif %}
+
+        headerRow.appendChild(newHeader2);
+
+        // Add new cells to each row in the body
+        bodyRows.forEach(row => {
+            const newCell1 = document.createElement('td');
+            newCell1.className = 'slot';
+            newCell1.textContent = '';
+            row.appendChild(newCell1);
+
+            const newCell2 = document.createElement('td');
+            newCell2.className = 'slot';
+            newCell2.textContent = '';
+            row.appendChild(newCell2);
+        });
+    });
+
+    function removeColumn(index) {
+        const headerRow = table.querySelector('thead tr');
+        const bodyRows = table.querySelectorAll('tbody tr');
+
+        // Remove the header cell
+        headerRow.deleteCell(index);
+
+        // Remove the corresponding cells in each row
+        bodyRows.forEach(row => {
+            row.deleteCell(index);
+        });
+    }
+
+    {% if user.is_authenticated %}
+    document.querySelectorAll('.slot').forEach(slot => {
+        slot.addEventListener('click', function () {
+            if (this.querySelector('input')) return;
+
+            const currentContent = this.textContent;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = currentContent;
+            input.style.width = '100%';
+
+            this.textContent = '';
+            this.appendChild(input);
+            input.focus();
+
+            input.addEventListener('blur', () => {
+                const newContent = input.value;
+                this.textContent = newContent;
+                saveCellContent(this.dataset.time, this.dataset.room, newContent);
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    input.blur();
+                }
+            });
+        });
+    });
+
+    function saveCellContent(time, room, content) {
+        fetch('/save_cell_content/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ time, room, content }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Cell content saved:', data);
+            })
+            .catch(error => {
+                console.error('Error saving cell content:', error);
+            });
+    }
+    {% endif %}
+</script>
+
+<style>
+    .table {
+        border-collapse: collapse;
+    }
+
+    .table th, .table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    .table th {
+        background-color: #f2f2f2;
+        text-align: center;
+    }
+
+    .slot {
+        cursor: pointer;
+    }
+
+    .slot:hover {
+        background-color: #e0e0e0;
+    }
+</style>
+{% endblock %}

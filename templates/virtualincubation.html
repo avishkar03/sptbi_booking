@@ -1,0 +1,145 @@
+{% extends 'base.html' %} {% load static %} {% block head %}
+<link rel="stylesheet" href="{% static 'css/virtualincubation.css' %}" />
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+/>
+<style>
+  @media (max-width: 980px) {
+    .about .container .box {
+      font-size: 13px;
+  }
+
+  .eligiblity .container .box {
+    font-size: 13px;
+}
+
+.timeline {
+  font-size: 35px;
+  position: relative;
+  width: 660px;
+  margin: 0 auto;
+  margin-top: 20px;
+  padding: 1em 0;
+  list-style-type: none;
+}
+
+
+}
+</style>
+{% endblock %} {% block Title %} Virtual Incubation {% endblock %} {% block content %}
+<div class="photo">
+  <div class="container">
+    <img src="{% static 'assets/banner/virtual_incubation.png' %}" alt="incubation" />
+  </div>
+</div>
+<div class="about">
+  <div class="container">
+    <h1>ABOUT</h1>
+    <div class="box">
+      The programme makes incubation accessible to all startups across the country without barriers or geographical boundaries. The programme is designed to meet every component of physical incubation and make it cost-effective for every startup. The programme creates the optimal environment for startups to scale up by providing support in the form of Virtual incubation and Flexi-Virtual Incubation to help them grow by connecting the startup with our webinars, events and widespread network of mentors, who are investors, accelerators and industry veterans. Although it's a Virtual incubation programme, SP-TBI allows a startup to use the office space & labs.
+      <br />
+      <ul>
+        <li> <strong> Meeting Rooms </strong>: 10 Hours a Month
+        </li>
+        <li> <strong> Hot Desk </strong>: 3 Days a month
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="facilities">
+  <div class="container">
+    <h1>Facilities Provided</h1>
+    <div class="hero-section">
+        <div class="card-grid">
+            <a class="card" href="#" style="background-image: url('{% static 'assets/features/mentoring.jpg' %}'); background-size: cover;">
+            <div class="card__background" ></div>
+            <div class="card__content">
+                <h3 class="card__heading">Access to our top-class mentors</h3>
+            </div>
+            </li>
+            <a class="card" href="#" style="background-image: url('{% static 'assets/features/webinars.jpg' %}'); background-size: cover;">
+            <div class="card__content">
+                <h3 class="card__heading">Access to our events & webinars</h3>
+            </div>
+            </a>
+            <a class="card" href="#" style="background-image: url('{% static 'assets/features/talentpool.jpg' %}'); background-size: cover;">
+            <div class="card__content">
+                <h3 class="card__heading">Access to our talent pool</h3>
+            </div>
+            </a>
+            <a class="card" href="#" style="background-image: url('{% static 'assets/features/funding.jpg' %}'); background-size: cover;">
+            <div class="card__content">
+                <h3 class="card__heading">Access to seed funding up to INR 25 Lacs</h3>
+            </div>
+            </a>
+            <a class="card" href="#" style="background-image: url('{% static 'assets/features/grant.jpg' %}'); background-size: cover;">
+            <div class="card__content">
+                <h3 class="card__heading">Access to prototype grant up to INR 10 Lacs</h3>
+            </div>
+            </a>
+            <a class="card" href="#" style="background-image: url('{% static 'assets/features/startuptoolkit.jpg' %}'); background-size: cover;">
+            <div class="card__content">
+                <h3 class="card__heading">Access to startup toolkit</h3>
+            </div>
+            </a>
+            <a class="card" href="#" style="background-image: url(https://images.unsplash.com/photo-1557004396-66e4174d7bf6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60)">
+            <div class="card__content">
+                <h3 class="card__heading">Limited office Space (12 hours a week)- Flexi Virtual Incubation Programme</h3>
+            </div>
+            </a>
+        </div>
+    </div>
+  </div>
+</div>
+<div class="eligiblity">
+  <div class="container">
+    <h1>Who is Eligible to Apply</h1>
+    <div class="box">
+      <ul>
+        <li>Tech Startups</li>
+        <li>Aspiring Tech Startups</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="evaluation">
+  <div class="container">
+    <h1>Process of evaluation</h1>
+    <div class="box">
+      <ul class="timeline">
+        <li>
+          <div class="direction-r">
+            <div class="flag-wrapper">
+              <span class="flag">First Stage</span>
+            </div>
+            <div class="desc">
+              For the first stage of screening, the information provided in the application will be evaluated.
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="direction-l">
+            <div class="flag-wrapper">
+              <span class="flag">Second Stage</span>
+            </div>
+            <div class="desc">
+              The founder will be evaluated on Team Capabilities and Relevance of Experience in the second stage, which will entail a telephonic or physical encounter. Stage/type of product, business proposition, size of the opportunity, and so on.
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="direction-r">
+            <div class="flag-wrapper">
+              <span class="flag">Final Stage</span>
+            </div>
+            <div class="desc">
+              The steering committee members, which include the Chief Executive Officer and Higher Management, will preside over the final selection stage.
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

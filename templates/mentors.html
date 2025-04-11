@@ -1,0 +1,46 @@
+{% extends 'base.html' %} {% load static %} {% block Title %}Mentors {% endblock%} {% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/mentors.css' %}" />
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+{% endblock %} {% block content %}
+<div class="heading">
+  <div class="wrapper">
+  <h1> Mentors </h1>
+  <p>For entrepreneurs, turning a passion into a business is the ultimate dream. But that dream doesn’t come easily. SP-TBI through its mentorship programme provides a chance to its Incubatees with access to the business knowledge and guidance of experienced professionals. </p>
+  </div>
+</div>
+{%for mentor in mentor_type %}
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="marketing">
+  <div class="wrapper">
+    <h1> {{mentor.name}} </h1>
+    <div class="container">
+      <div class="row">
+        {% for mentor in mentor.mentors.all %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+          <div class="our-team">
+            <div class="picture">
+              <img class="img-fluid" src="{{mentor.image.url}}">
+            </div>
+            <div class="team-content">
+              <h3 class="name">{{mentor.name}}</h3>
+              <h4 class="title">{{mentor.description}}</h4>
+            </div>
+            <ul class="social">
+              <li><a href="{{mentor.linkedin}}" aria-hidden="true"><i class="fa fa-linkedin"></i>Linkedin</a></li>
+            </ul>
+          </div>
+        </div>
+        {% endfor %}  
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endblock %} {% block js %}
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script src="{% static 'js/mentors.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,113 @@
+.apply{
+    width: 100%;
+    margin: 15rem 0;
+}
+
+.card{
+    width: 40%;
+    padding: 20px 0;
+    margin: auto;
+    border: 1px solid #1c4386;
+    border-radius: 20px;
+    box-shadow: 3px 5px #1c4386;
+}
+
+.card-container{
+    width: 90%;
+    margin: 0 auto;
+}
+
+.card h1{
+    font-family: Poppins;
+    font-size: 30px;
+    font-weight: 600;
+    color: #1c4386;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.card-header{
+    width: 100%;
+    font-family: Poppins;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1c4386;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.card-header img{
+    width : 100%;
+}
+
+form{
+    width: 100%;
+}
+
+.form{
+    width: 100%;
+    margin: 0 auto;
+}
+
+.form p{
+    font-family: Poppins;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1c4386;
+    text-align: center;
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.founder, .contact-number, .email, .brief, .sector, .startup{
+    width: 100%;
+}
+
+.founder p, .contact-number p, .email p, .brief p, .sector p, .startup p{
+    text-align: left;
+    display: block;
+}
+
+input{
+    display:block;
+    width: 97%;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 2%;
+    margin: 0;
+    border: 1px solid #1c4386;
+    border-radius: 10px;
+    font-family: Poppins;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1c4386;
+    transition: all 0.3s ease;
+}
+
+.form textarea{
+    width: 97%;
+    padding: 5px 0px 5px;
+    padding-left: 2%;
+    margin: 0 1rem 0 0;
+    border: 1px solid #1c4386;
+    border-radius: 10px;
+    font-family: Poppins;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1c4386;
+    transition: all 0.3s ease;
+}
+
+.form select{
+    width: 99%;
+    padding: 5px 0px 5px ;
+    padding-left: 2%;
+    margin: 0 1rem 0 0;
+    border: 1px solid #1c4386;
+    border-radius: 10px;
+    font-family: Poppins;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1c4386;
+    transition: all 0.3s ease;
+}

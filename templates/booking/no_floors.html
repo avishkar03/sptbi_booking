@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="alert alert-warning">
+        <h4 class="alert-heading">No Floors Available</h4>
+        <p>There are currently no floors available for booking. Please contact the administrator.</p>
+        {% if user.is_staff %}
+        <hr>
+        <p class="mb-0">
+            As an administrator, you can add floors through the 
+            <a href="{% url 'admin:booking_floor_add' %}">admin panel</a>.
+        </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 
