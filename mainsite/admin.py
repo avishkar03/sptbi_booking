@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.forms import inlineformset_factory
 from .models import *
+from django_summernote.widgets import SummernoteWidget
+
 User = get_user_model()
 
 
@@ -14,27 +16,33 @@ class SHAdmin(admin.ModelAdmin):
     list_display = ('programmeyear', 'title')
     list_filter = ('programmeyear',)
 
+class SummerNoteAdmin(admin.ModelAdmin): 
+
+     formfield_overrides = { 
+            models.TextField: {'widget': SummernoteWidget}, 
+     } 
+
 admin.site.register(User, IncubateeAdmin)
-admin.site.register(Features)
-admin.site.register(Team)
-admin.site.register(VisionMission)
-admin.site.register(Partner)
-admin.site.register(Partner_type)
-admin.site.register(Stat)
-admin.site.register(News)
-admin.site.register(Testimonial)
-admin.site.register(Mentor)
-admin.site.register(Mentor_type)
-admin.site.register(Facility)
+admin.site.register(Features, SummerNoteAdmin)
+admin.site.register(Team, SummerNoteAdmin)
+admin.site.register(VisionMission, SummerNoteAdmin)
+admin.site.register(Partner, SummerNoteAdmin)
+admin.site.register(Partner_type, SummerNoteAdmin)
+admin.site.register(Stat, SummerNoteAdmin)
+admin.site.register(News, SummerNoteAdmin)
+admin.site.register(Testimonial, SummerNoteAdmin)
+admin.site.register(Mentor, SummerNoteAdmin)
+admin.site.register(Mentor_type, SummerNoteAdmin)
+admin.site.register(Facility, SummerNoteAdmin)
 admin.site.register(Project, SHAdmin)
-admin.site.register(Programme)
-admin.site.register(ProgrammeYear)
-admin.site.register(Banner)
-admin.site.register(Count)
-admin.site.register(Image)
-admin.site.register(InfraFacility)
-admin.site.register(IotDevice)
-admin.site.register(Iot)
-admin.site.register(Sponsor)
-admin.site.register(Event)
-admin.site.register(About)
+admin.site.register(Programme , SummerNoteAdmin)
+admin.site.register(ProgrammeYear , SummerNoteAdmin)
+admin.site.register(Banner, SummerNoteAdmin)
+admin.site.register(Count, SummerNoteAdmin)
+admin.site.register(Image, SummerNoteAdmin)
+admin.site.register(InfraFacility, SummerNoteAdmin)
+admin.site.register(IotDevice, SummerNoteAdmin)
+admin.site.register(Iot, SummerNoteAdmin)
+admin.site.register(Sponsor, SummerNoteAdmin)
+admin.site.register(Event, SummerNoteAdmin)
+admin.site.register(About, SummerNoteAdmin)

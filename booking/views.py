@@ -241,11 +241,11 @@ def profile(request):
     visit_counter = Count.objects.get(name="Actual")
     visit_add = Count.objects.get(name="Extra")
     events = Event.objects.all()
-    events = sorted(events, key=lambda x: x.orderno)
+    # events = sorted(events, key=lambda x: x.orderno)
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     mon = datetime.now().strftime("%Y-%m-%d").split("-")[1]
     y = datetime.now().strftime("%Y-%m-%d").split("-")[0]
     objs = User.objects.filter(is_superuser=False)

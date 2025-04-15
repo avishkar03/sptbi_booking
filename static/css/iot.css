@@ -221,3 +221,7 @@ option:hover {
 .filter button:hover i {
     color: #1c4386
 }
+
+.specs {
+    font-family:'Poppins' !important;
+}

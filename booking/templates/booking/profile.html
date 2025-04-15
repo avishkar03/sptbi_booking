@@ -175,7 +175,9 @@
 
 </style>
 
-{% endblock %} {% block content %} {% if user.is_staff %}
+{% endblock %} 
+{% block content %} 
+{% if user.is_staff %}
 <table class="admin">
   <thead class="thead">
     <th style="width: 5%">&nbsp Sr. No</th>
@@ -237,15 +239,13 @@
   
   {% comment %} <button type="button" id="myBtn">Download Excel Report</button> {% endcomment %}
 </div>
-<center>
 <div class="seperator">
   <div class="lines">
     <div class="diamond"></div>
   </div>
 </div>
-</center>
 <div class="logs-wrapper">
-  <form method="POST" action="{% url "dateLog" %}">
+  <form method="POST" action="{% url 'dateLog' %}">
       {% csrf_token %}
       <table style="border-spacing: 30px;">
         <tr>
@@ -285,7 +285,7 @@
   <div class="user-p">
     <div class="mobile-user-1">
     <div class="profile">
-      {% if user.logo.url != Null}
+      {% if user.logo}
       <img src="{{user.logo.url}}" alt="profile" />
       {% endif %} 
       <h3 style="color: #1c4386">{{user.company_name}}</h3>
@@ -323,7 +323,7 @@
     </div>
     <div class="mobile-user-2">
     <div class="logs-wrapper">
-      <form method="POST" action="{% url "user_download_log" %}">
+      <form method="POST" action="{% url 'user_download_log' %}">
           {% csrf_token %}
           <table class="user-logs-table">
           <!-- <br><br> -->
@@ -421,7 +421,7 @@
 </div>
 
 {% endif %}
-{% endblock %} 
+{% endblock%} 
 {% block js %}
 <script src="{% static 'js/profile.js'%}"></script>
 

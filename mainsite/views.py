@@ -20,7 +20,7 @@ def index(request):
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
     banners = Banner.objects.all()
@@ -48,7 +48,7 @@ def incubation(request):
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     return render(request,'incubation.html', {'pg': pg, 'count': count, 'events' : events})
 
 def currentincubatee(request):
@@ -80,7 +80,7 @@ def currentincubatee(request):
     ]
     choices = sorted(choices)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     if request.method=='POST':
         option = request.POST.get('selected')
         print(option)
@@ -139,7 +139,7 @@ def graduatedincubatee(request):
     ]
     choices = sorted(choices)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     if request.method == 'POST':
         option = request.POST.get('selected')
         print(option)
@@ -176,7 +176,7 @@ def pgtemplate(request, page_slug):
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     try:
         page_template = Programme.objects.get(slug=page_slug)
         objectives_list = page_template.objectives.split('\n') if page_template.objectives else []
@@ -224,13 +224,13 @@ def pgtemplate(request, page_slug):
 
 def events(request, page_slug):
     events = Event.objects.all()
-    events = sorted(events, key=lambda x: x.orderno)
+    # events = sorted(events, key=lambda x: x.orderno)
     visit_counter = Count.objects.get(name="Actual")
     visit_add = Count.objects.get(name="Extra")
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     try:
         page_template = Event.objects.get(slug=page_slug)
         if page_template.timeline:
@@ -269,7 +269,7 @@ def virtualincubation(request):
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     return render(request,'virtualincubation.html', {'pg': pg, 'count': count, 'events' : events})
 
 def team(request):
@@ -280,7 +280,7 @@ def team(request):
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     team = Team.objects.all().order_by("orderno")
     return render(request,'team.html',{'team':team, 'pg': pg, 'count': count, 'events' : events})
 
@@ -292,7 +292,7 @@ def facilities(request):
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     infraFacility = InfraFacility.objects.all()
     return render(request,'meetingroom.html', {'pg': pg, 'count': count, 'infraFacility': infraFacility, 'events' : events})
 
@@ -304,7 +304,7 @@ def my_custom_error_view(request, exception=None):
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     return render(request,'404.html', {'pg': pg, 'count': count, 'events' : events})
 
 def mentors(request):
@@ -315,7 +315,7 @@ def mentors(request):
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     mentor_type = Mentor_type.objects.all()
     return render(request,'mentors.html', {'mentor_type': mentor_type, 'pg': pg, 'count': count, 'events' : events})
 
@@ -327,7 +327,7 @@ def cabinspace(request):
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     return render(request,'cabinspace.html', {'pg': pg, 'count': count, 'events' : events})
 
 def iot(request):
@@ -350,7 +350,7 @@ def iot(request):
         specs.append(others)
     # print(specs)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
 
     if request.method == 'POST':
         option = request.POST.get("selected")
@@ -369,7 +369,7 @@ def labs(request):
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     return render(request,'labs.html', {'pg': pg, 'count': count, 'events' : events})
 
 def loginuser(request):
@@ -380,7 +380,7 @@ def loginuser(request):
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')

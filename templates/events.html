@@ -34,7 +34,7 @@
   <div class="container">
     <h1>ABOUT</h1>
     <div class="box">
-      {{page_template.about}}
+      {{page_template.about | safe}}
       </ul>
     </div>
   </div>
@@ -57,15 +57,15 @@
                 {% for t in i %}
                 {% if forloop.counter == 1 %}
                 <div class="flag-wrapper">
-                  <span class="flag">{{t}}</span>
+                  <span class="flag">{{t | safe}}</span>
                 </div>
                 {% elif forloop.counter|even  %}
                 <div class="desc">
-                  <strong>{{t}}</strong>
+                  <strong>{{t | safe}}</strong>
                 </div>
                 {% else %}
                 <div class="desc">
-                  {{t}}
+                  {{t | safe}}
                 </div>
                 {% endif %}
                 {% endfor %}
@@ -75,15 +75,15 @@
                 {% for t in i %}
                 {% if forloop.counter == 1 %}
                 <div class="flag-wrapper">
-                  <span class="flag">{{t}}</span>
+                  <span class="flag">{{t | safe}}</span>
                 </div>
                 {% elif forloop.counter|even %}
                 <div class="desc">
-                  <strong>{{t}}</strong>
+                  <strong>{{t | safe}}</strong>
                 </div>
                 {% else %}
                 <div class="desc">
-                  {{t}}
+                  {{t |safe}}
                 </div>
                 {% endif %}
                 {% endfor %}
@@ -108,7 +108,7 @@
     <div class="box">
       <ul style="list-style-type:number">
         {% for line in takeaways %}
-            <li>{{ line }}</li>
+            <li>{{ line | safe}}</li>
         {% endfor %}
       </ul>
     </div>
@@ -127,7 +127,7 @@
     <div class="box">
       <ul style="list-style-type:number">
         {% for line in targetgrp %}
-            <li>{{ line }}</li>
+            <li>{{ line | safe}}</li>
         {% endfor %}
       </ul>
     </div>
@@ -151,7 +151,7 @@
           <img src="{% static 'assets/medals/gold.webp' %}" alt="prize" />
         </div>
         <div class="p-text">
-          <h3>{{page_template.prize1st}}</h3>
+          <h3>{{page_template.prize1st | safe}}</h3>
           
         </div>
       </div>
@@ -163,7 +163,7 @@
           <img src="{% static 'assets/medals/silver.webp' %}" alt="prize" />
         </div>
         <div class="p-text">
-          <h3>{{page_template.prize2nd}}</h3>
+          <h3>{{page_template.prize2nd | safe}}</h3>
           
         </div>
       </div>
@@ -175,7 +175,7 @@
           <img src="{% static 'assets/medals/bronze.webp' %}" alt="prize" />
         </div>
         <div class="p-text">
-          <h3>{{page_template.prize3rd}}</h3>
+          <h3>{{page_template.prize3rd | safe}}</h3>
           
         </div>
       </div>
@@ -190,9 +190,9 @@
           <div class="p-text">
             {% for i in line %}
             {% if forloop.counter == 1 %}
-            <h3>{{i}}</h3>
+            <h3>{{i | safe}}</h3>
             {% else %}
-            <p>{{i}}</p>
+            <p>{{i| safe}}</p>
             {% endif %}
             {% endfor %}
           </div>

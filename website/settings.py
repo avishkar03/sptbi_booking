@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'corsheaders',  # Add this line
     'mainsite',
     'booking',
+    'django_summernote',
 ]
 
 MIDDLEWARE = [
@@ -94,7 +95,7 @@ DATABASES = {
         'USER': 'sptbi',
         'PASSWORD': 'sptbi',
         'HOST': 'localhost',
-        'PORT': '5433',
+        'PORT': '5432',
     }
 }
 
