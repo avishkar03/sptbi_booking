@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Tickets{% endblock %}
+{% block content %}
+<table class="styled-table">
+    <thead>
+        <tr>
+            <th>Ticket</th>
+            <th>Summary</th>
+            <th>Status</th>
+            <th>Assignee</th>
+            <th>Created</th>
+            <th>Last Updated</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ticket in tickets %}
+        <tr>
+            <td><a href="{% url 'ticket_detail' ticket.id %}">{{ ticket.id }}</a></td>
+            <td>{{ ticket.title }}</td>
+            <td>{{ ticket.status }}</td>
+            <td>{{ ticket.assigned_to|default:"Unassigned" }}</td>
+            <td>{{ ticket.created_date|date:"M d, Y H:i" }}</td>
+            <td>{{ ticket.updated_date|date:"M d, Y H:i" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
