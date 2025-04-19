@@ -34,6 +34,6 @@ urlpatterns = [
         {'document_root': settings.STATIC_ROOT}),
     path('admin/', admin.site.urls),
     path('', include('mainsite.urls')),
-    path('tickets/', include('tickets.urls')),
+    path('tickets/', include('tickets.urls', namespace='tickets')),
     path('booking/', include('booking.urls', namespace='booking')),
 ]

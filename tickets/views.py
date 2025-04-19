@@ -7,4 +7,4 @@ class TicketCreateView(CreateView):
     model = Ticket
     form_class = TicketForm
     template_name = 'tickets/ticket_form.html'
-    success_url = reverse_lazy('ticket_success')
+    success_url = reverse_lazy('tickets:ticket_success')
