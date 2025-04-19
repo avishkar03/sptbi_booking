@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2 class="text-2xl font-semibold mb-4">Create a Ticket</h2>
+  <form method="post" class="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto">
+    {% csrf_token %}
+    <div class="mb-4">
+      <label for="id_title" class="block text-sm font-medium text-gray-700">Title:</label>
+      {{ form.title }}
+    </div>
+    <div class="mb-4">
+      <label for="id_description" class="block text-sm font-medium text-gray-700">Description:</label>
+      {{ form.description }}
+    </div>
+    <div class="mb-4">
+      <label for="id_priority" class="block text-sm font-medium text-gray-700">Priority:</label>
+      <select name="status" id="id_status" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm">
+        <option value="open" class="bg-blue-500 text-white">Open</option>
+        <option value="in_progress" class="bg-yellow-500 text-black">In Progress</option>
+        <option value="resolved" class="bg-green-500 text-white">Resolved</option>
+        <option value="closed" class="bg-gray-500 text-white">Closed</option>
+      </select>
+    </div>
+    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Submit</button>
+  </form>
+{% endblock %}

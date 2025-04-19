@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'corsheaders',  # Add this line
     'mainsite',
     'booking',
+    'tickets',
 ]
 
 MIDDLEWARE = [

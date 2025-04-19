@@ -1,0 +1,75 @@
+/* General Body Styling */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    min-height: 100vh;
+}
+
+/* Header Styling */
+.header {
+    background-color: #f8f9fa;
+    padding: 20px;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: #0b3c7c; /* Consistent dark blue */
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    font-weight: normal; /* No bold */
+    font-size: 16px;
+}
+
+/* Form Container Styling */
+.form-container {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Labels */
+.form-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+/* Inputs, Textareas, Selects, Buttons */
+.form-container input,
+.form-container textarea,
+.form-container select,
+.form-container button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Footer Styling */
+.footer {
+    background-color: #0b3c7c;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+}
