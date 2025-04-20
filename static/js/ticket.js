@@ -3,24 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const titleInput = document.querySelector('#id_title');
     const descriptionInput = document.querySelector('#id_description');
     
-    // Add click handlers for input fields
-    if (titleInput) {
-        titleInput.addEventListener('click', function() {
-            this.readOnly = false;
-        });
-    }
-    
-    if (descriptionInput) {
-        descriptionInput.addEventListener('click', function() {
-            this.readOnly = false;
-        });
-    }
-    
     if (ticketForm) {
-        // Set focus to title input when form loads
-        if (titleInput) {
-            titleInput.focus();
-        }
         
         if (ticketForm) {
             // Client-side validation before submission
