@@ -11,38 +11,49 @@ body {
 .header {
     background-color: #f8f9fa;
     padding: 20px;
+    padding-right: 40px;
     width: 100%;
     text-align: center;
     box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 }
 
 /* Navbar Styling */
 .navbar {
-    background-color: #0b3c7c; /* Consistent dark blue */
-    padding: 10px 0;
+    background-color: #0b3c7c;
+    padding: 15px 20px;
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 90px;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.navbar a {
-    color: white;
-    text-decoration: none;
-    padding: 10px 15px;
-    font-weight: normal; /* No bold */
-    font-size: 16px;
+/* Add margin to body to prevent content from hiding under fixed header/navbar */
+body {
+    margin-top: 140px;
 }
 
 /* Form Container Styling */
 .form-container {
     border: 1px solid #ccc;
     border-radius: 10px;
-    max-width: 600px;
-    margin: 50px auto;
+    width: 100%;
+    max-width: 800px;
+    margin: 140px auto;
     padding: 30px;
     background-color: #fff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 1;
 }
 
 /* Labels */
