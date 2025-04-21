@@ -152,7 +152,7 @@
     <div id="preloader">
     </div>
     <!-- Add the floating ticket icon -->
-    {% if request.path != '/tickets/create/'  %}
+    {% if request.path != '/tickets/create/' and user.is_authenticated  %}
     <a href="{% url 'tickets:ticket_create' %}" class="floating-ticket" title="Create Support Ticket">
         <img src="{% static 'assets/icons/ticket.jpeg' %}" alt="Create Ticket">
     </a>
