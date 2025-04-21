@@ -178,7 +178,7 @@
     </a>
     {% endif %}
     {% if request.path == '/tickets/create/' %}
-    <a href="{% url 'booking:booking' %}" class="floating-history" title="View Booking History">
+    <a href="{% url 'tickets:ticket_history' %}" class="floating-history" title="View Ticket History">
         <img src="{% static 'assets/icons/history.svg' %}" alt="View History">
     </a>
     {% endif %}

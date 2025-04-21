@@ -7,4 +7,5 @@ app_name = 'tickets'
 urlpatterns = [
     path('create/', TicketCreateView.as_view(), name='ticket_create'),
     path('success/', TemplateView.as_view(template_name='tickets/success.html'), name='ticket_success'),
+    path('history/', TicketHistoryView.as_view(), name='ticket_history'),
 ]

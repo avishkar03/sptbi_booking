@@ -22,3 +22,17 @@ class Ticket(models.Model):
 
     def __str__(self):
         return self.title
+
+class TicketHistory(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='history')
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    status = models.CharField(max_length=50, choices=Ticket.STATUS_CHOICES)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_date']
+        verbose_name_plural = 'Ticket histories'
+
+    def __str__(self):
+        return f'History for {self.ticket.title} - {self.created_date}'
