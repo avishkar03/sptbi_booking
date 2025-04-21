@@ -202,7 +202,6 @@ document.addEventListener('DOMContentLoaded', function() {
 {% endblock %}
 
 {% block content %}
-{{ form.title|attr:"class:form-input"|attr:"placeholder:Enter ticket title"|remove_attr:"readonly" }}
   <div class="overlay" id="overlay"></div>
   <div class="success-popup" id="successPopup">
     <h3 style="font-size: 1.5rem; color: var(--success-color); margin-bottom: 1rem;">Success!</h3>
