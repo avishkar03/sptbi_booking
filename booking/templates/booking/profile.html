@@ -233,7 +233,7 @@
 
 <div class="btn-wrapper">
   <button class="download-btn">
-    <a class="download-btn" href="{% url 'download_excel' %}" ><i class="fas fa-download"></i> Download Current Month Report</a
+    <a class="download-btn" href="{% url 'booking:download_excel' %}" ><i class="fas fa-download"></i> Download Current Month Report</a
     >
   </button>
   
@@ -245,7 +245,7 @@
   </div>
 </div>
 <div class="logs-wrapper">
-  <form method="POST" action="{% url 'dateLog' %}">
+  <form method="POST" action="{% url 'booking:download_log2' %}">
       {% csrf_token %}
       <table style="border-spacing: 30px;">
         <tr>
@@ -254,7 +254,8 @@
                <select name="selected" id="mySelect">
             <option value="all" name="option">All companies</option>
             {% for c in companies %}
-            <option value="{{c.name}}" name="option">{{c.name}}</option>
+            <!-- <option value="{{c.name}}" name="option">{{c.name}}</option> -->
+             <option value="{{c}}" name="option">{{c}}</option>
             {% endfor %}
         </select>
       </td>
@@ -307,13 +308,13 @@
       Charges: Rs.{{charges}}0
     </div>
     <div class="password">
-      <a href="{% url 'change_password' %}">
+      <a href="{% url 'booking:change_password' %}">
         <i class="fas fa-key"></i>
         Change Password
       </a>
     </div>
     <center>
-    <a class="password" href="{% url 'download_log' %}" download style="text-decoration: none;">Download {% now "M"%} Logs</a> 
+    <a class="password" href="{% url 'booking:download_log' %}" download style="text-decoration: none;">Download {% now "M"%} Logs</a> 
   </center>
   </div>
     <div class="seperator" style="margin-top:25px;margin-bottom: 25px;">
@@ -323,7 +324,7 @@
     </div>
     <div class="mobile-user-2">
     <div class="logs-wrapper">
-      <form method="POST" action="{% url 'user_download_log' %}">
+      <form method="POST" action="{% url 'booking:user_download_log' %}">
           {% csrf_token %}
           <table class="user-logs-table">
           <!-- <br><br> -->
@@ -420,8 +421,8 @@
   </div>
 </div>
 
-{% endif %}
-{% endblock%} 
+
+{% endblock content%} 
 {% block js %}
 <script src="{% static 'js/profile.js'%}"></script>
 

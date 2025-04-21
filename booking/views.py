@@ -301,7 +301,11 @@ def profile(request):
     if not user.is_authenticated:
         return redirect("login")
     
-    companies = aTimeSlot.objects.values('name').distinct()
+    # companies = aTimeSlot.objects.values('name').distinct()
+    keyset = Booking.objects.values('booked_by')
+    companies = [key['booked_by'] for key in keyset]
+    companies = list(set(companies))
+    print(companies)
     return render(request, 'booking/profile.html', {'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": active_objs, 'total': total, 'pg': pg, 'count': count, 'events': events, 'companies':companies})
 
 
