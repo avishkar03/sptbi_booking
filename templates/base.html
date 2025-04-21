@@ -152,9 +152,11 @@
     <div id="preloader">
     </div>
     <!-- Add the floating ticket icon -->
+    {% if request.path != '/tickets/create/' %}
     <a href="{% url 'tickets:ticket_create' %}" class="floating-ticket" title="Create Support Ticket">
         <img src="{% static 'assets/icons/ticket.jpeg' %}" alt="Create Ticket">
     </a>
+    {% endif %}
     <section class="blackbox-overlay">
 			<div class="drawer-control-x-button blackbox-button-holder" style="display: flex;">
             <a href="https://www.linkedin.com/in/sp-tbi/"><i class="fab fa-linkedin-in side-icons"></i></a>

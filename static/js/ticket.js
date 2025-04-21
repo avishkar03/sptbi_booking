@@ -3,38 +3,56 @@ document.addEventListener('DOMContentLoaded', function() {
     const titleInput = document.querySelector('#id_title');
     const descriptionInput = document.querySelector('#id_description');
     
+    console.log('Form elements:', { ticketForm, titleInput, descriptionInput });
+    
+    // Add focus/blur event listeners to debug input field behavior
+    titleInput.addEventListener('focus', () => {
+        console.log('Title input focused');
+    });
+    
+    titleInput.addEventListener('blur', () => {
+        console.log('Title input lost focus');
+    });
+    
+    titleInput.addEventListener('input', () => {
+        console.log('Title input value:', titleInput.value);
+    });
+    
     if (ticketForm) {
-        
-        if (ticketForm) {
-            // Client-side validation before submission
-            ticketForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const formData = new FormData(ticketForm);
-                
-                fetch(window.location.href, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showSuccessPopup();
-                        ticketForm.reset();
-                    } else {
-                        throw new Error('Failed to save ticket');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to submit ticket. Please try again.');
-                });
+        // Client-side validation before submission
+        ticketForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Form submitted');
+            
+            const formData = new FormData(ticketForm);
+            console.log('Form data:', Object.fromEntries(formData));
+            
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    showSuccessPopup();
+                    ticketForm.reset();
+                } else {
+                    throw new Error('Failed to save ticket');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to submit ticket. Please try again.');
             });
-        }
+        });
     }
 });
 
@@ -62,6 +80,32 @@ function showSuccessPopup() {
 // Add styles to head
 const styles = document.createElement('style');
 styles.textContent = `
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background-color: white;
+    cursor: text;
+    outline: none;
+    color: #1f2937;
+}
+
+.form-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    caret-color: #3b82f6;
+}
+
+.form-input::placeholder {
+    color: #9ca3af;
+    opacity: 1;
+}
+`;
+document.head.appendChild(styles);
+
 .success-popup {
     position: fixed;
     top: 0;
