@@ -45,9 +45,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'corsheaders',  # Add this line
+    'widget_tweaks',
     'mainsite',
     'booking',
     'django_summernote',
+    'tickets',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/base.css' %}">
+<style>
+:root {
+  --primary-color: #1c4386;
+  --hover-color: #163a6d;
+  --success-color: #10B981;
+  --background-color: #f4f4f9;
+  --text-color: #374151;
+  --border-color: #E5E7EB;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+}
+
+.success-popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.success-popup.show {
+  display: block;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.overlay.show {
+  display: block;
+  opacity: 1;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 2rem auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  margin-top: 8rem;
+}
+
+.form-container:hover {
+  transform: translateY(-5px);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.form-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(28, 67, 134, 0.1);
+  outline: none;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 0.5rem;
+  background-color: white;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(28, 67, 134, 0.1);
+  outline: none;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--hover-color);
+  transform: translateY(-2px);
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #0EA5E9;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 640px) {
+  .form-container {
+    padding: 1.5rem;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const prioritySelect = document.getElementById('id_priority');
+  
+  // Set initial font weight for selected option
+  updateSelectedOptionStyle();
+  
+  // Update font weight when selection changes
+  prioritySelect.addEventListener('change', updateSelectedOptionStyle);
+  
+  function updateSelectedOptionStyle() {
+    const options = prioritySelect.options;
+    for (let option of options) {
+      option.style.fontWeight = option === prioritySelect.selectedOptions[0] ? '700' : '400';
+    }
+  }
+});
+</script>
+<style>
+<style>
+#id_priority option, #id_status option {
+  font-weight: 700 !important;
+  font-family: 'Courier New', monospace;
+}
+
+#id_priority, #id_status {
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+.form-select option:hover {
+  background-color: #f3f4f6;
+  font-weight: 700;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{{ form.title|attr:"class:form-input"|attr:"placeholder:Enter ticket title"|remove_attr:"readonly" }}
+  <div class="overlay" id="overlay"></div>
+  <div class="success-popup" id="successPopup">
+    <h3 style="font-size: 1.5rem; color: var(--success-color); margin-bottom: 1rem;">Success!</h3>
+    <p style="margin-bottom: 1.5rem; color: var(--text-color);">Your ticket has been submitted successfully.</p>
+    <button onclick="closePopup()" class="btn btn-success">Close</button>
+  </div>
+
+  <div class="form-container">
+    <h2 style="font-size: 2rem; color: var(--primary-color); margin-bottom: 2rem; text-align: center;">Create a Ticket</h2>
+    <form id="ticketForm" method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="id_title" class="form-label">Title</label>
+        {{ form.title|attr:"class:form-input" }}
+      </div>
+      <div class="form-group full-width">
+        <label for="id_description" class="form-label">Description</label>
+        {{ form.description|attr:"class:form-input" }}
+      </div>
+      <div class="form-group">
+        <label for="id_priority" class="form-label">Priority</label>
+        <select name="priority" id="id_priority" class="form-select">
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low" selected style="font-weight: 700;">Low</option>
+        </select>
+       
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="id_status" class="form-label">Status</label>
+        <div class="form-input" style="background-color: #f3f4f6; cursor: not-allowed; padding: 0.5rem 0.75rem; border: 2px solid var(--border-color); border-radius: 0.5rem; width: auto; display: inline-block; font-size: 0.9rem;">
+          {{ form.status.value|default:'Open' }}
+          <input type="hidden" name="status" value="{{ form.status.value|default:'open' }}">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Ticket</button>
+    </form>
+  </div>
+
+  <script src="{% static 'js/ticket.js' %}"></script>
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+{% endblock %}

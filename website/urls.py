@@ -35,6 +35,7 @@ urlpatterns = [
         {'document_root': settings.STATIC_ROOT}),
     path('admin/', admin.site.urls),
     path('', include('mainsite.urls')),
+    path('tickets/', include('tickets.urls', namespace='tickets')),
     path('booking/', include('booking.urls', namespace='booking')),
     path("summernote/", include("django_summernote.urls"))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

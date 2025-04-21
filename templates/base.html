@@ -5,7 +5,9 @@
   <head>
     <meta charset="UTF-8" />
     <title>{% block Title %}Document{% endblock %} | SP-TBI </title>
-    {% block head %}{% endblock %}
+    {% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}" />
+{% endblock %}
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'assets/apple-touch-icon.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'assets/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'assets/favicon-16x16.png' %}">
@@ -125,13 +127,38 @@
             margin-left: 2rem; /* Add margin to separate from profile dropdown */
             z-index: 1100; /* Ensure it appears below the profile dropdown */
         }
+
+        .floating-ticket {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .floating-ticket:hover {
+            transform: scale(1.1);
+        }
+
+        .floating-ticket img {
+            width: 50px;
+            height: 50px;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        }
       </style>
   </head>
   <body>
     <div id="preloader">
     </div>
-    <section class="blackbox-overlay">
-			<div class="drawer-control-x-button blackbox-button-holder" style="display: flex;">
+    <!-- Add the floating ticket icon -->
+    {% if request.path != '/tickets/create/'  %}
+    <a href="{% url 'tickets:ticket_create' %}" class="floating-ticket" title="Create Support Ticket">
+        <img src="{% static 'assets/icons/ticket.jpeg' %}" alt="Create Ticket">
+    </a>
+    {% endif %}
+    <section id="social-media" class="blackbox-overlay">
+			<div class="drawer-control-x-button blackbox-button-holder" style="display: flex; ">
             <a href="https://www.linkedin.com/in/sp-tbi/"><i class="fab fa-linkedin-in side-icons"></i></a>
             <a href="https://www.instagram.com/sp_tbi/"><i class="fab fa-instagram side-icons"></i></a>
             <a href="https://www.facebook.com/sptbi/"><i class="fab fa-facebook side-icons"></i></a>
@@ -227,12 +254,12 @@
         {% comment %} Removed the Jobs Section from navbar {% endcomment %}
         
 	{% if user.is_authenticated %}
-        <li class="dropdown">
+        <li id="user-dropdown" class="dropdown">
         <a class="btn btn-light log dropdown-toggle" href="#" role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
           <i class="fas fa-user"></i>
           &nbsp {{user.company_name}} <i class="bi bi-caret-down-fill"></i>
         </a>
-        <ul class="submenu">
+        <ul  class="submenu">
           {% if user.is_staff %}
           <li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin</a></li>
           <li><a class="dropdown-item" href="{% url 'booking:profile' %}">Booking Admin</a></li>
@@ -393,6 +420,16 @@
           </center>
       </div>
     </footer>
+    <script>
+      console.log(document.querySelector("#user-dropdown"));
+      
+      document.querySelector("#user-dropdown").addEventListener("mouseover" , () =>{
+        document.querySelector("#social-media").style.display= "none"
+      })
+      document.querySelector("#user-dropdown").addEventListener("mouseout" , () =>{
+        document.querySelector("#social-media").style.display= "flex"
+      })
+    </script>
     <script
       src="https://kit.fontawesome.com/ccf941b7da.js"
       crossorigin="anonymous"
