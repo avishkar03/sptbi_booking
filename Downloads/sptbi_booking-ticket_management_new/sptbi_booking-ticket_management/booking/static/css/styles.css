@@ -1,0 +1,108 @@
+/* General styles for the ticket submission form */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 40px 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ticket-form-container {
+    background-color: #ffffff;
+    box-shadow: 0 8px 16px rgba(28, 67, 134, 0.15);
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.ticket-form-container form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.ticket-form-container h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    text-align: center;
+    color: #1c4386;
+    grid-column: span 2;
+}
+
+.form-group {
+    margin-bottom: 0;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.ticket-form-container input[type="text"],
+.ticket-form-container textarea,
+.ticket-form-container select {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    margin-bottom: 0;
+}
+
+.ticket-form-container input[type="text"]:hover,
+.ticket-form-container textarea:hover {
+    border-color: #bbb;
+}
+
+.ticket-form-container select {
+    width: 100%;
+    padding: 14px 16px;
+    margin-bottom: 24px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background-color: white;
+}
+
+.ticket-form-container select:hover {
+    border-color: #bbb;
+}
+
+.ticket-form-container button {
+    width: 100%;
+    padding: 16px 28px;
+    background-color: #1c4386;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 16px;
+}
+
+.ticket-form-container button:hover {
+    background-color: #163a6d;
+}
+
+.success-message {
+    color: #28a745;
+    font-size: 16px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 16px;
+    margin-top: 10px;
+    text-align: center;
+}

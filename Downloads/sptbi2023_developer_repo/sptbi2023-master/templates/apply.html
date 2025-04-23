@@ -1,0 +1,61 @@
+{% extends 'base.html' %} {% load static %}
+{% block Title %} Apply for Incubation {% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/apply.css' %}">
+{% endblock %}
+{% block content %}
+<div class="apply">
+    <div class="card">
+        <div class="card-container">
+            <div class="card-header">
+                <img src={% static 'assets/sptbilogo.png' %} alt="apply" />
+                <h1>Apply for Incubation</h1>
+            </div>
+            <div class="form">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="founder">
+                        <p>Founder Name*</p>
+                        <input type="text" name="founder" placeholder="Enter Full-Name" required />
+                    </div>
+                    <div class="contact-number">
+                        <p>Contact Number*</p>
+                        <input type="number" name="contact" placeholder="Enter Contact Number" required />
+                    </div>
+                    <div class="email">
+                        <p>Email*</p>
+                        <input type="email" name="email" placeholder="Enter Email" required />
+                    </div>
+                    <div class="startup">
+                        <p>Startup Name*</p>
+                        <input type="text" name="company" placeholder="Enter Startup Name" required />
+                    </div>
+                    <div class="brief">
+                        <p>Brief Description*</p>
+                        <textarea name="brief" placeholder="Enter Brief Description" rows="4" required></textarea>
+                    </div>
+                    <div class="sector">
+                        <p>Startup Sector</p>
+                        <select id="dropdown" name="dropdown">
+                        <option value="option1">EduTech</option><br>
+                        <option value="option2">Fintech</option><br>
+                        <option value="option3">AI-ML</option><br>
+                        <option value="option4">AR-VR</option><br>
+                        <option value="option5">HealthCare</option><br>
+                        <option value="option6">Finserv</option><br>
+                        <option value="option7">Gaming</option><br>
+                        <option value="option8">Robotics</option><br>
+                        <option value="option9">Electric Vehicles</option><br>
+                        <option value="option10">Renewable Energy</option><br>
+                        <option value="option11">E-Commerce</option><br>
+                        <option value="option12">SAAS Tools</option><br>
+                        <option value="option13">Hardware</option><br>
+                        <option value="option14">Others</option><br>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

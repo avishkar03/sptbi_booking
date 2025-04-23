@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% block Title %} {{page_template.title}} {% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/events.css' %}" />
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+/>
+{% endblock %}
+{% block content %}
+<div class="main-title">
+  <div class="container">
+    <h1>{{page_template.title}}</h1>
+  </div>
+</div>
+<div class="photo">
+  <div class="container">
+    <img src="{{page_template.banner.url}}" alt="incubation" />
+    {% if page_template.link %}
+    <center>
+      <a href="{{page_template.link}}"><button class="btn btn-primary">Apply Now</button></a>
+    </center>
+    {% endif %}
+  </div>
+</div>
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="about">
+  <div class="container">
+    <h1>ABOUT</h1>
+    <div class="box">
+      {{page_template.about}}
+      </ul>
+    </div>
+  </div>
+</div>
+{% if page_template.timeline %}
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="evaluation">
+  <div class="container">
+    <center><h1>Timeline</h1></center>
+    <div class="box">
+      <ul class="timeline">
+        {% for i in timeline %}
+        <li>
+            {% if forloop.counter|even %}
+            <div class="direction-r">
+                {% for t in i %}
+                {% if forloop.counter == 1 %}
+                <div class="flag-wrapper">
+                  <span class="flag">{{t}}</span>
+                </div>
+                {% elif forloop.counter|even  %}
+                <div class="desc">
+                  <strong>{{t}}</strong>
+                </div>
+                {% else %}
+                <div class="desc">
+                  {{t}}
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="direction-l">
+                {% for t in i %}
+                {% if forloop.counter == 1 %}
+                <div class="flag-wrapper">
+                  <span class="flag">{{t}}</span>
+                </div>
+                {% elif forloop.counter|even %}
+                <div class="desc">
+                  <strong>{{t}}</strong>
+                </div>
+                {% else %}
+                <div class="desc">
+                  {{t}}
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if page_template.takeaways %}
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="objectives">
+  <div class="container">
+    <h1>Key Takeaways</h1>
+    <div class="box">
+      <ul style="list-style-type:number">
+        {% for line in takeaways %}
+            <li>{{ line }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if targetgrp %}
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="objectives">
+  <div class="container">
+    <h1>Target Group</h1>
+    <div class="box">
+      <ul style="list-style-type:number">
+        {% for line in targetgrp %}
+            <li>{{ line }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if page_template.prize1st %}
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="objectives">
+  <div class="container">
+    <h1>Prizes</h1>
+    <div class="prize-box">
+      {% if page_template.prize1st %}
+      <div class="p">
+        <p>First Prize</p>
+        <div class="p-img">
+          <img src="{% static 'assets/medals/gold.webp' %}" alt="prize" />
+        </div>
+        <div class="p-text">
+          <h3>{{page_template.prize1st}}</h3>
+          
+        </div>
+      </div>
+      {% endif %}
+      {% if page_template.prize2nd %}
+      <div class="p">
+        <p>Second Prize</p>
+        <div class="p-img">
+          <img src="{% static 'assets/medals/silver.webp' %}" alt="prize" />
+        </div>
+        <div class="p-text">
+          <h3>{{page_template.prize2nd}}</h3>
+          
+        </div>
+      </div>
+      {% endif %}
+      {% if page_template.prize3rd %}
+      <div class="p">
+        <p>Third Prize</p>
+        <div class="p-img">
+          <img src="{% static 'assets/medals/bronze.webp' %}" alt="prize" />
+        </div>
+        <div class="p-text">
+          <h3>{{page_template.prize3rd}}</h3>
+          
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <div class="list-box">
+        {% for line in others %}
+        <div class="p">
+          <div class="p-img">
+            <img src="{% static 'assets/medals/othermedals.webp' %}" alt="prize" />
+          </div>
+          <div class="p-text">
+            {% for i in line %}
+            {% if forloop.counter == 1 %}
+            <h3>{{i}}</h3>
+            {% else %}
+            <p>{{i}}</p>
+            {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if conditions %}
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="incubatees">
+  <div class="container">
+  <h1>Our Sponsors</h1>
+  {{page_template.sponsors.all}}
+  <div class="container2">
+    {% for sponsor in page_template.sponsors.all%}
+    <div class="person">
+        <div class="container-inner">
+          <a href="{{sponsor.website}}"><img
+            class="img img1"
+            src="{{sponsor.image.url}}"
+          /></a>
+        </div>
+      <div class="divider"></div>
+      <div class="name"><a href="{{sponsor.website}}">{{sponsor.name}}</a></div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+</div>
+{% endif %}
+{% if conditions %}
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="incubatees">
+  <div class="container">
+  <h1>Our Partners</h1>
+  <div class="container2">
+    {% for partner in page_template.partners.all%}
+    <div class="person">
+        <div class="container-inner">
+          <a href="{{partner.website}}"><img
+            class="img img1"
+            src="{{partner.image.url}}"
+          /></a>
+        </div>
+      <div class="divider"></div>
+      <div class="name"><a href="{{partner.website}}">{{partner.name}}</a></div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block Title %}Cabin Space {% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/meetingroom.css' %}">
+{% endblock %}
+{% block content %}
+<div class="message">
+  Sorry, your browser does not support CSS Grid. 😅
+</div>
+<section class="section">
+  <h1>Cabin Space</h1>
+  <div class="grid">
+    <div class="item" style="background: url({% static 'assets/meetingroom/img1.jpg'%})">
+    </div>
+    <div class="item item--medium" >
+    </div>
+    <div class="item item--large">
+    </div>
+    <div class="item" style="background: url({% static 'assets/meetingroom/img1.jpg'%})">
+    </div>
+    <div class="item item--medium" >
+    </div>
+    <div class="item item--large">
+    </div>
+    <div class="item" style="background: url({% static 'assets/meetingroom/img1.jpg'%})">
+    </div>
+    <div class="item item--medium" >
+    </div>
+    <div class="item item--large">
+    </div>
+    <div class="item" style="background: url({% static 'assets/meetingroom/img1.jpg'%})">
+    </div>
+    <div class="item item--medium" >
+    </div>
+    <div class="item item--large">
+    </div>
+  </div>
+</section>
+{% endblock %}

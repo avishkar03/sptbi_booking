@@ -1,0 +1,264 @@
+{% extends 'base.html' %} {% load static %} {% block head %}
+<link rel="stylesheet" href="{% static 'css/studentstartup.css' %}" />
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+/>
+
+{% endblock %} {% block Title %} Student/Faculty Startup Program {% endblock %} {% block content %}
+<div class="photo">
+  <div class="container">
+    <img src="{% static 'assets/incubation.png' %}" alt="incubation" />
+    <center>
+      <button class="btn btn-primary">Apply Now</button>
+    </center>
+  </div>
+</div>
+<div class="about">
+  <div class="container">
+    <h1>ABOUT</h1>
+    <div class="box">
+        <p>
+      This programme is created to foster and promote the spirit of entrepreneurship in students and faculties, SP-TBI provides the facility of Student Startup Programme where students from Bhavans Campus and our collaborated colleges with SP-TBI with startup or business ideas can take the help of SP-TBI, its resources, and services to become a full-fledged startup.</p>
+      <p>This programme will give provide the student startups with discounted incubation.</p>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="facilities">
+  <div class="container">
+    <h1>Facilities Provided</h1>
+    <div class="hero-section">
+        <div class="card-grid">
+            <a class="card" href="#">
+            <div class="card__background" style="background-image: url('{% static 'assets/features/office.jpg' %}')"></div>
+            <div class="card__content">
+                <h3 class="card__heading">Plug-and-Play Dedicated Office</h3>
+            </div>
+            </a>
+            <a class="card" href="#">
+            <div class="card__background" style="background-image: url('{% static 'assets/features/techlab.jpg' %}')"></div>
+            <div class="card__content">
+                <h3 class="card__heading">Access to Tech Lab</h3>
+            </div>
+            </a>
+            <a class="card" href="#">
+            <div class="card__background" style="background-image: url('{% static 'assets/features/mentoring.jpg' %}')"></div>
+            <div class="card__content">
+                <h3 class="card__heading">Access to our top-class mentors</h3>
+            </div>
+            </li>
+            <a class="card" href="#">
+            <div class="card__background" style="background-image: url('{% static 'assets/features/webinars.jpg' %}')"></div>
+            <div class="card__content">
+                <h3 class="card__heading">Access to our events & webinars</h3>
+            </div>
+            </a>
+            <a class="card" href="#">
+            <div class="card__background" style="background-image: url('{% static 'assets/features/talentpool.jpg' %}')"></div>
+            <div class="card__content">
+                <h3 class="card__heading">Access to our talent pool</h3>
+            </div>
+            </a>
+            <a class="card" href="#">
+            <div class="card__background" style="background-image: url('{% static 'assets/features/funding.jpg' %}')"></div>
+            <div class="card__content">
+                <h3 class="card__heading">Access to seed funding up to INR 25 Lacs</h3>
+            </div>
+            </a>
+            <a class="card" href="#">
+            <div class="card__background" style="background-image: url('{% static 'assets/features/grant.jpg' %}')"></div>
+            <div class="card__content">
+                <h3 class="card__heading">Access to prototype grant up to INR 10 Lacs</h3>
+            </div>
+            </a>
+            <a class="card" href="#">
+            <div class="card__background" style="background-image: url('{% static 'assets/features/startuptoolkit.jpg' %}')"></div>
+            <div class="card__content">
+                <h3 class="card__heading">AWS Credits worth 10000 USD</h3>
+            </div>
+            </a>
+            <a class="card" href="#">
+            <div class="card__background" style="background-image: url(https://images.unsplash.com/photo-1557004396-66e4174d7bf6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60)"></div>
+            <div class="card__content">
+                <h3 class="card__heading">All ad-hoc services including CA, Registration, IP, etc</h3>
+            </div>
+            </a>
+            <a class="card" href="#">
+            <div class="card__background" style="background-image: url(https://images.unsplash.com/photo-1557004396-66e4174d7bf6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60)"></div>
+            <div class="card__content">
+                <h3 class="card__heading">MathWorks Accelerator Program</h3>
+            </div>
+            </a>
+        </div>
+    </div>
+</div>
+</div>
+<div class="eligiblity">
+  <div class="container">
+    <h1>Who is Eligible to Apply</h1>
+    <div class="box">
+      <ul>
+        <li>One of the co-founders should be a Student/Faculty respectively. Please provide valid proof of the same.</li>
+        <li>Startups at Ideation, Prototype, Traction & Scaling stages.</li>
+        <li>Startups from the science & technology sector.</li>
+        <li>
+          Entrepreneurs and ideators with registered startups less than 7 years
+          old from the date of registration.
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="colleges">
+  <div class="container">
+  <h1>Our Partner Colleges</h1>
+  <div class="container2">
+    <div class="person">
+      <div class="container1">
+        <div class="container-inner">
+          <img
+            class="img img1"
+            src="{% static 'assets/colleges/spit.png' %}"
+          />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="name">Sardar Patel Institute of Technology</div>
+    </div>
+    <div class="person">
+      <div class="container1">
+        <div class="container-inner">
+          <img
+            class="img img2"
+            src="{% static 'assets/colleges/spce.png' %}"
+          />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="name">Sardar Patel College of Engineering</div>
+    </div>
+    <div class="person">
+      <div class="container1">
+        <div class="container-inner">
+          <img
+            class="img img3"
+            src="{% static 'assets/colleges/bhavans.jpg' %}"
+          />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="name">Bhavans College</div>
+    </div>
+    <div class="person">
+      <div class="container1">
+        <div class="container-inner">
+          <img
+            class="img img1"
+            src="{% static 'assets/colleges/spjimr.jpg' %}"
+          />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="name">S. P. Jain Institute of Management and Research</div>
+    </div>
+    <div class="person">
+      <div class="container1">
+        <div class="container-inner">
+          <img
+            class="img img1"
+            src="{% static 'assets/colleges/dbit.png' %}"
+          />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="name">Don Bosco Institute of Technology</div>
+    </div>
+    <div class="person">
+      <div class="container1">
+        <div class="container-inner">
+          <img
+            class="img img1"
+            src="{% static 'assets/colleges/sakec.jpeg' %}"
+          />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="name">Shah & Anchor Kutchhi Engineering college</div>
+    </div>
+    <div class="person">
+      <div class="container1">
+        <div class="container-inner">
+          <img
+            class="img img1"
+            src="{% static 'assets/colleges/mgmcet.jpg' %}"
+          />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="name">Mahatma Gandhi Missions College of Engineering & Technology</div>
+    </div>
+    <div class="person">
+      <div class="container1">
+        <div class="container-inner">
+          <img
+            class="img img1"
+            src="{% static 'assets/colleges/djsanghvi.png' %}"
+          />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="name">DJ Sanghvi College of Engineering</div>
+    </div>
+    <div class="person">
+      <div class="container1">
+        <div class="container-inner">
+          <img
+            class="img img1"
+            src="{% static 'assets/colleges/vpm.jpg' %}"
+          />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="name">Vidya Prasarak Mandals Polytechnic, Thane</div>
+    </div>
+    <div class="person">
+      <div class="container1">
+        <div class="container-inner">
+          <img
+            class="img img1"
+            src="{% static 'assets/colleges/vit.jpg' %}"
+          />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="name">Vidyalankar Institute of Technology </div>
+    </div>
+    <div class="person">
+      <div class="container1">
+        <div class="container-inner">
+          <img
+            class="img img1"
+            src="{% static 'assets/colleges/bvp.png' %}"
+          />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="name">Bharti Vidyapeeth College of Engineering, Kolhapur</div>
+    </div>
+    <div class="person">
+      <div class="container1">
+        <div class="container-inner">
+          <img
+            class="img img1"
+            src="{% static 'assets/colleges/iims.jpg' %}"
+          />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="name">International Institute of Management Science </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %}

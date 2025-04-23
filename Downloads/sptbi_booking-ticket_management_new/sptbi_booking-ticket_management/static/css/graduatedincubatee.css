@@ -1,0 +1,175 @@
+.filter{
+  display: flex;
+  justify-content: right;
+  align-items: center;
+}
+
+.filter select {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin: 1rem;
+  font-family: Poppins;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+
+/* Style for the button */
+.filter button {
+  color: white;
+  border-radius: 5px;
+  padding: 8px;
+  cursor: pointer;
+  margin-right: 1rem;
+  background-color: #1c4386;
+  /* Optionally, you can add more styles for the button icon (bi-funnel) */
+}
+
+.filter button:hover {
+  background-color: white;
+  border: 1px solid #1c4386;
+  transition: 0.3s ease-in-out;
+}
+
+.filter button:hover i{
+  color: #1c4386
+}
+
+
+.incubatee{
+    width: 100%;
+    margin: 2rem 0;
+    color: #1c4386;
+}
+
+.incubatee .wrapper{
+    width: 80%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 0px;
+    margin: 0 auto;
+}
+
+/* CSS for the pagination container */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* CSS for the pagination links */
+.step-links {
+  display: flex;
+  align-items: center;
+}
+
+.step-links a {
+  background-color: #1c4386;
+  color: white;
+  text-decoration: none;
+  padding: 5px 10px;
+  border: 1px solid #1c4386;
+  border-radius: 3px;
+  margin: 0 2px;
+  transition: background-color 0.3s;
+}
+
+.step-links a:hover {
+  background-color: white;
+  color: #1c4386;
+  border: 1px solid #1c4386;
+}
+
+.current {
+  padding: 5px 10px;
+  margin: 0 2px;
+  font-weight: bold;
+}
+
+/* CSS for the card container */
+.card {
+    width: 33rem;
+  display: flex;
+  height: 400px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 1rem;
+}
+
+/* CSS for the left part (Complete Image) */
+.left-part {
+    display: flex;
+    justify-content: center;
+    width: 50%;
+    height: 100%;
+    align-items: center;
+  flex: 1;
+}
+
+.left-part img {
+    width: 100%;
+    height: auto;
+  display: block;
+  margin: auto;
+}
+
+/* CSS for the right part (Logo, Name, and Description) */
+.right-part {
+  display: flex;
+  flex-direction: column;
+    width: 50%;
+  flex: 1;
+  padding: 20px;
+  background-color: #f0f0f0;
+}
+
+.wrapper a:hover .card .right-part{
+  text-decoration: none;
+    background-color: #1c4386;
+    transition: 0.3s ease-in-out;
+    color: white;
+}
+
+.incubatee > .wrapper > a > .card > .right-part > .details > .name,
+.incubatee > .wrapper > a > .card > .right-part > .details > .description,
+.incubatee > .wrapper > a > .card > .right-part > .details > .founder-name{
+  text-decoration: none;
+}
+
+.wrapper a:hover .card .right-part{
+    background-color: #1c4386;
+    transition: 0.3s ease-in-out;
+    color: white;
+}
+
+.company-logo{
+    height: 20%;
+}
+
+.company-logo img {
+    max-height: 100%;
+    max-width: 100%;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.name {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.description {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+a:-webkit-any-link {
+    color: -webkit-link;
+    cursor: pointer;
+    text-decoration: none;
+}

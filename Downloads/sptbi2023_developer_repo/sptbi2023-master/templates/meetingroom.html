@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block Title %}Facilities {% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/meetingroom.css' %}">
+{% endblock %}
+{% block content %}
+<div class="message">
+  Sorry, your browser does not support CSS Grid. 😅
+</div>
+{% for infra in infraFacility %}
+<section class="section">
+  <h1>{{infra.name}}</h1>
+  <div class="grid">
+    {% for img in infra.imgs.all %}
+    <div class="item class{{img.aspect}}" style="background: url({{img.image.url}}); background-size:cover;">
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
+{% endblock %}
+{% block js %}
+<script src="{% static 'js/meetingroom.js' %}"></script>
+{% endblock %}
+```

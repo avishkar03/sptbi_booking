@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load static %}
+{% block Title %} Equipments {% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/iot.css' %}">
+{% endblock %}
+{% block content %}
+<div class="main-title">
+    <div class="filter">
+        <form method="POST">
+            {% csrf_token %}
+            <select name="selected" id="mySelect" onchange="this.form.submit()">
+                <option value="all" name="option" selected>Select Equipments</option>
+                <option value="all" name="option">All Tools</option>
+                {% for c in choices %}
+                <option value="{{c}}" name="option">{{c}}</option>
+                {% endfor %}
+            </select>
+            {% comment %} <button type="submit"><i class="bi bi-funnel"></i></button> {% endcomment %}
+        </form>
+    </div>
+</div>
+{% for type in types %}
+<div class="devices">
+    <div class="iot-title">
+        <h1 class="eqp-title">{{type}}</h1>
+    </div>
+
+    <div class="device-wrapper">
+        <div class="cards-wrapper">
+            {% for device, spec in type.devices.all|zip_lists:specs %}
+            <div class="device-card-new">
+                <div class="left-card">
+                    <img src="{{ device.image.url }}" alt="">
+                </div>
+                <div class="right-card">
+                    <div class="heading">
+                        <div class="name">
+                            <h2>{{ device.name }}</h2>
+                        </div>
+                        {% if device.slug != Null %}
+                        <div class="download"><a href="{% url 'downloaddevice' device.slug %}" target="_blank"><i
+                                    class="bi bi-download"></i></a></div>
+                        {% endif %}
+                    </div>
+                    <div class="description">
+                        {{device.description}}
+                    </div>
+                    <div class="specs">
+                     {% comment %} {% for sp in spec %}
+                        {% for s in sp %}
+                        {% if forloop.counter == 1%}
+                        <strong>{{ s }}: &nbsp </strong>
+                        {% else %}
+                        {{ s }} <br>
+                        {% endif %}
+                        {% endfor %}
+                        {% endfor %} {% endcomment %}
+                       <pre class="specs">{{device.spec}}</pre>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endfor %}
+<script>
+    window.onload = function() {
+        var specsDivs = document.querySelectorAll('.specs'); // Get all divs with class 'specs'
+        
+        specsDivs.forEach(function(specsDiv) { // Loop through each div
+            var specsText = specsDiv.textContent; // Get the raw text content
+            var lines = specsText.split('\n'); // Split by line breaks
+
+            var formattedSpecs = '';
+            for (var i = 1; i < lines.length; i++) {
+                var line = lines[i];
+                var colonIndex = line.indexOf(':');
+                if (colonIndex !== -1) {
+                    var beforeColon = line.substring(0, colonIndex + 1); // Include the colon
+                    var afterColon = line.substring(colonIndex + 1);
+                    formattedSpecs += '<strong>' + beforeColon + '</strong>' + afterColon + '<br>'; // Add line breaks after each line
+                } else {
+                    formattedSpecs += line + '<br>'; // If there's no colon, just add the line as is
+                }
+            }
+
+            specsDiv.innerHTML = formattedSpecs; // Set the formatted content back to the div
+        });
+    };
+</script>
+{% endblock %}

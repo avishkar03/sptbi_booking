@@ -1,0 +1,228 @@
+{% extends 'base.html' %} {% load static %} 
+{% block Title %} Home {% endblock %} 
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}" />
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />
+{% endblock %} {% block title %}Home{% endblock %} {% block content %}
+<div class="split-slideshow">
+  <div class="slideshow">
+    <div class="autoplay">
+      {% for banner in banners %}
+      <a href="{{banner.site}}">
+	<div class="item">
+          <img src="{{banner.image.url}}" />
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    <button class="prev-button"><i class="bi bi-caret-left-fill"></i></button>
+    <button class="next-button"><i class="bi bi-caret-right-fill"></i></button>
+  </div>
+</div>
+<div class="about-section">
+  <div class="container">
+    <div class="about-content">
+      <div class="about-photo">
+        <img src="{% static 'assets/office.png'%}" alt="About Photo" />
+      </div>
+      <div class="about-text">
+        <h2>About Us</h2>
+        {% for a in about %}
+        <p>
+         {{a.text}}
+        </p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="vision-mission">
+  <div class="vision-mission-content">
+    {% for i in vm %}
+    <div class="card left">
+      <div class="content">
+        <div class="front">
+          <div class="text">
+            <br />
+            <i class="bi bi-eye"></i>
+            <h2>Vision</h2>
+          </div>
+        </div>
+        <div class="back">
+          <div class="text">
+            <p>
+              {{i.vision}}
+          </p>
+    
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card right">
+      <div class="content">
+        <div class="front">
+          <div class="text">
+            <br />
+            <i class="bi bi-bullseye"></i>
+            <h2>Mission</h2>
+          </div>
+        </div>
+        <div class="back">
+          <div class="text">
+            <p>{{i.mission}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+<div class="stats">
+  {% for stat in stats %}
+  <div class="stats-content">
+    <div class="stats-item">
+      <input type=hidden value="{{stat.startups}}" id="startups" />
+      <input type=hidden value="{{stat.current}}" id="currentstartups" />
+      <input type=hidden value="{{stat.graduated}}" id="graduatedstartups" />
+      <img src="{{stat.image.url}}" alt="Startups" />
+    </div>
+    <div class="stats-item1">
+      {% csrf_token %}
+      <canvas id="doughnutChart1" width: "80%" height: "350px"></canvas>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="offerings">
+  <div class="heading">
+    <h1>What We Offer</h1>
+  </div>
+  <div class="facilities">
+    <div id="modal-container">
+      <div class="modal-background">
+        <div class="modal">
+          <h2>I'm a Modal</h2>
+          <p>Hear me roar.</p>
+          <svg class="modal-svg" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="none">
+            <rect x="0" y="0" fill="none" width="226" height="162" rx="3" ry="3"></rect>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="container-wrapper">
+      {% for obj in objs %}
+      <div class="contents">
+        <input type=hidden value="{{obj.description}}" id="modaltitle-{{forloop.counter}}" />
+        <img src="{{obj.image.url}}" />
+        <div class="buttons">
+          <div id="{{forloop.counter}}" class="button">{{obj.title}}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="news">
+  <center> <h1> News & Events </h1> </center>
+  <div class="wrapper">
+    {% for news in news %}
+    <figure class="snip1208">
+      <img src="{{news.image.url}}" alt="{{news.title}}"/>
+      <div class="date"><span class="day">{{news.day}}</span><span class="month">{{news.month}}</span></div><i class="ion-film-marker"></i>
+      <figcaption>
+        <h3>{{news.title}}</h3>
+        <p>
+          {{news.description}}
+        </p>
+        <a href="{{news.link}}"><button>Read More</button></a>
+      </figcaption>
+    </figure>
+    {% endfor %}
+  </div>
+</div>
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="partners">
+  {% for partner_type in Partner_types%}
+  <div class="contain">
+    <div class="ourpartners">
+      <h1>{{partner_type.name}}</h1>
+      <section class="customer-logos slider">
+        {% for partner in partner_type.partners.all %}
+        <div class="slide"><a href="{{partner.website}}"><img src="{{partner.image.url}}"></img></a></div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+{% if testimonial %}
+<div id="page" class="site">
+  <div class="container3">
+    <div class="testi">
+      <div class="head">
+        <h3>Testimonials</h3>
+      </div>
+        <div class="body swiper">
+          <ul class="swiper-wrapper">
+            {% for test in testimonial %}
+              <li class="swiper-slide">
+                <div class="wrapper1">
+                  <div class="thumbnail">
+                    <img src="{{test.logo.url}}" alt="" />
+                  </div>
+                  <div class="aside">
+                    <p><br/>{{test.description}}<br/></p>
+                    <div class="name">
+                      <h4>{{test.name}} <strong>- {{test.company_name}}</strong></h4>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+          <div class="swiper-pagination"></div>
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-button-next"></div>
+        </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %} 
+{% block js %} 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/micro-slider@1.0.9/dist/micro-slider.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/index.js' %}"></script>
+{% endblock %}
+

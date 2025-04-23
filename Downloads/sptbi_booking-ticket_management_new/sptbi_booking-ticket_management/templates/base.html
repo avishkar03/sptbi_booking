@@ -1,0 +1,435 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block Title %}Document{% endblock %} | SP-TBI </title>
+    {% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}" />
+{% endblock %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'assets/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'assets/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'assets/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'assets/site.webmanifest' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
+    <style>
+        /* Define the CSS animation outside the loop */
+        {% for c in count %}
+        {% with c|divide:3 as num %}
+        .number-{{forloop.counter}}::after {
+            animation: animate-{{forloop.counter}} {{num}}s steps(100) 1 forwards;
+        }
+        {% endwith %}
+        @keyframes animate-{{forloop.counter}}{
+            0%{
+                top: 0;
+            }
+            100%{
+                top: -{{c}}em;
+            }
+        }
+        {% endfor %}
+        #preloader {
+            background: #fff url('{% static 'assets/animations/Hourglass.gif' %}') no-repeat center center;
+            height: 100vh;
+            width: 100%;
+            position: fixed;
+            z-index: 100;
+        }
+        @media (max-width: 980px) {
+          #preloader {
+            background: #fff url('{% static 'assets/animations/Hourglass.gif' %}') no-repeat center center;
+            height: 100vh;
+            width: 100%;
+            position: fixed;
+            z-index: 100;
+            background-size:155px;
+        }
+
+        .side-icons{
+          font-size:35px;
+        }
+
+        .drawer-control-x-button{
+          height:370px;
+          width:35px;
+          margin-left:15px;
+        }
+
+        .drawer-control-x-button i{
+          line-height: 1.6;
+          margin:auto;
+        }
+
+        .blackbox-overlay{
+          right:-400px;
+          background-color:transparent;
+        }
+          }
+        
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            z-index: 1050;
+        }
+
+        .dropbtn {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        #profileDropdown {
+            position: relative;
+            z-index: 2000;
+        }
+
+        #profileDropdown .submenu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            z-index: 2100;
+            display: block;
+        }
+
+        .admin-options {
+            margin-left: 2rem; /* Add margin to separate from profile dropdown */
+            z-index: 1100; /* Ensure it appears below the profile dropdown */
+        }
+
+        .floating-ticket {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .floating-ticket:hover {
+            transform: scale(1.1);
+        }
+
+        .floating-ticket img {
+            width: 50px;
+            height: 50px;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        }
+      </style>
+  </head>
+  <body>
+    <div id="preloader">
+    </div>
+    <!-- Add the floating ticket icon -->
+    {% if request.path != '/tickets/create/' %}
+    <a href="{% url 'tickets:ticket_create' %}" class="floating-ticket" title="Create Support Ticket">
+        <img src="{% static 'assets/icons/ticket.jpeg' %}" alt="Create Ticket">
+    </a>
+    {% endif %}
+    <section class="blackbox-overlay">
+			<div class="drawer-control-x-button blackbox-button-holder" style="display: flex;">
+            <a href="https://www.linkedin.com/in/sp-tbi/"><i class="fab fa-linkedin-in side-icons"></i></a>
+            <a href="https://www.instagram.com/sp_tbi/"><i class="fab fa-instagram side-icons"></i></a>
+            <a href="https://www.facebook.com/sptbi/"><i class="fab fa-facebook side-icons"></i></a>
+            <a href="https://wa.me/8291842971"><i class="fab fa-whatsapp side-icons"></i></a>
+            <a href="https://twitter.com/sp_tbi"><i class="bi bi-twitter-x side-icons"></i></a>
+        </div>
+			</div>
+		</section>
+    <div>
+    <header class="header">
+      <div class="logo-left">
+        <img src="{% static 'assets/icons/sptbi.svg'%}" alt="Left Logo" />
+      </div>
+      <div class="center-text">
+        <span>An initiative of Bharatiya Vidhya Bhavan's Sardar Patel Institute of Technology</span>
+        <a href="{% url 'index' %}"><span><h2>Sardar Patel Technology Business Incubator</h2></span></a>
+        <span>Supported by Department of Science and Technology - Government of India</span>
+      </div>
+      <div class="logo-right">
+        <img class="laptop-spit" src="{% static 'assets/spitlogo.png'%}" alt="Right Logo" />
+      </div>
+      <div class="mobile">
+        <div class="logo-mobile">
+          <img src="{% static 'assets/sptbilogo.png'%}" alt="Left Logo" />
+          <img class="phone-spit" src="{% static 'assets/icons/spit.svg'%}" alt="Right Logo" />
+        </div>
+        <div class="center-text-mobile">
+          <a href="{% url 'index' %}"><span><h2>Sardar Patel Technology Business Incubator</h2></span></a>
+          <span>Supported by Department of Science and Technology - Government of India</span>
+        </div>
+      </div>
+    </header>
+    <nav class="navbar">
+      <a href="{% url 'index'%}" class="logo">
+        <img
+          src="{% static 'assets/sptbiwhitelogo.png'%}"
+          alt="Left Logo"
+          class="white-logo"
+        />
+      </a>
+      <ul class="menu">
+        <li><a href="{% url 'index'%}">Home</a></li>
+        <li class="dropdown">
+          <a href="#">About <i class="bi bi-caret-down-fill"></i></a>
+          <ul class="submenu">
+            <li><a href="#footer">About SP-TBI</a></li>
+            <li><a href="{% url 'team' %}">Team SP-TBI</a></li>
+            <li><a href="{% url 'mentors' %}">Mentors</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#">Incubatees <i class="bi bi-caret-down-fill"></i></a>
+          <ul class="submenu">
+            <li><a href="{% url 'currentincubatee' %}">Current Incubatees</a></li>
+            <li><a href="{% url 'graduatedincubatee' %}">Past Incubatees</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#">Programmes <i class="bi bi-caret-down-fill"></i></a>
+          <ul class="submenu">
+            {% for pg in pg %}
+            <li><a href="{% url 'programme' pg.slug %}">{{pg.title}}</a></li>
+            {% endfor %}
+            <li><a href="{% url 'incubation' %}">Incubation</a></li>
+            <li><a href="{% url 'virtualincubation' %}">Virtual Incubation</a></li>
+          </ul>
+        </li>
+        {% if events %}
+        <li class="dropdown">
+          <a href="#">Events <i class="bi bi-caret-down-fill"></i></a>
+          <ul class="submenu">
+            {% for event in events %}
+            <li><a href="{% url 'events' event.slug %}">{{event.title}}</a></li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endif %}
+        <li class="dropdown">
+          <a href="#">Facilities <i class="bi bi-caret-down-fill"></i></a>
+          <ul class="submenu">
+            <li><a href="{% url 'equipments' %}">Equipments</a></li>
+            <li><a href="{% url 'facilities' %}">Others</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#">Booking <i class="bi bi-caret-down-fill"></i></a>
+          <ul class="submenu">
+            {% for floor in floors %}
+              <li><a href="{% url 'booking:floor_booking' floor.slug %}">{{ floor.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% comment %} Removed the Jobs Section from navbar {% endcomment %}
+        
+	{% if user.is_authenticated %}
+        <li class="dropdown">
+        <a class="btn btn-light log dropdown-toggle" href="#" role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fas fa-user"></i>
+          &nbsp {{user.company_name}} <i class="bi bi-caret-down-fill"></i>
+        </a>
+        <ul class="submenu">
+          {% if user.is_staff %}
+          <li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin</a></li>
+          <li><a class="dropdown-item" href="{% url 'booking:profile' %}">Booking Admin</a></li>
+          {% else %}
+          <li><a class="dropdown-item" href="{% url 'booking:profile' %}">Profile</a></li>
+          {% endif %} 
+          <li><a class="dropdown-item" href="{% url 'booking:booking' %}">Schedule</a></li>
+          {% if user.is_staff %}
+          <li><a class="dropdown-item" href="{% url 'booking:delete_booking' %}">Delete Slot</a></li>
+          {% endif %}
+          <li><a class="dropdown-item" href="{% url 'logout' %}?next={{ request.path }}">Logout</a></li>
+        </ul>
+      </li>
+        {% else %}
+        <li><a href="{% url 'login' %}">Login</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+    <div class="menu-container">
+      <div class="hamburger-menu">
+        <div class="menu-icon" id="hamburger-1">
+          <span class="line"></span>
+          <span class="line"></span>
+          <span class="line"></span>
+        </div>
+      </div>
+      <ul class="menu-items">
+        <a href="{% url 'index' %}"><li>Home</li></a>
+        <li>About <i class="bi bi-caret-down-fill"></i>
+          <ul class="sub-hammenu">
+            <a href="#footer"><li>About SP-TBI</li></a>
+            <a href="{% url 'team' %}"><li>Team SP-TBI</li></a>
+            <a href="{% url 'mentors' %}"><li>Mentors</li></a>
+          </ul>
+        </li>
+        <li>Incubatees <i class="bi bi-caret-down-fill"></i>
+          <ul class="sub-hammenu">
+            <a href="{% url 'currentincubatee' %}"><li>Current Incubatees</li></a>
+            <a href="{% url 'graduatedincubatee' %}"><li>Past Incubatees</li></a>
+          </ul>
+        </li>
+        <li>Programmes <i class="bi bi-caret-down-fill"></i>
+          <ul class="sub-hammenu">
+            {% for pg in pg %}
+            <a href="{% url 'programme' pg.slug %}"><li>{{pg.title}}</li></a>
+            {% endfor %}
+            <a href="{% url 'incubation' %}"><li>Incubation</li></a>
+            <a href="{% url 'virtualincubation' %}"><li>Virtual Incubation</li></a>
+          </ul>
+        </li>
+        {% if events %}
+        <li class="dropdown">
+          <a href="#">Events <i class="bi bi-caret-down-fill"></i></a>
+          <ul class="sub-hammenu">
+            {% for event in events %}
+            <li><a href="{% url 'events' event.slug %}">{{event.title}}</a></li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endif %}
+        <li>Facilities <i class="bi bi-caret-down-fill"></i>
+          <ul class="sub-hammenu">
+            <a href="{% url 'equipments' %}"><li>Equipments</li></a>
+            <a href="{% url 'facilities' %}"><li>Other Facilities</li></a>
+          </ul>
+        </li>
+        <a href="{% url 'booking:booking' %}"><li>Booking</li></a>
+        {% if user.is_authenticated %}
+        <li><i class="fas fa-user"></i>
+          &nbsp {{user.company_name}} <i class="bi bi-caret-down-fill"></i>
+          <ul class="sub-hammenu">
+            {% if user.is_superuser %}
+            <a href="{% url 'admin:index' %}"><li>Admin</li></a>
+            <a href="{% url 'booking:profile' %}"><li>Booking Admin</li></a>
+            {% else %}
+            <a href="{% url 'booking:profile' %}"><li>Profile</li></a>
+            {% endif %}
+            <a href="{% url 'booking:booking' %}"><li>Schedule</li></a>
+            {% if user.is_staff %}
+            <a href="{% url 'booking:delete_booking' %}"><li>Delete Slot</li></a>
+            {% endif %} 
+            <a href="{% url 'logout' %}?next={{ request.path }}"><li>Logout</li></a>
+          </ul>
+        </li>
+        {% else %}
+        <a href="{% url 'login' %}"><li>Login</li></a>
+        {% endif %}
+      </ul>
+  </div>
+</div>
+    {%block content%} {%endblock%}
+    <footer class="footer" id="footer">
+      <div class="container">
+        <div class="row">
+          <div class="footer-col">
+            <div class="col-content">
+              <h4>About Us</h4>
+              <p>
+                Sardar Patel Technology Business Incubator (SP-TBI) is an
+                incubation centre founded in 2015 as an initiative of Bhartiya
+                Vidya Bhavan's Sardar Patel Institute of Technology and is
+                affiliated with the Department of Science and Technology,
+                Government of India.
+              </p>
+              <h4>Follow Us</h4>
+              <div class="social-links">
+                <a href="https://www.linkedin.com/in/sp-tbi/"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://www.instagram.com/sp_tbi/"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.facebook.com/sptbi/"><i class="fab fa-facebook"></i></a>
+                <a href="https://twitter.com/sp_tbi"><i class="bi bi-twitter-x"></i></a>
+              </div>
+              <h4>Contact Us</h4>
+              <div class="contact">
+                <div class="center-info">
+                  <a href="https://wa.me/8291842971"><i class="fa fa-phone"></i> &nbsp+91 82918 42971</a>
+                </div>
+                <div class="center-info">
+                  <a href="mailto:managertbi@spit.ac.in" target="_blank">
+                  <i class="fa fa-envelope"></i>
+                    managertbi@spit.ac.in
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="footer-col">
+            <div class="col-content">
+              <h4>Find Us</h4>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1884.8174436891225!2d72.83528598344624!3d19.123666865645333!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c9d91191abd5%3A0x1aaf4f3e22c033dc!2sSardar%20Patel%20Technology%20Business%20Incubator%20(SP-TBI)!5e0!3m2!1sen!2sin!4v1688465838122!5m2!1sen!2sin"
+                width="600"
+                height="450"
+                style="border: 0"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <center style="margin-top: 3rem; color: white">
+            Visitors:
+          </center>
+          <div class="footer-wrapper">
+            <center>
+            {% for c in count %}
+              <span class="numbox number-{{forloop.counter}}">
+              </span>
+            {% endfor %}
+            </center>
+          </div>
+          <center>
+          <p>
+            © {% now "Y" %} Sardar Patel Technology Business Incubator (SP-TBI). All
+            Rights Reserved.
+          </p>
+          </center>
+      </div>
+    </footer>
+    <script
+      src="https://kit.fontawesome.com/ccf941b7da.js"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+  {% block js %}
+  
+  {% endblock %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="{% static 'js/base.js' %}"></script>
+  
+
+</html>

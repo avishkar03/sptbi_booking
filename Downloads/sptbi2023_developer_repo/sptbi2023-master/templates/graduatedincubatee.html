@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block Title %}Past Incubatee{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/currentincubatee.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="incubatee">
+    <center><h1>Past Incubatees</h1></center>
+    <div class="filter">
+    <form method="POST">
+        {% csrf_token %}
+      <select name="selected" id="mySelect" onchange="this.form.submit()">
+            <option value="all" name="option" selected hidden>Filter Sectors</option>
+            <option value="all" name="option" >All Sectors</option>
+            {% for c in choices %}
+            <option value="{{c}}" name="option">{{c}}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+    <div class="wrapper">
+        {% if objs %}
+    {% for obj in objs %}
+    <a href="{{obj.company_website}}" target="_blank">
+        <div class="card">
+        <!-- Left Part: Complete Image -->
+        <div class="left-part">
+            {% if obj.founder_image.url != Null %}
+            <img src="{{obj.founder_image.url}}" alt="Complete Image">
+              {% endif %}
+        </div>
+
+        <!-- Right Part: Logo, Name, and Description -->
+            <div class="right-part">
+            <div class="company-logo">
+                {% if obj.logo.url != Null %}
+            <img src="{{obj.logo.url}}" alt="Logo">
+            {% endif %}
+            </div>
+            <div class="details">
+            <h2 class="name">{{obj.company_name}}</h2>
+            <p class="description">{{obj.company_description}}</p>
+            <h3 class="founder-name">{{obj.founder_name}}</h3>
+            </div>
+        </div>
+    </div>
+</a>
+        {% endfor %}
+    </div>
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+        {% else %}
+        <style>
+            body{
+                display:unset;
+            }
+        </style>
+<h5 style="font-size:25px">No Incubatee found for the selected sector</h5>
+{% endif %}
+</div>
+
+
+
+
+{% endblock %}
+{% block js %}
+{% endblock %}
+```

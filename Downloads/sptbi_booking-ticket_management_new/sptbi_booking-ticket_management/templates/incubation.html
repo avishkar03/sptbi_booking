@@ -1,0 +1,185 @@
+{% extends 'base.html' %} {% load static %} {% block head %}
+<link rel="stylesheet" href="{% static 'css/incubation.css' %}" />
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+/>
+
+<style>
+  @media (max-width: 980px) {
+    .eligiblity .container .box {
+      font-size: 13px;
+  }
+  
+  .about .container .box {
+    font-size: 13px;
+}
+
+.timeline {
+  font-size: 35px;
+  position: relative;
+  width: 660px;
+  margin: 0 auto;
+  margin-top: 20px;
+  padding: 1em 0;
+  list-style-type: none;
+}
+
+
+  }
+</style>
+
+{% endblock %} {% block Title %} Incubation {% endblock %} {% block content %}
+<div class="photo">
+  <div class="container">
+    <img src="{% static 'assets/incubation.png' %}" alt="incubation" />
+  </div>
+</div>
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="about">
+  <div class="container">
+    <h1>About</h1>
+    <div class="box">
+      The incubation programme provides a platform for entrepreneurs to pioneer
+      themselves into the world of technology-based business careers. The
+      incubator is designed to support entrepreneurs in terms of infrastructure,
+      office space, consultation, mentorship, business plan assistance, growth
+      acceleration, product prototyping and seed funding to make a
+      technology-based business successful. This will provide you with a highly
+      innovative and supportive environment to upsurge your productivity and
+      reduce the flaws.
+    </div>
+  </div>
+</div>
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="facilities">
+  <div class="container">
+    <h1>Facilities Provided</h1>
+    <div class="hero-section">
+      <div class="card-grid">
+        <a class="card" href="#" style="background-image: url('{% static 'assets/features/office.jpg' %}'); background-size: cover;">
+          <div class="card__content">
+            <h3 class="card__heading">Plug-and-Play Dedicated Office</h3>
+          </div>
+        </a>
+        <a class="card" href="#" style="background-image: url('{% static 'assets/features/techlab.jpg' %}'); background-size: cover;">
+          <div class="card__content">
+            <h3 class="card__heading">Access to Tech Lab</h3>
+          </div>
+        </a>
+        <a class="card" href="#" style="background-image: url('{% static 'assets/features/mentoring.jpg' %}'); background-size: cover;">
+          <div class="card__content">
+            <h3 class="card__heading">Access to our top-class mentors</h3>
+          </div>
+        </li>
+        <a class="card" href="#" style="background-image: url('{% static 'assets/features/webinars.jpg' %}'); background-size: cover;">
+          <div class="card__content">
+            <h3 class="card__heading">Access to our events & webinars</h3>
+          </div>
+        </a>
+        <a class="card" href="#" style="background-image: url('{% static 'assets/features/talentpool.jpg' %}'); background-size: cover;">
+          <div class="card__content">
+            <h3 class="card__heading">Access to our talent pool</h3>
+          </div>
+        </a>
+        <a class="card" href="#" style="background-image: url('{% static 'assets/features/funding.jpg' %}'); background-size: cover;">
+          <div class="card__content">
+            <h3 class="card__heading">Access to seed funding up to INR 25 Lacs</h3>
+          </div>
+        </a>
+        <a class="card" href="#" style="background-image: url('{% static 'assets/features/grant.jpg' %}'); background-size: cover;">
+          <div class="card__content">
+            <h3 class="card__heading">Access to prototype grant up to INR 10 Lacs</h3>
+          </div>
+        </a>
+        <a class="card" href="#" style="background-image: url('{% static 'assets/features/startuptoolkit.jpg' %}'); background-size: cover;">
+          <div class="card__content">
+            <h3 class="card__heading">Access to startup toolkit</h3>
+          </div>
+        </a>
+        <a class="card" href="#" style="background-image: url(https://images.unsplash.com/photo-1557004396-66e4174d7bf6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60); background-size: cover;">
+          <div class="card__content">
+            <h3 class="card__heading">All ad-hoc services including CA, Registration, IP, etc</h3>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="eligiblity">
+  <div class="container">
+    <h1>Who is Eligible to Apply</h1>
+    <div class="box">
+      <ul>
+        <li>Startups at Ideation, Prototype, Traction & Scaling stages.</li>
+        <li>Startups from the science & technology sector.</li>
+        <li>
+          Entrepreneurs and ideators with registered startups less than 10 years
+          old from the date of registration.
+        </li>
+        <li>
+          Startups who want to incubate under PwD Incubation Programme, Women
+          Entrepreneurship Programme
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+<div class="evaluation">
+  <div class="container">
+    <center><h1>Process of evaluation</h1></center>
+    <div class="box">
+      <ul class="timeline">
+        <li>
+          <div class="direction-r">
+            <div class="flag-wrapper">
+              <span class="flag">First Stage</span>
+            </div>
+            <div class="desc">
+              For the first stage of screening, the information provided in the application will be evaluated.
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="direction-l">
+            <div class="flag-wrapper">
+              <span class="flag">Second Stage</span>
+            </div>
+            <div class="desc">
+              The founder will be evaluated on Team Capabilities and Relevance of Experience in the second stage, which will entail a telephonic or physical encounter. Stage/type of product, business proposition, size of the opportunity, and so on.
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="direction-r">
+            <div class="flag-wrapper">
+              <span class="flag">Final Stage</span>
+            </div>
+            <div class="desc">
+              The steering committee members, which include the Chief Executive Officer and Higher Management, will preside over the final selection stage.
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
