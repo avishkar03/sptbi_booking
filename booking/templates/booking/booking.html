@@ -56,6 +56,17 @@
 </style>
 {% endblock %}
 
+
+{% if messages %}
+  <div>
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
 {% block content %}
 <div class="booking-container">
     <div class="booking-header">
@@ -125,23 +136,30 @@
     </button>
 </div>
 {% endif %}
+
+<!-- <div class="booking-slots-data" style="display:none;">
+    {{ booked_slots_json|safe }}
+</div> -->
+
 {% endblock %}
+
+
 
 {% block extra_js %}
 <script src="{% static 'js/booking.js' %}"></script>
 <script>
-    const bookedSlotsData = JSON.stringify({
-        {% for room, times in booked_slots.items %}
-        "{{ room }}": {
-            {% for time, details in times.items %}
-            "{{ time }}": {
-                "booked_by": "{{ details.booked_by }}",
-                "reason": "{{ details.reason }}"
-            }{% if not loop.last %},{% endif %}
-            {% endfor %}
-        }{% if not loop.last %},{% endif %}
-        {% endfor %}
-    });
+    // const bookedSlotsData = JSON.stringify({
+    //     {% for room, times in booked_slots.items %}
+    //     "{{ //room }}": {
+    //         {% for time, details in times.items %}
+    //         "{{ //time }}": {
+    //             "booked_by": "{{// details.booked_by }}",
+                // "reason": "{{ //details.reason }}"
+    //         }{% if not loop.last %},{% endif %}
+    //         {% endfor %}
+    //     }{% if not loop.last %},{% endif %}
+    //     {% endfor %}
+    // });
 
     function changeFloor(slug) {
         if (slug) {

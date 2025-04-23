@@ -23,6 +23,7 @@ urlpatterns = [
     path('save_columns/', views.save_columns, name='save_columns'),
     path('save_booking/', views.save_booking, name='save_booking'),
     path('delete_slots/', views.delete_slots, name='delete_slots'),
-    # Debug routes
-    path('debug/bookings/', views.debug_bookings, name='debug_bookings'),
+    path('debug/bookings/', views.debug_bookings, name='debug_bookings'),       # Debug routes
+    # path('approve-booking/<int:booking_id>/', views.approve_booking, name='approve-booking'),       # Debug routes
+    # path('reject-booking/<int:booking_id>/', views.reject_booking, name='reject-booking'),
 ]

@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.conf import settings
 
 class Ticket(models.Model):
     STATUS_CHOICES = [
@@ -19,6 +21,7 @@ class Ticket(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='open')
     priority = models.CharField(max_length=50, choices=PRIORITY_CHOICES, default='medium')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title

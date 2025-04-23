@@ -114,7 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Log data before parsing
     const bookedSlotsData = document.querySelector('.booking-slots-data').textContent;
     console.log('Raw booked slots data:', bookedSlotsData);
-
     try {
         const bookedSlots = JSON.parse(bookedSlotsData);
         console.log('Parsed booked slots:', bookedSlots);

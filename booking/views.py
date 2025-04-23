@@ -16,6 +16,11 @@ from mainsite.models import *
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
+from django.http import JsonResponse
+from django.contrib import messages
+
 
 # Create your views here.
 User = get_user_model()
@@ -167,7 +172,8 @@ def floor_booking(request, floor_slug):
     # Get all bookings for this floor on the selected date - NO AUTHENTICATION FILTER
     bookings = Booking.objects.filter(
         floor=floor,
-        date=selected_date.date()
+        date=selected_date.date(),      
+        # status= 'approved'              #only show approved bookings
     ).select_related('floor')
     
     # Debug logging for booking data
@@ -224,6 +230,19 @@ def floor_booking(request, floor_slug):
         i_a_format = sample_time.strftime('%I:%M %p').lower()  # 12-hour with am/pm
         logger.info(f"Time format comparison - 24h: {h_i_format}, 12h: {i_a_format}")
 
+        # Add JSON data for JS use
+#     context['booked_slots_json'] = json.dumps([
+#     {
+#         'room': b.room,
+#         'time_slot': b.time_slot.strftime('%I:%M %p'),
+#         'date': str(b.date),
+#         'floor': b.floor.slug,
+#         'status': b.status,
+#     }
+#     for b in bookings
+# ])
+
+
     return render(request, 'booking/booking.html', context)
 
 @login_required
@@ -241,11 +260,11 @@ def profile(request):
     visit_counter = Count.objects.get(name="Actual")
     visit_add = Count.objects.get(name="Extra")
     events = Event.objects.all()
-    events = sorted(events, key=lambda x: x.orderno)
+    events = sorted(events, key=lambda x: x.orderno)            #commented out for now
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    pg = sorted(pg, key=lambda x: x.orderno)                    #commented out for now
     mon = datetime.now().strftime("%Y-%m-%d").split("-")[1]
     y = datetime.now().strftime("%Y-%m-%d").split("-")[0]
     objs = User.objects.filter(is_superuser=False)
@@ -301,7 +320,11 @@ def profile(request):
     if not user.is_authenticated:
         return redirect("login")
     
-    companies = aTimeSlot.objects.values('name').distinct()
+    # companies = aTimeSlot.objects.values('name').distinct()
+    keyset = Booking.objects.values('booked_by')
+    companies = [key['booked_by'] for key in keyset]
+    companies = list(set(companies))
+    print(companies)
     return render(request, 'booking/profile.html', {'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": active_objs, 'total': total, 'pg': pg, 'count': count, 'events': events, 'companies':companies})
 
 
@@ -685,13 +708,46 @@ def save_booking(request):
                     reason=data['reason'],
                     user=request.user,
                     booked_by=request.user.company_name,
-                    date=booking_date
+                   # email=request.user.email,  # optional: ensure email is saved
+                    date=booking_date,
+                    #status='approved',
+                    # status='pending',
                 )
-            
+                # # After creating the booking, send email to admin
+                # approve_url = request.build_absolute_uri(reverse('booking:approve-booking', args=[booking.id]))
+                # reject_url = request.build_absolute_uri(reverse('booking:reject-booking', args=[booking.id]))
+
+
+     # Send email notification to admin
+#             send_mail(
+#             subject='New Room Booking Request',
+#             message=f"""A new room booking has been requested by {request.user.username}.
+
+#     Floor: {floor.name}
+#     Room: {data['room']}
+#     Time Slot: {time_obj}
+#     Date: {booking_date}
+#     Reason: {data['reason']}
+
+
+#     Click below to respond to this booking:
+# ✅ Approve: {approve_url}
+# ❌ Reject: {reject_url}
+#                     """,
+#                     from_email=settings.DEFAULT_FROM_EMAIL,
+#                     recipient_list=['avishkar.more@spit.ac.in', 'sheshasai.reddy@spit.ac.in', 'sahil.nannaware@spit.ac.in'],  # Update this with the actual admin email
+#                     fail_silently=False,
+#     # Please log in to the admin panel to approve or reject this request.
+#     # """,
+#     # from_email=settings.DEFAULT_FROM_EMAIL,
+#     # recipient_list=['sahil.nannaware@spit.ac.in'],
+#     # fail_silently=False,
+# )
+
             return JsonResponse({
                 'status': 'success',
                 'booked_by': bookings_data[-1]['reason']  # Return the last booking reason
-            })
+                })
             
         except Floor.DoesNotExist:
             return JsonResponse({
@@ -707,7 +763,76 @@ def save_booking(request):
     return JsonResponse({
         'status': 'error',
         'message': 'Invalid request method'
-    }, status=405)
+}, status=405)
+
+#Approve booking
+# def approve_booking(request, booking_id):
+#     booking = get_object_or_404(Booking, id=booking_id)
+
+#     # Ensure the user is an admin or authorized to approve
+#     if not request.user.is_staff:
+#         return JsonResponse({
+#             'status': 'error',
+#             'message': 'You are not authorized to approve this booking'
+#         }, status=403)
+
+#     # Update the booking status to approved
+#     booking.status = 'approved'
+#     booking.save()
+
+#     # ✅ Send an approval notification email to the user
+#     if booking.email:  # Make sure email exists
+#         send_mail(
+#             subject='✅ Your Booking Was Approved',
+#             message=f"Hi {booking.booked_by},\n\nYour booking for:\n\n"
+#                     f"📍 Floor: {booking.floor.name}\n"
+#                     f"🏠 Room: {booking.room}\n"
+#                     f"🗓 Date: {booking.date}\n"
+#                     f"⏰ Time: {booking.time_slot}\n\n"
+#                     f"has been approved. 🎉\n\nThank you!",
+#             from_email=settings.DEFAULT_FROM_EMAIL,
+#             recipient_list=[booking.email],
+#             fail_silently=True  # You can set to False for debugging
+#         )
+#         # ✅ success message here
+#     messages.success(request, "Booking approved successfully! 😇")
+
+#     return redirect('booking')  # Make sure to use 'booking:booking' if you use app_name = 'booking'
+
+
+# Reject booking
+# def reject_booking(request, booking_id):
+#     booking = get_object_or_404(Booking, id=booking_id)
+
+#     # Ensure the user is an admin or autho ized to reject
+#     if not request.user.is_staff:
+#         return JsonResponse({
+#             'status': 'error',
+#             'message': 'You are not authorized to reject this booking'
+#         }, status=403)
+
+#     # Update the booking status to rejected
+#     booking.status = 'rejected'
+#     booking.save()
+
+#     # ❌ Send a rejection notification email to the user
+#     if booking.email:
+#         send_mail(
+#             subject='❌ Your Booking Was Rejected',
+#             message=f"Hi {booking.booked_by},\n\nWe regret to inform you that your booking for:\n\n"
+#                     f"📍 Floor: {booking.floor.name}\n"
+#                     f"🏠 Room: {booking.room}\n"
+#                     f"🗓 Date: {booking.date}\n"
+#                     f"⏰ Time: {booking.time_slot}\n\n"
+#                     f"has been rejected.\n\nFeel free to try booking another slot.\n\nThanks!",
+#             from_email=settings.DEFAULT_FROM_EMAIL,
+#             recipient_list=[booking.email],
+#             fail_silently=True
+#             )
+#         messages.error(request, "Booking rejected.")
+        
+#     return redirect('booking')  # Redirect to the main booking page or wherever you'd like
+
 
 @login_required
 def delete_slots(request):

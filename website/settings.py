@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'mainsite',
     'booking',
+    'django_summernote',
     'tickets',
 ]
 
@@ -100,7 +101,7 @@ DATABASES = {
     }
 }
 
-# Password validation
+# Password validations
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -157,6 +158,26 @@ else:
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'avishkar.more@spit.ac.in'       # Your Gmail address
+EMAIL_HOST_PASSWORD = 'htba spci ahev rgkm'      # The 16-char app password generate by Google from your_app passwords
+EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = 'rd'
+EMAIL_USE_SSL = False
+
+
+
+
+
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

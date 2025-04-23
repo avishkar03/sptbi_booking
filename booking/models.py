@@ -52,7 +52,8 @@ class Booking(models.Model):
         ('2nd', '2nd Floor'),
         ('8th', '8th Floor'),
     ]
-    
+
+    email = models.EmailField(null=True, blank=True) 
     time_slot = models.TimeField()
     booked_by = models.CharField(max_length=255)
     floor = models.ForeignKey(Floor, on_delete=models.CASCADE)
@@ -66,3 +67,14 @@ class Booking(models.Model):
     
     def __str__(self):
         return f"{self.floor.name} - {self.room} - {self.time_slot}"
+
+
+    # Add a new field for status for Notification
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    # status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')   # For pending status
+
+

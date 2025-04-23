@@ -22,7 +22,7 @@
       <div class="divider"></div>
       <div class="name">{{member.name}}</div>
       <div class="designation">{{member.designation}}</div>
-      <div class="description">{{member.description}}</div>
+      <div class="description">{{member.description | safe}}</div>
     </div>
     {% endfor %}
   </div>

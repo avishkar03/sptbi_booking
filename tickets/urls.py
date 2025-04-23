@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 from django.urls import path
-from .views import TicketCreateView
+from .views import TicketCreateView, TicketHistoryView
 
 app_name = 'tickets'
 

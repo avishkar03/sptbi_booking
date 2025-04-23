@@ -13,6 +13,7 @@ class TicketCreateView(CreateView):
     
     def form_valid(self, form):
         try:
+            form.instance.created_by = self.request.user  # 👈 set created_by before saving
             self.object = form.save()
             # Create ticket history entry
             TicketHistory.objects.create(
@@ -33,6 +34,7 @@ class TicketCreateView(CreateView):
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
         return super().form_invalid(form)
+
 
 class TicketHistoryView(ListView):
     model = TicketHistory
