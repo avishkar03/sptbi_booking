@@ -37,7 +37,7 @@ class aTimeSlot(models.Model):
     room = models.IntegerField(null=True, blank=True)
     date = models.CharField(null=True, blank=True, max_length=10)
     name = models.CharField(null=True, blank=True, max_length=100)
-    email = models.EmailField(null=True, blank=True)
+    # email = models.EmailField(null=True, blank=True)             # For pending status email functionality
     month = models.CharField(null=True, blank=True, max_length=2)
     year = models.CharField(null=True, blank=True, max_length=4)
     reason = models.CharField(null=True, blank=True, max_length=100)
@@ -53,7 +53,7 @@ class Booking(models.Model):
         ('8th', '8th Floor'),
     ]
 
-    email = models.EmailField(null=True, blank=True) 
+    # email = models.EmailField(null=True, blank=True)  # For pending status email functionality   
     time_slot = models.TimeField()
     booked_by = models.CharField(max_length=255)
     floor = models.ForeignKey(Floor, on_delete=models.CASCADE)
@@ -70,11 +70,11 @@ class Booking(models.Model):
 
 
     # Add a new field for status for Notification
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
-    ]
+    # STATUS_CHOICES = [
+    #     ('pending', 'Pending'),
+    #     ('approved', 'Approved'),
+    #     ('rejected', 'Rejected'),
+    # ]
     # status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')   # For pending status
 
 

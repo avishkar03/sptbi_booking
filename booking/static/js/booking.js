@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const adminControls = document.getElementById('adminControls');
     const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    const addColumnBtn = document.getElementById('addColumnBtn');
     let selectedSlots = [];
     
     console.log('JavaScript initialized');
@@ -9,8 +10,20 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.booking-cell.booked').forEach(cell => {
         cell.addEventListener('click', function(e) {
             console.log('Cell clicked:', this);
-            console.log('Is authenticated:', this.dataset.isAuthenticated);
-            console.log('Is booked:', this.dataset.booked);
+            // console.log('Is authenticated:', this.dataset.isAuthenticated);
+            // console.log('Is booked:', this.dataset.booked);
+
+            const floor = this.dataset.floor;
+            
+
+            console.log('floor selected:', floor);
+            if(!floor || typeof floor !== 'string'){
+                console.log('Invalid floor format');
+                return;
+            }
+
+            console.log("Is authenticated:", this.dataset.isAuthenticated);
+            console.log("Is booked:", this.dataset.booked);
             
             // Only allow selection if user is authenticated and cell is booked
             if (this.dataset.isAuthenticated !== 'true' || this.dataset.booked !== 'true') {
@@ -125,6 +138,38 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.booking-cell').forEach(cell => {
         console.log('Cell auth:', cell.dataset.isAuthenticated);
     });
+    
+    // Add Columns functionality
+    if (addColumnBtn) {
+        addColumnBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Add Column button clicked');
+            
+            // Prompt for new room name
+            const roomName = prompt('Enter new room name:');
+            if (!roomName || roomName.trim() === '') return;
+            
+            // Add new column to the table
+            const table = document.querySelector('.booking-table');
+            const rows = table.querySelectorAll('tbody tr');
+            
+            // Add header
+            const headerRow = table.querySelector('thead tr');
+            const newHeader = document.createElement('th');
+            newHeader.className = 'text-center room-header selectable-header';
+            newHeader.textContent = roomName;
+            headerRow.appendChild(newHeader);
+            
+            // Add cells for each row
+            rows.forEach(row => {
+                const newCell = document.createElement('td');
+                newCell.className = 'booking-cell';
+                row.appendChild(newCell);
+            });
+            
+            console.log('New column added:', roomName);
+        });
+    }
 });
 
 // Helper function to get CSRF token

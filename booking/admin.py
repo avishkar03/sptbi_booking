@@ -13,8 +13,8 @@ class FloorAdmin(admin.ModelAdmin):
 
 @admin.register(aTimeSlot)
 class aTimeSlotAdmin(admin.ModelAdmin):
-    list_display = ('slot', 'room', 'date', 'name', 'email')
-    search_fields = ('name', 'email', 'date')
+    list_display = ('slot', 'room', 'date', 'name')
+    search_fields = ('name',  'date')
 
 
 @admin.register(Booking)

@@ -74,9 +74,15 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.booking-cell.booked').forEach(cell => {
             cell.style.cursor = 'not-allowed';
             cell.style.backgroundColor = '#f3f4f6';
+        
+            // Add a click listener to inspect floor slug
+            cell.addEventListener('click', function () {
+                const floorSlug = this.dataset.floor;
+                console.log("Floor slug:", floorSlug);
+            });
         });
+        
     }
-
     // Initialize column deletion functionality
     if (deleteColumnBtn) {
         deleteColumnBtn.addEventListener('click', function(e) {

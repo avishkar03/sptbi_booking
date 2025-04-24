@@ -116,7 +116,8 @@
                         data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}">
                         {% with slot_data=booked_slots|get_item:room|get_item:time_key %}
                         {% if slot_data %}
-                        <span class="booked-text">{{ slot_data.reason }}</span>
+                        <!-- <span class="booked-text">{{ slot_data.reason }}</span> -->
+                        data-booked-by="{{ slot_data.booked_by }}"
                         {% endif %}
                         {% endwith %}
                     </td>
@@ -173,4 +174,12 @@
         }
     }
 </script>
+
+<script src="{% static 'js/booking.js' %}"></script>
+
+<script type="application/json" id="bookedSlotsData">
+    {{ booked_slots|json_script:"booked_slots_data" }
+     </script>
+
+
 {% endblock %}

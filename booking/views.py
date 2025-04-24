@@ -98,11 +98,11 @@ def delete_slot(request):
     visit_counter = Count.objects.get(name="Actual")
     visit_add = Count.objects.get(name="Extra")
     events = Event.objects.all()
-    events = sorted(events, key=lambda x: x.orderno)
+    # events = sorted(events, key=lambda x: x.orderno)
     count_list = str(visit_counter.count + visit_add.count)
     count = list(count_list)
     pg = Programme.objects.all()
-    pg = sorted(pg, key=lambda x: x.orderno)
+    # pg = sorted(pg, key=lambda x: x.orderno)
     times = ["09.00 am", "09.30 am", "10.00 am", "10.30 am", "11.00 am", "11.30 am", "12.00 pm", "12.30 pm", "01.00 pm", "01.30 pm", "02.00 pm", "02.30 pm",
              "03.00 pm", "03.30 pm", "04.00 pm", "04.30 pm", "05.00 pm", "05.30 pm", "06.00 pm", "06.30 pm", "07.00 pm", "07.30 pm", "08.00 pm", "08.30 pm"]
     date = datetime.now().strftime("%Y-%m-%d")
@@ -194,9 +194,15 @@ def floor_booking(request, floor_slug):
                 time_key = time_key[1:]  # Remove leading zero for hours
             
             logger.info(f"DEBUG: Adding booking to UI: room={room}, time_key='{time_key}', reason='{booking.reason}'")
+            # booked_slots[room][time_key] = {
+            #     'booked_by': booking.booked_by,
+            #     'reason': booking.reason  # Include the reason
+            # }
             booked_slots[room][time_key] = {
-                'booked_by': booking.booked_by,
-                'reason': booking.reason  # Include the reason
+                'booked_by': booking.user.username if booking.user  else booking.booked_by,
+                'user_id' : booking.user.id if booking.user else None,
+                'reason': booking.reason,
+
             }
             
     # After creating the booked_slots dictionary, log its contents
