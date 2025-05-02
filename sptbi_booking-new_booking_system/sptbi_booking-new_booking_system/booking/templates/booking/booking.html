@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+console.log("✅ booking_with_approval.js loaded");
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/booking.css' %}">
+<style>
+    .booking-cell.booked.selected {
+        background-color: #ffcccc !important;
+        border: 2px solid #ff6666 !important;
+    }
+    .booking-cell.booked {
+        cursor: pointer !important;
+        user-select: none;
+        position: relative;
+    }
+    .booking-cell .booked-text {
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .delete-options {
+        margin-top: 20px;
+        text-align: right;
+        padding: 10px;
+    }
+    #deleteSelectedBtn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    #deleteSelectedBtn:hover {
+        background-color: #c82333;
+    }
+    .admin-controls {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: white;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        display: none;
+    }
+    .admin-controls.show {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+
+{% if messages %}
+  <div>
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% block content %}
+<div class="booking-container">
+    <div class="booking-header">
+        <div class="header-left">
+            <h2>{{ floor.name }} - Room Booking Schedule</h2>
+            <div class="floor-selector">
+                <select id="floorSelect" onchange="changeFloor(this.value)">
+                    <option value="">Select Floor</option>
+                    {% for available_floor in available_floors %}
+                    <option value="{{ available_floor.slug }}" 
+                    data-booking-type="{{ available_floor.booking_type }}"
+                    {% if available_floor.slug == floor.slug %}selected{% endif %}>
+                        {{ available_floor.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="date-navigation">
+            <a href="?date={{ prev_day }}" class="nav-btn prev-day">◀</a>
+            <div class="current-date" data-date="{{ date|date:'Y-m-d' }}">
+                {{ date|date:"l, F d, Y" }}
+            </div>
+            <a href="?date={{ next_day }}" class="nav-btn next-day">▶</a>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="booking-table">
+            <thead>
+                <tr>
+                    <th class="time-slot-header">Time Slot</th>
+                    {% for room in rooms %}
+                    <th class="room-header">{{ room }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for time in time_slots %}
+                <tr>
+                    <td class="time-slot">{{ time|time:"h:i a"|lower }}</td>
+                    {% for room in rooms %}
+                    {% with time_key=time|time:"h:i a"|lower %}
+                    <td class="booking-cell{% if booked_slots|get_item:room|get_item:time_key %} booked{% endif %}"
+                        data-room="{{ room }}"
+                        data-time="{{ time|time:'h:i a'|lower }}"
+                        data-booking-type="{{ floor.booking_type }}"
+                        data-floor="{{ floor.slug }}"
+                        data-booked="{% if booked_slots|get_item:room|get_item:time_key %}true{% else %}false{% endif %}"
+                        data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}">
+                        {% with slot_data=booked_slots|get_item:room|get_item:time_key %}
+                        {% if slot_data %}
+                        <!-- <span class="booked-text">{{ slot_data.reason }}</span> -->
+                        data-booked-by="{{ slot_data.booked_by }}"
+                        {% endif %}
+                        {% endwith %}
+                    </td>
+                    {% endwith %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if request.user.is_authenticated %}
+<div class="admin-controls" id="adminControls">
+    <button class="btn btn-danger" id="deleteSelectedBtn">
+        <i class="fas fa-trash"></i> Delete Selected Slots
+    </button>
+</div>
+{% endif %}
+
+<!-- <div class="booking-slots-data" style="display:none;">
+    {{ booked_slots_json|safe }}
+</div> -->
+
+{% endblock %}
+
+
+{% block extra_js %}
+    {% if floor.booking_type == "requires approval" %}
+        <script src="{% static 'js/booking_with_approval.js' %}"></script>
+    {% else %}
+        <script src="{% static 'js/booking.js' %}"></script>
+    {% endif %}
+<script>
+    // const bookedSlotsData = JSON.stringify({
+    //     {% for room, times in booked_slots.items %}
+    //     "{{ //room }}": {
+    //         {% for time, details in times.items %}
+    //         "{{ //time }}": {
+    //             "booked_by": "{{// details.booked_by }}",
+                // "reason": "{{ //details.reason }}"
+    //         }{% if not loop.last %},{% endif %}
+    //         {% endfor %}
+    //     }{% if not loop.last %},{% endif %}
+    //     {% endfor %}
+    // });
+
+    function changeFloor(slug) {
+        if (slug) {
+            const currentUrl = new URL(window.location.href);
+            const date = currentUrl.searchParams.get('date');
+
+            //Get the selected floor's booking type
+            const selectElement = document.getElementById('floorSelect');
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const selectedFloorBookingType = selectedOption.getAttribute('data-booking-type');
+
+            //Choose the appropriate URL based on booking type
+            let newUrl;
+            if(floorBookingType && floorBookingType.toLowerCase() === 'requires approval') {
+                newUrl = `/booking/restricted-booking/${slug}/`;
+            } else {
+                newUrl = `/booking/floor/${slug}/`;
+            }
+            if (date) {
+                newUrl += `?date=${date}`;
+            }
+            window.location.href = newUrl;
+        }
+    }
+</script>
+
+// <script src="{% static 'js/booking.js' %}"></script>
+
+
+    {{ booked_slots|json_script:"booked_slots_data" }
+    
+
+{% endblock %}

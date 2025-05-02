@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% load booking_filters %}
+{% load static %}
+
+{% block Title %}Booking - {{ floor.name }}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/booking.css' %}">
+<style>
+    .booking-cell.booked.selected {
+        background-color: #ffcccc !important;
+        border: 2px solid #ff6666 !important;
+    }
+    .booking-cell.booked {
+        cursor: pointer !important;
+        user-select: none;
+        position: relative;
+    }
+    .booking-cell .booked-text {
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .delete-options {
+        margin-top: 20px;
+        text-align: right;
+        padding: 10px;
+    }
+    #deleteSelectedBtn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    #deleteSelectedBtn:hover {
+        background-color: #c82333;
+    }
+    .admin-controls {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: white;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        display: none;
+    }
+    .admin-controls.show {
+        display: block;
+    }
+
+    /* Pending bookings (red) */
+    .booking-cell.pending {
+        background-color: #ffdddd!important;
+        border: 2px dashed #ff0000!important;
+    }
+
+    /* Approved bookings (green) */
+   .booking-cell.approved {
+        background-color: #ddffdd!important;
+        border: 2px solid #00aa00!important;
+    }
+
+
+
+</style>
+{% endblock %}
+
+{% if messages %}
+  <div>
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% block content %}
+<meta name="floor-slug" content="{{ floor.slug }}">
+<meta name="floor-name" content="{{ floor.name }}">
+<div class="container-fluid px-4">
+    <div class="table-container">
+        <div class="date-navigation">
+            <div class="date-nav-wrapper">
+                <div class="date-nav-content">
+                    <a href="?date={{ prev_day }}" class="nav-arrow">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <span class="date-display"><i class="bi bi-calendar"></i> {{ date|date:"l, F d, Y" }}</span>
+                    <a href="?date={{ next_day }}" class="nav-arrow">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+            {% if user.is_staff %}
+            <div class="admin-options">
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link">
+                        Admin Options <i class="bi bi-caret-down-fill"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" id="addColumnBtn">Add Columns</a></li>
+                        <li><a class="dropdown-item" href="#" id="deleteColumnBtn">Delete Columns</a></li>
+                        <li><a class="dropdown-item" href="#" id="deleteSlotBtn">Delete Slot</a></li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+            <div class="floor-selector">
+                <select id="floorSelect" class="form-select">
+                    <option value="">Select Floor</option>
+                    {% for available_floor in available_floors %}
+                    <option value="{{ available_floor.slug }}" 
+                            data-booking-type="{{ available_floor.booking_type }}"
+                            {% if available_floor.slug == floor.slug %}selected{% endif %}>
+                        {{ available_floor.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="booking-table mb-0">
+                <thead>
+                    <tr>
+                        <th class="time-slot-header">Time Slot</th>
+                        {% for room in rooms %}
+                        <th class="text-center room-header selectable-header">{{ room }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for time in time_slots %}
+                    <tr>
+                        <td class="time-slot">{{ time.name }}</td>
+                        {% for room in rooms %}
+                        {% with time_key=time.name|lower %}
+                        {% with slot_data=booked_slots|get_item:room|get_item:time_key %}
+                            {% if slot_data and slot_data.status == 'approved' %}
+                            <td class="booking-cell 
+                                       {%if slot_data.status == 'pending'%}pending
+                                       {% elif slot_data.status == 'approved' %}approved{% endif %}"
+                                data-room="{{ room }}"
+                                data-time="{{ time.name|lower }}"
+                                data-status="{{slot_data.status}}">
+                                <!-- data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
+                                data-booked-by="{{ slot_data.booked_by }}"> -->
+                                <div class="booked-text">{{ slot_data.reason }}
+                                                         {% if slot_data.status == 'pending' %}(Pending){% endif %}
+                                </div>
+                            </td>
+                            {% else %}
+                            <td class="booking-cell"
+                                data-room="{{ room }}"
+                                data-time="{{ time.name|lower }}"
+                                data-booking-type="{{ floor.booking_type }}"
+                                data-floor="{{ floor.slug }}"
+                                data-booked="false"
+                                data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}">
+                            </td>
+                            {% endif %}
+                        {% endwith %}
+                        {% endwith %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if request.user.is_authenticated %}
+<div class="admin-controls" id="adminControls">
+    <button class="btn btn-danger" id="deleteSelectedBtn">
+        <i class="fas fa-trash"></i> Delete Selected Slots
+    </button>
+</div>
+{% endif %}
+
+
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookingModalLabel">Book a Slot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="bookingForm">
+                    <div class="mb-3">
+                        <label for="bookingReason" class="form-label">Reason for Booking</label>
+                        <textarea class="form-control" id="bookingReason" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="bookSlotBtn">Submit for Approval</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        flatpickr(".date-display", {
+            defaultDate: "{{ date|date:'Y-m-d' }}",
+            onChange: function(selectedDates, dateStr, instance) {
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('date', dateStr);
+                window.location.href = newUrl.toString();
+            }
+        });
+        
+        function changeFloor(slug) {
+            if (slug) {
+                const currentUrl = new URL(window.location.href);
+                const date = currentUrl.searchParams.get('date');
+                let newUrl = `/booking/restricted-booking/${slug}/`;
+                if (date) {
+                    newUrl += `?date=${date}`;
+                }
+                window.location.href = newUrl;
+            }
+        }
+
+
+
+
+
+        // Add event listener to the floor select dropdown if it exists
+        const floorSelect = document.getElementById("floorSelect");
+        if (floorSelect) {
+            floorSelect.addEventListener("change", function() {
+                changeFloor(this.value);
+            });
+        }
+
+    document.getElementById('bookSlotBtn').addEventListener('click', function() {
+    const reason = document.getElementById('bookingReason').value;
+    const selectedCell = document.querySelector('.booking-cell.selected');
+
+    fetch("{% url 'restricted_booking_view' floor.slug %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}',
+        },
+        body: JSON.stringify({
+            time_slot: selectedCell.getAttribute('data-time'),
+            room: selectedCell.getAttribute('data-room'),
+            reason: reason,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Update UI to show pending state (red)
+            selectedCell.classList.add('booked', 'pending');
+            selectedCell.innerHTML = `<div class="booked-text">${reason} (Pending)</div>`;
+        }
+    });
+});
+        // Variables to store selected cell
+let selectedCell = null;
+
+// Add click event listeners to booking cells
+document.querySelectorAll('.booking-cell:not(.booked)').forEach(cell => {
+    cell.addEventListener('click', function() {
+        // Remove selected class from all cells
+        document.querySelectorAll('.booking-cell').forEach(c => c.classList.remove('selected'));
+        
+        // Add selected class to clicked cell
+        this.classList.add('selected');
+        selectedCell = this;
+        
+        // Show booking modal
+        const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+        bookingModal.show();
+    });
+});
+
+// Add click event listeners to booked cells for admin users
+if (document.querySelector('[data-is-authenticated="true"]')) {
+    document.querySelectorAll('.booking-cell.booked').forEach(cell => {
+        cell.addEventListener('click', function() {
+            if (this.classList.contains('selected')) {
+                this.classList.remove('selected');
+                
+                // Hide admin controls if no cells are selected
+                if (!document.querySelector('.booking-cell.selected')) {
+                    document.getElementById('adminControls').classList.remove('show');
+                }
+            } else {
+                this.classList.add('selected');
+                
+                // Show admin controls
+                document.getElementById('adminControls').classList.add('show');
+            }
+        });
+    });
+}
+
+
+   // Show booking modal with fallback
+   const bookingModal = document.getElementById('bookingModal');
+        if (bookingModal) {
+            if (typeof bootstrap !== 'undefined') {
+                const modal = new bootstrap.Modal(bookingModal);
+                modal.show();
+            } else {
+                // Fallback if Bootstrap JS is not available
+                bookingModal.style.display = 'block';
+                bookingModal.classList.add('show');
+            }
+        }
+
+// Delete selected slots button
+document.getElementById('deleteSelectedBtn').addEventListener('click', function() {
+    const selectedCells = document.querySelectorAll('.booking-cell.booked.selected');
+    if (selectedCells.length === 0) {
+        alert('Please select at least one booked slot to delete.');
+        return;
+    }
+    
+    if (confirm('Are you sure you want to delete the selected bookings?')) {
+        // Implement deletion logic here
+        console.log('Deleting selected bookings...');
+    }
+});
+        </script>
+
+        <!-- {% if floor.booking_type == "requires approval" %} -->
+            <!-- <script src="{% static 'js/booking_with_approval.js' %}"></script> -->
+        <!-- {% else %} -->
+            <!-- <script src="{% static 'js/booking.js' %}"></script> -->
+        <!-- {% endif %} -->
+
+        {{ booked_slots|json_script:"booked_slots_data" }}
+        {% endblock %}
+
+

@@ -1,0 +1,341 @@
+{% extends 'base.html' %} {% load static %} 
+{% load custom_filters %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/pgtemp.css' %}" />
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+/>
+
+<style>
+  @media (max-width: 980px) {
+
+  
+         
+.incubatees .container h1 {
+    font-family: Poppins;
+    font-size: 40px;
+    font-weight: 600;
+    color: #1c4386;
+    text-align: left;
+    padding-left: 23px;
+    transition: all 0.3s ease;
+}
+
+.about .container .box{
+  font-size: 11px;
+  padding: 0 25px;
+}
+
+.objectives .container .box {
+  font-family: Poppins;
+  font-size: 11px;
+  font-weight: 400;
+  color: #000;
+  text-align: left;
+  padding: 0 50px;
+}
+
+.eligiblity .container .box {
+  font-family: Poppins;
+  font-size: 11px;
+  font-weight: 400;
+  color: #000;
+  text-align: left;
+  padding: 0 50px;
+}
+
+.important .container .box {
+  font-family: Poppins;
+  font-size: 11px;
+  font-weight: 400;
+  color: #000;
+  text-align: left;
+}
+
+.guidelines .container .box {
+  font-family: Poppins;
+  font-size: 11px;
+  font-weight: 400;
+  color: #000;
+  text-align: left;
+}
+
+.footer-bottom p {
+  font-size: 9px;
+}
+
+
+/* .cmlogo {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    height: 255px;
+    justify-content: center;
+} */
+
+/* .name{
+  font-size: 35px;
+} */
+
+/* .person{
+  height: 320px;
+} */
+
+/* .img{
+  height: 180px;
+} */
+
+
+
+}
+</style>
+
+{% endblock %} {% block Title %} {{page_template.title}} {% endblock %} {% block content %}
+<div class="photo">
+  <div class="container">
+    <img src="{{page_template.banner.url}}" alt="incubation" />
+   {% if page_template.link %}
+    <center>
+      <a href="{{page_template.link}}"><button class="btn btn-primary">Apply Now</button></a>
+    </center>
+    {% endif %}
+    
+    {% if page_template.message %}
+    <center>
+      <button class="btn btn-primary">{{ page_template.message }}</button>
+    </center>
+    {% endif %}
+
+  </div>
+</div>
+<div class="about">
+  <div class="container">
+    <h1>ABOUT</h1>
+    <div class="box">
+      {{page_template.about | safe}}
+      </ul>
+    </div>
+  </div>
+</div>
+{% if page_template.objectives %}
+<div class="objectives">
+  <div class="container">
+    <h1>Objectives</h1>
+    <div class="box">
+      <ul style="list-style-type:disc">
+        {% for line in objectives_list %}
+            <li>
+              {% for l in line %}
+              {% if forloop.counter == 1 %}
+              {{ l | safe}}
+              <ul style="list-style-type:circle" class="subpoint">
+              {% else %}
+              <li>{{ l | safe}}</li>
+              {% endif %}
+              {% endfor %}
+            </ul>
+            </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if page_template.broadcovered %}
+<div class="eligiblity">
+  <div class="container">
+    <h1>Broad Areas Covered Under {{page_template.title}}</h1>
+    <div class="box">
+      <ul style="list-style-type:disc">
+        {% for line in broadcovered_list %}
+            <li>
+              {% for l in line %}
+              {% if forloop.counter == 1 %}
+              {{ l | safe}}
+              <ul style="list-style-type:circle" class="subpoint">
+              {% else %}
+              <li>{{ l | safe}}</li>
+              {% endif %}
+              {% endfor %}
+            </ul>
+            </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if page_template.broadnotcovered %}
+<div class="eligiblity">
+  <div class="container">
+    <h1>Broad Areas Not Covered Under {{page_template.title}}</h1>
+    <div class="box">
+      <ul style="list-style-type:disc">
+        {% for line in broadnotcovered_list %}
+            <li>
+              {% for l in line %}
+              {% if forloop.counter == 1 %}
+              {{ l | safe}}
+              <ul style="list-style-type:circle" class="subpoint">
+              {% else %}
+              <li>{{ l | safe}}</li>
+              {% endif %}
+              {% endfor %}
+            </ul>
+            </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if page_template.eligible %}
+<div class="eligiblity">
+  <div class="container">
+    <h1>Eligiblity Criteria</h1>
+    <div class="box">
+      <ul style="list-style-type:disc">
+        {% for line in eligibility_list %}
+            <li>
+              {% for l in line %}
+              {% if forloop.counter == 1 %}
+              {{ l | safe}}
+              <ul style="list-style-type:circle" class="subpoint">
+              {% else %}
+              <li>{{ l | safe}}</li>
+              {% endif %}
+              {% endfor %}
+            </ul>
+            </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if page_template.noteligible %}
+<div class="eligiblity">
+  <div class="container">
+    <h1>Not Eligible </h1>
+    <div class="box">
+      <ul style="list-style-type:disc">
+        {% for line in noteligible_list %}
+            <li>
+              {% for l in line %}
+              {% if forloop.counter == 1 %}
+              {{ l | safe}}
+              <ul style="list-style-type:circle" class="subpoint">
+              {% else %}
+              <li>{{ l | safe}}</li>
+              {% endif %}
+              {% endfor %}
+            </ul>
+            </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if page_template.guidelines %}
+<div class="guidelines">
+  <div class="container">
+    <h1>GENERAL GUIDELINES</h1>
+    <div class="box">
+      <ul style="list-style-type:disc">
+        {% for line in guidelines %}
+            <li>
+              {% for l in line %}
+              {% if forloop.counter == 1 %}
+              {{ l | safe}}
+              <ul style="list-style-type:circle" class="subpoint">
+              {% else %}
+              <li>{{ l | safe}}</li>
+              {% endif %}
+              {% endfor %}
+            </ul>
+            </li>
+        {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if page_template.facilities %}
+<div class="facilities">
+    <div class="container">
+    <h1>Facilities Provided</h1>    
+        <div class="hero-section">
+            <div class="card-grid">
+                {% for card in page_template.facilities.all %}
+                <a class="card" style="background-image: url('{{card.image.url}}'); background-size: cover;">
+                <div class="card__content">
+                    <h3 class="card__heading">{{card.name}}</h3>
+                </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% if page_template.benefits %}
+<div class="important">
+  <div class="container">
+    <h1>Benefits</h1>
+    <div class="box">
+      <ul>
+        {% for line in benefits %}
+            <li>
+              {% for l in line %}
+              {% if forloop.counter == 1 %}
+              {{ l | safe}}
+              <ul style="list-style-type:disc">
+              {% else %}
+              <li>{{ l }}</li>
+              {% endif %}
+              {% endfor %}
+            </ul>
+            </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if years %}
+<div class="incubatees">
+  {% for year,project in years|zip_lists:projects%}
+  <div class="container">
+    <div class="container-title">
+      <h1>Year {{year.yearNo}} Projects / Incubatees</h1>
+    </div>
+    <div class="container2">
+      {% for p in project.all %}
+      <div class="person">
+        <div class="container-inner">
+          {% comment %} Added the Condition for checking the slug {% endcomment %}
+          {% if p.slug != Null %}
+          <a href="{% url 'downloadproject' p.slug %}" target="_blank" class="cmlogo"><img
+            class="img"
+            src="{{p.image.url}}"
+          /></a>
+          <div class="divider"></div>
+        <div class="name"><a href="{% url 'downloadproject' p.slug %}" target="_blank">{{p.title}}</a></div>
+          {% else %}
+          <a href="{{ p.website }}" target="_blank" class="cmlogo"><img
+            class="img"
+            src="{{p.image.url}}"
+          /></a>
+          <div class="divider"></div>
+          <div class="name"><a href="{{ p.website }}" target="_blank">{{p.title}}</a></div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

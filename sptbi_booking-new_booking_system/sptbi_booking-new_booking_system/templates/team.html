@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block Title %} Team {% endblock %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/team.css' %}" />
+{% endblock %}
+{% block content %}
+<div class="colleges">
+  <div class="container">
+  <h1>Meet Our Team</h1>
+  <div class="container2">
+    {% for member in team %}
+    <div class="person">
+      <div class="container1">
+        <div class="container-inner">
+          <img
+            class="img img1"
+            src="{{ member.image.url }}"
+          />
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="name">{{member.name}}</div>
+      <div class="designation">{{member.designation}}</div>
+      <div class="description">{{member.description | safe}}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+</div>
+{% endblock %}
+```

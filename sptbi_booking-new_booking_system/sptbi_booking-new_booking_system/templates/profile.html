@@ -1,0 +1,434 @@
+{% extends 'base.html' %} {% load static %} {% block Title %}Profile
+{% endblock %} 
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}" />
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/bootstrap-icons.min.css"
+  rel="stylesheet"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  integrity="sha384-...your-integrity-hash...="
+  crossorigin="anonymous"
+/>
+<style>
+  /* The Modal (background) */
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+  }
+
+  /* Modal Content */
+  .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+  }
+
+  /* The Close Button */
+  .close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .logs-wrapper{
+    display:flex;
+    flex-direction: column-reverse;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+  color: #1c4386;
+  }
+
+  .logs-wrapper select {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: -1rem 1rem;
+    font-family: Poppins;
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+  .logs-wrapper input[type=month]{
+    margin: 0 1rem;
+  }
+
+.label-divs{
+  height: 40px;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+}
+
+.label-divs h5{
+  margin-left: 40px;
+  font-size: 20px;
+  color: #1c4386;
+}
+
+.report-title {
+    margin: 15px;
+    font-size: 28px;
+    font-weight: 500;
+    color: #1c4386;
+    text-align: center;
+}
+
+.user-logs-table{
+  border-spacing: 3px;
+  font-weight: 500;
+}
+
+
+.user-logs-table td{
+  padding: 10px 0;
+}
+
+@media (max-width: 980px) {
+  .user-p {
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+
+    }
+
+  .seperator{
+    display: none;
+  }
+
+  .user-p .mobile-user-1 .profile h3{
+    font-size: 35px;
+  } 
+  
+  .user-p .mobile-user-1 .profile{
+    font-size: 30px;
+    margin: 20px -6px;
+  }  
+  
+  .user-p .mobile-user-1 .profile i{
+    font-size: 30px;
+  }
+
+  .user-p .password{
+    font-size: 25px;
+    margin: 20px 65px;
+  }
+
+  .mobile-user-2 {
+        display: flex;
+        width: 45%;
+        height: 100%;
+        flex-direction: row;
+    }
+
+  .logs-wrapper{
+    height: 100%;
+  }
+
+  .logs-wrapper form{
+    height: 60%;
+    margin-bottom: -150px;
+    width: 100%;
+  }
+
+  .user-logs-table td {
+    padding: 20px 15px;
+   }
+
+  .report-title{
+    margin-top: 85px;
+   }
+
+   .logs-wrapper table{
+      font-size: 25px;
+      margin-top: 35px;
+   }
+
+   .logs-wrapper input[type=month]{
+    font-size: 14px;
+   }
+
+ }
+
+</style>
+
+{% endblock %} {% block content %} {% if user.is_staff %}
+<table class="admin">
+  <thead class="thead">
+    <th style="width: 5%">&nbsp Sr. No</th>
+    <th style="width: 25%"><i class="fas fa-user"></i>&nbsp Startup Name</th>
+    <th style="width: 20%"><i class="fas fa-envelope"></i> &nbsp Email</th>
+    <th style="text-align: right; width: 10%">
+      <i class="fas fa-clock"></i> Hours Used
+    </th>
+    <th style="text-align: right; width: 15%">
+      <i class="fas fa-clock"></i> Total Free Hours
+    </th>
+    <th style="width: 7.5%">Charges</th>
+    <th style="width: 10%">Status</th>
+    <th style="width: 7.5%">Edit</th>
+  </thead>
+  {% for i in objs %}
+  <tr>
+    <td>{{ forloop.counter }}</td>
+    <td>{{ i.company_name }}</td>
+    <td>{{ i.email }}</td>
+    <td style="text-align: right">{{ i.free_slots }} Hours &nbsp &nbsp</td>
+    <td style="text-align: right">{{i.total}} Hours &nbsp &nbsp</td>
+    <td>Rs.{% if i.charges %}{{i.charges}}0{% else %}0.00{% endif %}</td>
+    <td>
+      <form action="" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="email" id="email" value="{{i.email}}" />
+        {% if i.lock == 0 %}
+        <input type="hidden" name="lock" id="lock" value="1" />
+        <button class="edit-btn" type="submit" name="form4" style="cursor:pointer">
+          <i class="fas fa-unlock"></i> Unlocked
+        </button>
+        {% else %}
+        <input type="hidden" name="lock" id="lock" value="0" />
+        <button class="edit-btn" type="submit" name="form4" style="cursor:pointer">
+          <i class="fas fa-lock"></i> Locked
+        </button>
+        {% endif %}
+      </form>
+    </td>
+    <form action="" method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="email" id="email" value="{{i.email}}" />
+      <td>
+        <button class="edit-btn" type="submit" name="form1" style="cursor:pointer">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+      </td>
+    </form>
+  </tr>
+  {% endfor %}
+</table>
+
+<div class="btn-wrapper">
+  <button class="download-btn">
+    <a class="download-btn" href="{% url 'download_excel' %}" ><i class="fas fa-download"></i> Download Current Month Report</a
+    >
+  </button>
+  
+  {% comment %} <button type="button" id="myBtn">Download Excel Report</button> {% endcomment %}
+</div>
+<center>
+<div class="seperator">
+  <div class="lines">
+    <div class="diamond"></div>
+  </div>
+</div>
+</center>
+<div class="logs-wrapper">
+  <form method="POST" action="{% url "dateLog" %}">
+      {% csrf_token %}
+      <table style="border-spacing: 30px;">
+        <tr>
+          <td>Company</td>
+          <td>   
+               <select name="selected" id="mySelect">
+            <option value="all" name="option">All companies</option>
+            {% for c in companies %}
+            <option value="{{c.name}}" name="option">{{c.name}}</option>
+            {% endfor %}
+        </select>
+      </td>
+        </tr>
+      <!-- <br><br> -->
+      <tr>
+        <td>Start Month</td>
+        <td><input type="month" name="start" required></td>
+      </tr>
+
+      <tr>
+        <td>End Month</td>
+        <td><input type="month" name="end" required></td>
+      </tr>
+      <!-- <br><br> -->
+    </table>
+    <center>
+      <input class="download-btn logs-dtbn" style="cursor:pointer" type="submit" value="Download User logs"> <br>
+    </center>
+  </form>
+
+
+  <h3 class="report-title">Get Custom Report</h3>
+
+</div>
+{% else %}
+<div class="user-profile">
+  <div class="user-p">
+    <div class="mobile-user-1">
+    <div class="profile">
+      {% if user.logo.url != Null}
+      <img src="{{user.logo.url}}" alt="profile" />
+      {% endif %} 
+      <h3 style="color: #1c4386">{{user.company_name}}</h3>
+    </div>
+    <div class="profile">
+      <i class="fas fa-envelope"></i>
+      {{user.email}}
+    </div>
+    <div class="profile">
+      <i class="fas fa-clock"></i>
+      Hours Used: {{free_hours}} Hours
+    </div>
+    <div class="profile">
+      <i class="fas fa-clock"></i>
+      Free Hours: {{total}} Hours
+    </div>
+    <div class="profile">
+      <i class="bi bi-currency-rupee"></i>
+      Charges: Rs.{{charges}}0
+    </div>
+    <div class="password">
+      <a href="{% url 'change_password' %}">
+        <i class="fas fa-key"></i>
+        Change Password
+      </a>
+    </div>
+    <center>
+    <a class="password" href="{% url 'download_log' %}" download style="text-decoration: none;">Download {% now "M"%} Logs</a> 
+  </center>
+  </div>
+    <div class="seperator" style="margin-top:25px;margin-bottom: 25px;">
+      <div class="lines" style="width: 236px;">
+        <div class="diamond"></div>
+      </div>
+    </div>
+    <div class="mobile-user-2">
+    <div class="logs-wrapper">
+      <form method="POST" action="{% url "user_download_log" %}">
+          {% csrf_token %}
+          <table class="user-logs-table">
+          <!-- <br><br> -->
+          <tr>
+            <td>Start Month</td>
+            <td><input type="month" name="start" required></td>
+          </tr>
+    
+          <tr>
+            <td>End Month</td>
+            <td><input type="month" name="end" required></td>
+          </tr>
+        </table>
+        <center>
+          <input class="password" style="cursor:pointer" type="submit" value="Download"> <br>
+        </center>
+        </form>
+    
+      <h3 class="report-title" style="margin: -2px;">Get Custom Log</h3>
+    </div>
+  </div>
+  </div>
+  <div class="right-section">
+    <div class="booking-log">
+      <h2>
+        Booking Log
+      </h2>
+      <ul class="log-list">
+        <li>
+          <table class="date-list">
+            <thead>
+              <th style="width: 14%">
+                <i class="fas fa-calendar"></i> &nbsp Date
+              </th>
+              <th style="width: 12%">
+                <i class="fas fa-clock"></i> &nbsp Slot
+              </th>
+              <th style="width: 27%">
+                <i class="fas fa-building"></i> &nbsp Room
+              </th>
+              <th><i class="fas fa-bullseye"></i> &nbsp Reason</th>
+            </thead>
+            {% for i in logs %} {% if i.room == 0 %}
+            <tr>
+              <td>{{i.date}}</td>
+              <td>{{i.slot}}</td>
+              <td>Meeting Room 1 - 1st Floor</td>
+              <td>{{i.reason}}</td>
+            </tr>
+            {% elif i.room == 1 %}
+            <tr>
+              <td>{{i.date}}</td>
+              <td>{{i.slot}}</td>
+              <td>Meeting Room 1 - 2nd Floor</td>
+              <td>{{i.reason}}</td>
+            </tr>
+            {% elif i.room == 2 %}
+            <tr>
+              <td>{{i.date}}</td>
+              <td>{{i.slot}}</td>
+              <td>Meeting Room 2 - 2nd Floor</td>
+              <td>{{i.reason}}</td>
+            </tr>
+
+            {% else %}
+            <tr>
+              <td>{{i.date}}</td>
+              <td>{{i.slot}}</td>
+              <td>Meeting Room - 8th Floor</td>
+              <td>{{i.reason}}</td>
+            </tr>
+            {% endif %} {% endfor %}
+          </table>
+        </li>
+      </ul>
+    </div>
+    <div class="pagination">
+      <span class="step-links">
+        {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; First</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        <span class="current">
+          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+        {% endif %}
+      </span>
+    </div>
+  </div>
+</div>
+
+{% endif %}
+{% endblock %} 
+{% block js %}
+<script src="{% static 'js/profile.js'%}"></script>
+
+  
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+  crossorigin="anonymous"
+></script>
+{% endblock %}
