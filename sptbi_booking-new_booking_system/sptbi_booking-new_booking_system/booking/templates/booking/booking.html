@@ -150,7 +150,7 @@ console.log("✅ booking_with_approval.js loaded");
 
 
 {% block extra_js %}
-    {% if floor.booking_type == "requires approval" %}
+    {% if floor.booking_type == "Requires Approval" %}
         <script src="{% static 'js/booking_with_approval.js' %}"></script>
     {% else %}
         <script src="{% static 'js/booking.js' %}"></script>

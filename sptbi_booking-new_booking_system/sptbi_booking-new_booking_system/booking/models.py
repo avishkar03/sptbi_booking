@@ -28,23 +28,23 @@ class Floor(models.Model):
         ('Instant Booking', 'Instant Booking'),
         # ('restricted', 'Restricted'),
         ('Requires Approval', 'Requires Approval'),
-      
+
     ]
-    
+
     booking_type = models.CharField(
-        max_length=50, 
+        max_length=50,
         choices=BOOKING_TYPE_CHOICES,
         default='Instant Booking',
     )
 
-        
+
 
     class Meta:
         ordering = ['order']
         verbose_name = 'Floor'
         verbose_name_plural = 'Floors'
 
-    
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
@@ -77,7 +77,7 @@ class Booking(models.Model):
         ('8th', '8th Floor'),
     ]
 
-    # email = models.EmailField(null=True, blank=True)  # For pending status email functionality   
+    # email = models.EmailField(null=True, blank=True)  # For pending status email functionality
     time_slot = models.TimeField()
     booked_by = models.CharField(max_length=255)
     floor = models.ForeignKey(Floor, on_delete=models.CASCADE)
@@ -87,7 +87,7 @@ class Booking(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
 
 
-    STATUS_CHOICES = (  # For email functionality                           
+    STATUS_CHOICES = (  # For email functionality
         ('pending', 'Pending Approval'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
@@ -109,14 +109,15 @@ class Booking(models.Model):
     admin_notes = models.TextField(blank=True, null=True) #Optional for Reject Reasons
 
     def save(self, *args, **kwargs):      #For Email fucntionality
-        if not self.approval_token and self.floor.booking_type == 'requires approval':
+        # Always generate an approval token if it doesn't exist
+        if not self.approval_token:
             self.approval_token = str(uuid.uuid4())
         super().save(*args, **kwargs)
 
-    
+
     class Meta:
         ordering = ['date', 'time_slot']
-    
+
     def __str__(self):
         return f"{self.floor.name} - {self.room} - {self.time_slot}"
 
@@ -130,4 +131,4 @@ def send_booking_status_notification(sender, instance, **kwargs):
         message = f"Your booking for {instance.room} on {instance.date} has been {instance.status}."
         send_mail(subject, message, 'admin@sptbi.com', [instance.user.email])
 
-   
+

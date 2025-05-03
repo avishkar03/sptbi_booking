@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-%v^9)6o^6-1f27x(mtp_^9%a@eqotkck^$*r0a*w3$b%iy%d%^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost','172.16.10.45', 'sptbi.com', 'https://www.sptbi.com', 'www.sptbi.com',]
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','172.16.10.45', 'sptbi.com', 'https://www.sptbi.com', 'www.sptbi.com','testserver']
 
 CSRF_TRUSTED_ORIGINS = ['https://spbti.com', 'https://www.sptbi.com']
 
@@ -173,10 +173,7 @@ DEFAULT_FROM_EMAIL = 'avishkar.more@spit.ac.in'
 EMAIL_USE_SSL = False
 SITE_URL =  'http://127.0.0.1:8000'
 ADMIN_EMAIL = 'avishkar.more@spit.ac.in'
-
-
-
-
+BOOKING_ADMIN_EMAIL = 'avishkar.more@spit.ac.in'  # Added for booking approval emails
 
 
 

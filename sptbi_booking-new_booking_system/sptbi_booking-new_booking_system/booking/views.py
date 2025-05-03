@@ -914,52 +914,118 @@ def debug_bookings(request):
     return HttpResponse("\n".join(output))
 
 
-
-@csrf_exempt    # Remove this if you're passing CSRF token via JS correctly
-@require_POST 
-@login_required 
+@csrf_exempt
+@login_required
 def book_room(request):
+    """Handle room booking requests, with approval if needed."""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Only POST method is allowed'})
+    
     try:
         data = json.loads(request.body)
         room = data.get('room')
-        time_slot = data.get('time_slot')
+        time_str = data.get('time_slot')
         floor_slug = data.get('floor')
         date_str = data.get('date')
         reason = data.get('reason', '')
-        booked_by = request.user.username
-
-        # Basic validation
-        if not all([room, time_slot, floor_slug, date_str]):
-            return JsonResponse({'success': False, 'error': 'Missing required fields'})
-
-        date = parse_date(date_str)
-        if not date:
+        
+        # Get floor
+        floor = get_object_or_404(Floor, slug=floor_slug)
+        
+        # Parse date
+        try:
+            booking_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
             return JsonResponse({'success': False, 'error': 'Invalid date format'})
-
-        floor = Floor.objects.get(slug=floor_slug)
-
+        
+        # Parse time
+        time_match = re.match(r'(\d+)[:\.]?(\d*)\s*(am|pm)', time_str.lower())
+        if not time_match:
+            return JsonResponse({'success': False, 'error': 'Invalid time format'})
+        
+        hours = int(time_match.group(1))
+        minutes = int(time_match.group(2) or 0)
+        period = time_match.group(3).lower()
+        
+        # Convert to 24-hour format
+        if period == 'pm' and hours < 12:
+            hours += 12
+        elif period == 'am' and hours == 12:
+            hours = 0
+        
+        time_obj = time(hours, minutes)
+        
         # Check for conflicts
-        exists = Booking.objects.filter(
-            room=room, floor=floor, date=date, time_slot=time_slot
-        ).exclude(status='rejected').exists()
-
-        if exists:
-            return JsonResponse({'success': False, 'error': 'Room already booked'})
-
-        # Create pending booking
-        Booking.objects.create(
-            room=room,
-            time_slot=time_slot,
-            date=date,
-            booked_by=booked_by,
+        if Booking.objects.filter(
             floor=floor,
-            status='pending',
-            user=request.user,
+            room=room,
+            date=booking_date,
+            time_slot=time_obj
+        ).exists():
+            return JsonResponse({'success': False, 'error': 'This slot is already booked'})
+        
+        # Determine if this booking requires approval
+        requires_approval = floor.booking_type.lower() == 'requires approval'
+        
+        # Create booking
+        booking = Booking.objects.create(
+            floor=floor,
+            room=room,
+            time_slot=time_obj,
+            date=booking_date,
             reason=reason,
+            user=request.user,
+            booked_by=request.user.company_name if hasattr(request.user, 'company_name') else request.user.username,
+            status='pending' if requires_approval else 'confirmed',
+            approval_token=str(uuid.uuid4()) if requires_approval else None
         )
-        return JsonResponse({'success': True})
+        
+        # If approval is required, send email to admin
+        if requires_approval:
+            # Generate approval links
+            approve_url = request.build_absolute_uri(
+                reverse('booking:approve_booking', args=[booking.approval_token])
+            )
+            reject_url = request.build_absolute_uri(
+                reverse('booking:reject_booking', args=[booking.approval_token])
+            )
+            
+            # Send email to admin
+            send_mail(
+                subject=f'Booking Approval Required: {room} at {time_str}',
+                message=f"""A new booking requires your approval:
+                
+User: {request.user.get_full_name() or request.user.username}
+Company: {request.user.company_name if hasattr(request.user, 'company_name') else 'N/A'}
+Room: {room}
+Date: {booking_date}
+Time: {time_str}
+Reason: {reason}
 
-    except Floor.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'Invalid floor'})
+Approve: {approve_url}
+Reject: {reject_url}
+""",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.BOOKING_ADMIN_EMAIL],
+                fail_silently=False,
+            )
+            
+            return JsonResponse({
+                'success': True, 
+                'message': 'Your booking request has been submitted for approval. You will be notified when it is approved.'
+            })
+        else:
+            return JsonResponse({
+                'success': True, 
+                'message': 'Booking confirmed successfully!'
+            })
+            
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})  
+        logger.error(f"Error in book_room: {str(e)}")
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+
+
+
+
