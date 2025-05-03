@@ -1,97 +1,24 @@
 {% extends 'base.html' %}
-{% load booking_filters %}
 {% load static %}
+{% load booking_filters %}
 
-{% block Title %}Booking - {{ floor.name }}{% endblock %}
+{% block Title %}Restricted Booking - {{ floor.name }}{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/booking.css' %}">
-<style>
-    .booking-cell.booked.selected {
-        background-color: #ffcccc !important;
-        border: 2px solid #ff6666 !important;
-    }
-    .booking-cell.booked {
-        cursor: pointer !important;
-        user-select: none;
-        position: relative;
-    }
-    .booking-cell .booked-text {
-        pointer-events: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .delete-options {
-        margin-top: 20px;
-        text-align: right;
-        padding: 10px;
-    }
-    #deleteSelectedBtn {
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    #deleteSelectedBtn:hover {
-        background-color: #c82333;
-    }
-    .admin-controls {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: white;
-        padding: 10px;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        display: none;
-    }
-    .admin-controls.show {
-        display: block;
-    }
-
-    /* Pending bookings (red) */
-    .booking-cell.pending {
-        background-color: #ffdddd!important;
-        border: 2px dashed #ff0000!important;
-    }
-
-    /* Approved bookings (green) */
-   .booking-cell.approved {
-        background-color: #ddffdd!important;
-        border: 2px solid #00aa00!important;
-    }
-
-
-
-</style>
-{% endblock %}
-
-{% if messages %}
-  <div>
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
 
 {% block content %}
-<meta name="floor-slug" content="{{ floor.slug }}">
-<meta name="floor-name" content="{{ floor.name }}">
+<!-- Hidden booking container with data attributes for JS -->
+<div id="bookingContainer"
+    data-booking-type="{{ floor.booking_type }}"
+    data-csrf-token="{{ csrf_token }}"
+    data-booking-url="{% url 'booking:restricted_booking' floor.slug %}"
+    data-current-date="{{ date|date:'Y-m-d' }}"
+    data-is-admin="{% if user.is_staff %}true{% else %}false{% endif %}"
+    style="display: none;">
+</div>
+
 <div class="container-fluid px-4">
     <div class="table-container">
         <div class="date-navigation">
@@ -100,7 +27,7 @@
                     <a href="?date={{ prev_day }}" class="nav-arrow">
                         <i class="bi bi-chevron-left"></i>
                     </a>
-                    <span class="date-display"><i class="bi bi-calendar"></i> {{ date|date:"l, F d, Y" }}</span>
+                    <span class="date-display" data-date="{{ selected_date|date:'Y-m-d' }}"><i class="bi bi-calendar"></i> {{ selected_date|date:"l, F d, Y" }}</span>
                     <a href="?date={{ next_day }}" class="nav-arrow">
                         <i class="bi bi-chevron-right"></i>
                     </a>
@@ -120,18 +47,6 @@
                 </div>
             </div>
             {% endif %}
-            <div class="floor-selector">
-                <select id="floorSelect" class="form-select">
-                    <option value="">Select Floor</option>
-                    {% for available_floor in available_floors %}
-                    <option value="{{ available_floor.slug }}" 
-                            data-booking-type="{{ available_floor.booking_type }}"
-                            {% if available_floor.slug == floor.slug %}selected{% endif %}>
-                        {{ available_floor.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
         </div>
 
         <div class="table-responsive">
@@ -147,215 +62,479 @@
                 <tbody>
                     {% for time in time_slots %}
                     <tr>
-                        <td class="time-slot">{{ time.name }}</td>
+                        <td class="time-slot">{{ time|time:"h:i a"|lower }}</td>
                         {% for room in rooms %}
-                        {% with time_key=time.name|lower %}
-                        {% with slot_data=booked_slots|get_item:room|get_item:time_key %}
-                            {% if slot_data and slot_data.status == 'approved' %}
-                            <td class="booking-cell 
-                                       {%if slot_data.status == 'pending'%}pending
-                                       {% elif slot_data.status == 'approved' %}approved{% endif %}"
-                                data-room="{{ room }}"
-                                data-time="{{ time.name|lower }}"
-                                data-status="{{slot_data.status}}">
-                                <!-- data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
-                                data-booked-by="{{ slot_data.booked_by }}"> -->
-                                <div class="booked-text">{{ slot_data.reason }}
-                                                         {% if slot_data.status == 'pending' %}(Pending){% endif %}
-                                </div>
-                            </td>
-                            {% else %}
-                            <td class="booking-cell"
-                                data-room="{{ room }}"
-                                data-time="{{ time.name|lower }}"
-                                data-booking-type="{{ floor.booking_type }}"
-                                data-floor="{{ floor.slug }}"
-                                data-booked="false"
-                                data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}">
-                            </td>
+                        <td class="booking-cell
+                            {% with time_key=time|format_time_key %}
+                                {% if booked_slots|get_item:room|get_item:time_key %}
+                                    {% with booking_data=booked_slots|get_item:room|get_item:time_key %}
+                                        {% if booking_data.status == 'pending' %}
+                                            booked pending
+                                        {% else %}
+                                            booked
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endif %}
+                            {% endwith %}"
+                            data-room="{{ room }}"
+                            data-time="{{ time|time:'h:i a'|lower }}"
+                            data-floor="{{ floor.slug }}">
+                            {% with time_key=time|format_time_key %}
+                            {% if booked_slots|get_item:room|get_item:time_key %}
+                                {% with booking_data=booked_slots|get_item:room|get_item:time_key %}
+                                    {% if booking_data.status == 'pending' %}
+                                        <span class="booking-info pending">{{ booking_data.reason }} (Pending)</span>
+                                    {% else %}
+                                        <span class="booked-text">{{ booking_data.reason }}</span>
+                                    {% endif %}
+                                {% endwith %}
                             {% endif %}
-                        {% endwith %}
-                        {% endwith %}
+                            {% endwith %}
+                        </td>
                         {% endfor %}
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-    </div>
-</div>
 
-{% if request.user.is_authenticated %}
-<div class="admin-controls" id="adminControls">
-    <button class="btn btn-danger" id="deleteSelectedBtn">
-        <i class="fas fa-trash"></i> Delete Selected Slots
-    </button>
-</div>
-{% endif %}
-
-
-<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="bookingModalLabel">Book a Slot</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="bookingForm">
-                    <div class="mb-3">
-                        <label for="bookingReason" class="form-label">Reason for Booking</label>
-                        <textarea class="form-control" id="bookingReason" rows="3" required></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="bookSlotBtn">Submit for Approval</button>
-            </div>
+        {% if not user_authenticated %}
+        <div class="alert alert-info mt-3">
+            <i class="bi bi-info-circle"></i>
+            To make a booking, please <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link">login</a> to your account.
         </div>
+        {% endif %}
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        flatpickr(".date-display", {
-            defaultDate: "{{ date|date:'Y-m-d' }}",
-            onChange: function(selectedDates, dateStr, instance) {
-                const newUrl = new URL(window.location.href);
-                newUrl.searchParams.set('date', dateStr);
-                window.location.href = newUrl.toString();
-            }
-        });
-        
-        function changeFloor(slug) {
-            if (slug) {
-                const currentUrl = new URL(window.location.href);
-                const date = currentUrl.searchParams.get('date');
-                let newUrl = `/booking/restricted-booking/${slug}/`;
-                if (date) {
-                    newUrl += `?date=${date}`;
-                }
-                window.location.href = newUrl;
-            }
-        }
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap');
 
-
-
-
-
-        // Add event listener to the floor select dropdown if it exists
-        const floorSelect = document.getElementById("floorSelect");
-        if (floorSelect) {
-            floorSelect.addEventListener("change", function() {
-                changeFloor(this.value);
-            });
-        }
-
-    document.getElementById('bookSlotBtn').addEventListener('click', function() {
-    const reason = document.getElementById('bookingReason').value;
-    const selectedCell = document.querySelector('.booking-cell.selected');
-
-    fetch("{% url 'restricted_booking_view' floor.slug %}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}',
-        },
-        body: JSON.stringify({
-            time_slot: selectedCell.getAttribute('data-time'),
-            room: selectedCell.getAttribute('data-room'),
-            reason: reason,
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            // Update UI to show pending state (red)
-            selectedCell.classList.add('booked', 'pending');
-            selectedCell.innerHTML = `<div class="booked-text">${reason} (Pending)</div>`;
-        }
-    });
-});
-        // Variables to store selected cell
-let selectedCell = null;
-
-// Add click event listeners to booking cells
-document.querySelectorAll('.booking-cell:not(.booked)').forEach(cell => {
-    cell.addEventListener('click', function() {
-        // Remove selected class from all cells
-        document.querySelectorAll('.booking-cell').forEach(c => c.classList.remove('selected'));
-        
-        // Add selected class to clicked cell
-        this.classList.add('selected');
-        selectedCell = this;
-        
-        // Show booking modal
-        const bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
-        bookingModal.show();
-    });
-});
-
-// Add click event listeners to booked cells for admin users
-if (document.querySelector('[data-is-authenticated="true"]')) {
-    document.querySelectorAll('.booking-cell.booked').forEach(cell => {
-        cell.addEventListener('click', function() {
-            if (this.classList.contains('selected')) {
-                this.classList.remove('selected');
-                
-                // Hide admin controls if no cells are selected
-                if (!document.querySelector('.booking-cell.selected')) {
-                    document.getElementById('adminControls').classList.remove('show');
-                }
-            } else {
-                this.classList.add('selected');
-                
-                // Show admin controls
-                document.getElementById('adminControls').classList.add('show');
-            }
-        });
-    });
+/* Table Container and Navigation */
+.table-container {
+    position: relative;
+    width: 100%;
+    margin-top: 0;
+    overflow: hidden;
 }
 
+.date-navigation {
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin: 0;
+    padding: 1rem 2rem;
+    background-color: #f0f0f0;
+    width: 100%;
+    border-bottom: 1px solid #e5e7eb;
+}
 
-   // Show booking modal with fallback
-   const bookingModal = document.getElementById('bookingModal');
-        if (bookingModal) {
-            if (typeof bootstrap !== 'undefined') {
-                const modal = new bootstrap.Modal(bookingModal);
-                modal.show();
-            } else {
-                // Fallback if Bootstrap JS is not available
-                bookingModal.style.display = 'block';
-                bookingModal.classList.add('show');
-            }
-        }
+.date-nav-wrapper {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+}
 
-// Delete selected slots button
-document.getElementById('deleteSelectedBtn').addEventListener('click', function() {
-    const selectedCells = document.querySelectorAll('.booking-cell.booked.selected');
-    if (selectedCells.length === 0) {
-        alert('Please select at least one booked slot to delete.');
-        return;
+.date-nav-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    pointer-events: auto;
+}
+
+.admin-options {
+    position: relative;
+    margin-left: auto;
+    margin-right: 2rem;
+    z-index: 1;
+}
+
+.admin-options .nav-item.dropdown {
+    position: relative;
+}
+
+.admin-options .nav-link {
+    position: relative;
+    z-index: 0;
+    color: #fff;
+    font-weight: 500;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+    background-color: #1e3a8a;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.admin-options .nav-link:hover {
+    background-color: #1e40af;
+}
+
+.admin-options .dropdown-menu {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    min-width: 180px;
+    padding: 0;
+    margin: 0;
+    font-size: 0.875rem;
+    background-color: #1e3a8a;
+    border: none;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    z-index: -1;
+    transform-origin: top right;
+    transition: all 0.4s ease;
+    transform: translateY(-10px);
+    max-width: calc(100vw - 2rem);
+    width: max-content;
+    list-style: none;
+    pointer-events: none;
+}
+
+.admin-options .nav-item.dropdown:hover .dropdown-menu {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition-delay: 0.5s;
+}
+
+.admin-options .dropdown-menu:hover {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition-delay: 0s;
+}
+
+/* Add a hover area to prevent accidental closing */
+.admin-options .nav-item.dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background: transparent;
+}
+
+.admin-options .dropdown-item {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.admin-options .dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.admin-options .dropdown-item:hover {
+    background-color: #1e40af;
+    color: #fff;
+    padding-left: 1.75rem;
+}
+
+.nav-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    color: #212529;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: 900;
+}
+
+.nav-arrow:hover {
+    color: #0d6efd;
+    background: none;
+}
+
+.date-display {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #212529;
+    min-width: 200px;
+    text-align: center;
+    font-family: 'Anuphan', sans-serif;
+}
+
+/* Table Styling */
+.container-fluid {
+    padding: 0;
+}
+
+.booking-table {
+    font-family: 'Roboto', Arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0;
+    background-color: white;
+    font-size: 0.875rem;
+}
+
+.booking-table th,
+.booking-table td {
+    border: 1px solid #e5e7eb;
+    padding: 0.35rem;
+    vertical-align: middle;
+    line-height: 1.2;
+}
+
+.time-slot {
+    text-align: center;
+    font-weight: 500;
+    background-color: white;
+    white-space: nowrap;
+    color: #1f2937;
+    font-size: 0.95rem;
+    padding-right: 4rem !important;
+    padding-left: 3rem !important;
+}
+
+.time-slot-header {
+    width: 85px;
+    background-color: white;
+    text-align: center;
+    white-space: nowrap;
+    color: #1e40af;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding-right: 4rem !important;
+    padding-left: 3rem !important;
+}
+
+.booking-cell {
+    height: 28px;
+    text-align: center;
+    position: relative;
+    min-width: 130px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.booking-cell.selected {
+    background-color: #1e40af !important;
+    color: white !important;
+}
+
+.booking-cell.booked {
+    background-color: #f3f4f6;
+    cursor: not-allowed;
+}
+
+.booking-cell.pending {
+    background-color: #ffebee !important; /* Red background for pending bookings */
+    cursor: not-allowed;
+}
+
+.booking-info.pending {
+    color: #d32f2f !important; /* Red text for pending bookings */
+    font-weight: normal;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.875rem;
+    text-align: center;
+    display: block;
+}
+
+.booking-cell:not(.booked):hover {
+    background-color: #e5e7eb;
+}
+
+.booked-text {
+    font-weight: normal;
+    font-family: 'Roboto', sans-serif;
+    color: #4b5563;
+    font-size: 0.875rem;
+    text-align: center;
+    display: block;
+}
+
+.book-slot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.813rem;
+}
+
+.booking-table th:not(.time-slot-header) {
+    color: #1e40af;
+    font-weight: 700;
+    font-size: 0.95rem;
+    background-color: #f8f9fa;
+    padding: 0.35rem;
+    padding-left: 3rem;
+}
+
+.selectable-header {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.selectable-header.selected {
+    background-color: #1e40af !important;
+    color: white !important;
+}
+
+/* Column selection styles */
+th:not(.time-slot-header) {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+th.selected {
+    background-color: #1e40af !important;
+    color: white !important;
+}
+
+.table-responsive {
+    position: relative;
+    z-index: 0;
+}
+
+/* Header selection styles */
+.room-header {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.room-header.selected {
+    background-color: #1e40af !important;
+    color: white !important;
+}
+
+.time-slot-header {
+    cursor: default;
+    user-select: none;
+}
+
+/* Ensure booked text remains visible on selection */
+.booking-cell.selected .booked-text {
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0.25rem;
     }
-    
-    if (confirm('Are you sure you want to delete the selected bookings?')) {
-        // Implement deletion logic here
-        console.log('Deleting selected bookings...');
+
+    .booking-table th,
+    .booking-table td {
+        padding: 0.25rem;
+    }
+
+    .booking-cell {
+        height: 32px;
+        min-width: 120px;
+    }
+
+    .admin-options .dropdown-menu {
+        position: absolute;
+        width: auto;
+        min-width: 200px;
+    }
+
+    .admin-options .nav-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.813rem;
+    }
+
+    .admin-options .dropdown-item {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.813rem;
+    }
+}
+
+#bookButton:hover {
+    background-color: white !important;
+    color: #1e3a8a !important;
+    border: 1px solid #1e3a8a !important;
+}
+
+.avi-dropdown {
+    position: absolute;
+    z-index: 1050;
+}
+</style>
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    flatpickr(".date-display", {
+        defaultDate: "{{ selected_date|date:'Y-m-d' }}",
+        onChange: function(selectedDates, dateStr, instance) {
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set('date', dateStr);
+            window.location.href = newUrl.toString();
+        }
+    });
+
+    if (document.querySelector(".nav-item")) {
+        document.querySelector(".nav-item").addEventListener("mouseover", (e) => {
+            document.querySelector(".table-responsive").style.zIndex = -1;
+        });
+
+        document.querySelector(".nav-item").addEventListener("mouseout", (e) => {
+            document.querySelector(".table-responsive").style.zIndex = 0;
+        });
+    }
+
+    // Define bookedSlots for JavaScript
+    let bookedSlots;
+    try {
+        // Parse the booked slots data from the server
+        const bookedSlotsData = document.getElementById('booked_slots_data');
+        if (bookedSlotsData) {
+            bookedSlots = JSON.parse(bookedSlotsData.textContent);
+        }
+    } catch(e) {
+        console.error('Error parsing booked slots data:', e);
+    }
+
+    // Add booking functionality
+    const bookButton = document.getElementById('bookButton');
+    if (bookButton) {
+        bookButton.addEventListener('click', function() {
+            // Booking logic is handled by booking_with_approval.js
+        });
     }
 });
-        </script>
+</script>
 
-        <!-- {% if floor.booking_type == "requires approval" %} -->
-            <!-- <script src="{% static 'js/booking_with_approval.js' %}"></script> -->
-        <!-- {% else %} -->
-            <!-- <script src="{% static 'js/booking.js' %}"></script> -->
-        <!-- {% endif %} -->
-
-        {{ booked_slots|json_script:"booked_slots_data" }}
-        {% endblock %}
+<script src="{% static 'js/booking_with_approval.js' %}"></script>
+{% if user.is_staff %}
+<script src="{% static 'js/admin_options.js' %}"></script>
+{% endif %}
+{{ booked_slots|json_script:"booked_slots_data" }}
 
 
+{% endblock %}
