@@ -97,7 +97,7 @@ DATABASES = {
         'USER': 'sptbi',
         'PASSWORD': 'sptbi',
         'HOST': 'localhost',
-        'PORT': '5433',
+        'PORT': '5432',
     }
 }
 

@@ -148,6 +148,7 @@ def booking(request):
 
 def floor_booking(request, floor_slug):
     """Handle booking for a specific floor."""
+    print("In here")
     floor = get_object_or_404(Floor, slug=floor_slug, is_active=True)
     
     # Get all available floors for the dropdown
@@ -216,7 +217,7 @@ def floor_booking(request, floor_slug):
     # Previous and next day for navigation
     prev_day = (selected_date - timedelta(days=1)).strftime('%Y-%m-%d')
     next_day = (selected_date + timedelta(days=1)).strftime('%Y-%m-%d')
-    
+
     context = {
         'floor': floor,
         'available_floors': available_floors,
@@ -312,9 +313,10 @@ def profile(request):
     else:
         previous_month = str(int(month) - 1).zfill(2)
         previous_year = year
-    print(month, year)
+    print(user.email)
     timeslots_tm = aTimeSlot.objects.filter(
         email=user.email, month=month, year=year)
+    print(f"timeslots_tm : {timeslots_tm}")
     timeslots = sorted(timeslots_tm, key=lambda obj: obj.date)
     timeslots_pm = aTimeSlot.objects.filter(
         email=user.email, month=previous_month, year=previous_year)
@@ -329,11 +331,11 @@ def profile(request):
     if not user.is_authenticated:
         return redirect("login")
     
-    # companies = aTimeSlot.objects.values('name').distinct()
+    companies = aTimeSlot.objects.values('name').distinct()
     keyset = Booking.objects.values('booked_by')
-    companies = [key['booked_by'] for key in keyset]
-    companies = list(set(companies))
-    print(companies)
+    # companies = [key['booked_by'] for key in keyset]
+    # companies = list(set(companies))
+    print({'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": active_objs, 'total': total, 'pg': pg, 'count': count, 'events': events, 'companies':companies})
     return render(request, 'booking/profile.html', {'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": active_objs, 'total': total, 'pg': pg, 'count': count, 'events': events, 'companies':companies})
 
 
@@ -652,6 +654,127 @@ def save_columns(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 @login_required
+# def save_booking(request):
+#     """Save multiple bookings."""
+#     if request.method == 'POST':
+#         try:
+#             bookings_data = json.loads(request.body)
+#             if not isinstance(bookings_data, list):
+#                 return JsonResponse({
+#                     'status': 'error',
+#                     'message': 'Data should be a list of bookings'
+#                 }, status=400)
+#             for data in bookings_data:
+#                 if not isinstance(data, dict):
+#                     return JsonResponse({
+#                         'status': 'error',
+#                         'message': 'Each booking should be a dictionary'
+#                     }, status=400)
+#                 floor = get_object_or_404(Floor, slug=data['floor'])
+                
+#                 # Parse the time slot
+#                 time_str = data['time_slot'].strip()
+#                 logger.info(f"Processing time string: '{time_str}'")
+                
+#                 # Extract components with better regex
+#                 import re
+#                 time_match = re.match(r'(\d+)[:\.]?(\d*)\s*(am|pm)', time_str.lower())
+                
+#                 if time_match:
+#                     hours = int(time_match.group(1))
+#                     minutes = int(time_match.group(2) or 0)
+#                     period = time_match.group(3).lower()
+                    
+#                     # Convert to 24-hour format if pm
+#                     if period == 'pm' and hours < 12:
+#                         hours += 12
+#                     elif period == 'am' and hours == 12:
+#                         hours = 0
+                        
+#                     # Create a valid time object
+#                     time_obj = dt.time(hours, minutes)
+#                     logger.info(f"Successfully parsed time: {time_obj}")
+#                 else:
+#                     logger.error(f"Failed to parse time string: {time_str}")
+#                     return JsonResponse({
+#                         'status': 'error',
+#                         'message': f"Could not parse time string: {time_str}. Expected format: HH:MM am/pm"
+#                     }, status=400)
+                
+#                 # Get the date from the query parameters or use current date
+#                 selected_date = data.get('date')
+#                 booking_date = datetime.now().date()
+#                 if selected_date:
+#                     try:
+#                         booking_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+#                     except ValueError:
+#                         # If date parsing fails, use current date
+#                         pass
+                
+#                 # Create the booking
+#                 booking = Booking.objects.create(
+#                     floor=floor,
+#                     room=data['room'],
+#                     time_slot=time_obj,
+#                     reason=data['reason'],
+#                     user=request.user,
+#                     booked_by=request.user.company_name,
+#                    # email=request.user.email,  # optional: ensure email is saved
+#                     date=booking_date,
+#                     #status='approved',
+#                     # status='pending',
+#                 )
+#                 # # After creating the booking, send email to admin
+#                 # approve_url = request.build_absolute_uri(reverse('booking:approve-booking', args=[booking.id]))
+#                 # reject_url = request.build_absolute_uri(reverse('booking:reject-booking', args=[booking.id]))
+
+
+#      # Send email notification to admin
+# #             send_mail(
+# #             subject='New Room Booking Request',
+# #             message=f"""A new room booking has been requested by {request.user.username}.
+
+# #     Floor: {floor.name}
+# #     Room: {data['room']}
+# #     Time Slot: {time_obj}
+# #     Date: {booking_date}
+# #     Reason: {data['reason']}
+
+
+# #     Click below to respond to this booking:
+# # ✅ Approve: {approve_url}
+# # ❌ Reject: {reject_url}
+# #                     """,
+# #                     from_email=settings.DEFAULT_FROM_EMAIL,
+# #                     recipient_list=['avishkar.more@spit.ac.in', 'sheshasai.reddy@spit.ac.in', 'sahil.nannaware@spit.ac.in'],  # Update this with the actual admin email
+# #                     fail_silently=False,
+# #     # Please log in to the admin panel to approve or reject this request.
+# #     # """,
+# #     # from_email=settings.DEFAULT_FROM_EMAIL,
+# #     # recipient_list=['sahil.nannaware@spit.ac.in'],
+# #     # fail_silently=False,
+# # )
+
+#             return JsonResponse({
+#                 'status': 'success',
+#                 'booked_by': bookings_data[-1]['reason']  # Return the last booking reason
+#                 })
+            
+#         except Floor.DoesNotExist:
+#             return JsonResponse({
+#                 'status': 'error',
+#                 'message': 'Floor not found'
+#             }, status=404)
+#         except Exception as e:
+#             return JsonResponse({
+#                 'status': 'error',
+#                 'message': str(e)
+#             }, status=400)
+    
+#     return JsonResponse({
+#         'status': 'error',
+#         'message': 'Invalid request method'
+# }, status=405)
 def save_booking(request):
     """Save multiple bookings."""
     if request.method == 'POST':
@@ -662,20 +785,20 @@ def save_booking(request):
                     'status': 'error',
                     'message': 'Data should be a list of bookings'
                 }, status=400)
+            
             for data in bookings_data:
                 if not isinstance(data, dict):
                     return JsonResponse({
                         'status': 'error',
                         'message': 'Each booking should be a dictionary'
                     }, status=400)
+
                 floor = get_object_or_404(Floor, slug=data['floor'])
                 
-                # Parse the time slot
+                # Parse time string
                 time_str = data['time_slot'].strip()
                 logger.info(f"Processing time string: '{time_str}'")
-                
-                # Extract components with better regex
-                import re
+
                 time_match = re.match(r'(\d+)[:\.]?(\d*)\s*(am|pm)', time_str.lower())
                 
                 if time_match:
@@ -683,13 +806,11 @@ def save_booking(request):
                     minutes = int(time_match.group(2) or 0)
                     period = time_match.group(3).lower()
                     
-                    # Convert to 24-hour format if pm
                     if period == 'pm' and hours < 12:
                         hours += 12
                     elif period == 'am' and hours == 12:
                         hours = 0
-                        
-                    # Create a valid time object
+                    
                     time_obj = dt.time(hours, minutes)
                     logger.info(f"Successfully parsed time: {time_obj}")
                 else:
@@ -698,18 +819,30 @@ def save_booking(request):
                         'status': 'error',
                         'message': f"Could not parse time string: {time_str}. Expected format: HH:MM am/pm"
                     }, status=400)
-                
-                # Get the date from the query parameters or use current date
+
                 selected_date = data.get('date')
                 booking_date = datetime.now().date()
                 if selected_date:
                     try:
                         booking_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
                     except ValueError:
-                        # If date parsing fails, use current date
-                        pass
-                
-                # Create the booking
+                        pass  # fallback to today's date
+
+                # Check for conflicts
+                conflict = Booking.objects.filter(
+                    floor=floor,
+                    room=data['room'],
+                    date=booking_date,
+                    time_slot=time_obj
+                ).exists()
+
+                if conflict:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': f"Time slot {time_str} for room {data['room']} on {booking_date} is already booked."
+                    }, status=409)
+
+                # Create Booking
                 booking = Booking.objects.create(
                     floor=floor,
                     room=data['room'],
@@ -717,62 +850,43 @@ def save_booking(request):
                     reason=data['reason'],
                     user=request.user,
                     booked_by=request.user.company_name,
-                   # email=request.user.email,  # optional: ensure email is saved
                     date=booking_date,
-                    #status='approved',
-                    # status='pending',
                 )
-                # # After creating the booking, send email to admin
-                # approve_url = request.build_absolute_uri(reverse('booking:approve-booking', args=[booking.id]))
-                # reject_url = request.build_absolute_uri(reverse('booking:reject-booking', args=[booking.id]))
-
-
-     # Send email notification to admin
-#             send_mail(
-#             subject='New Room Booking Request',
-#             message=f"""A new room booking has been requested by {request.user.username}.
-
-#     Floor: {floor.name}
-#     Room: {data['room']}
-#     Time Slot: {time_obj}
-#     Date: {booking_date}
-#     Reason: {data['reason']}
-
-
-#     Click below to respond to this booking:
-# ✅ Approve: {approve_url}
-# ❌ Reject: {reject_url}
-#                     """,
-#                     from_email=settings.DEFAULT_FROM_EMAIL,
-#                     recipient_list=['avishkar.more@spit.ac.in', 'sheshasai.reddy@spit.ac.in', 'sahil.nannaware@spit.ac.in'],  # Update this with the actual admin email
-#                     fail_silently=False,
-#     # Please log in to the admin panel to approve or reject this request.
-#     # """,
-#     # from_email=settings.DEFAULT_FROM_EMAIL,
-#     # recipient_list=['sahil.nannaware@spit.ac.in'],
-#     # fail_silently=False,
-# )
+                print(request.user.company_name)
+                # Create aTimeSlot
+                aTimeSlot.objects.create(
+                    slot=data['time_slot'],  # original AM/PM string
+                    room=data['room'],
+                    date=booking_date.strftime('%Y-%m-%d'),
+                    name=request.user.company_name,
+                    email=request.user.email,
+                    month=str(booking_date.month).zfill(2),
+                    year=str(booking_date.year),
+                    reason=data['reason']
+                )
 
             return JsonResponse({
                 'status': 'success',
-                'booked_by': bookings_data[-1]['reason']  # Return the last booking reason
-                })
-            
+                'booked_by': bookings_data[-1]['reason']
+            })
+
         except Floor.DoesNotExist:
             return JsonResponse({
                 'status': 'error',
                 'message': 'Floor not found'
             }, status=404)
+
         except Exception as e:
+            logger.exception("Unexpected error occurred while saving bookings.")
             return JsonResponse({
                 'status': 'error',
                 'message': str(e)
             }, status=400)
-    
+
     return JsonResponse({
         'status': 'error',
         'message': 'Invalid request method'
-}, status=405)
+    }, status=405)
 
 #Approve booking
 # def approve_booking(request, booking_id):
