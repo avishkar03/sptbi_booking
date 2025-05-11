@@ -245,7 +245,7 @@
   </div>
 </div>
 <div class="logs-wrapper">
-  <form method="POST" action="{% url 'booking:download_log2' %}">
+  <form method="POST" action="{% url 'booking:user_download_log' %}">
       {% csrf_token %}
       <table style="border-spacing: 30px;">
         <tr>
@@ -286,8 +286,8 @@
   <div class="user-p">
     <div class="mobile-user-1">
     <div class="profile">
-      {% if user.logo}
-      <img src="{{user.logo.url}}" alt="profile" />
+      {% if user.logo %}
+      <img src="{{user.logo}}" alt="profile" />
       {% endif %} 
       <h3 style="color: #1c4386">{{user.company_name}}</h3>
     </div>
@@ -314,7 +314,7 @@
       </a>
     </div>
     <center>
-    <a class="password" href="{% url 'booking:download_log' %}" download style="text-decoration: none;">Download {% now "M"%} Logs</a> 
+    <a class="password" href="{% url 'booking:download_log' %}" download style="text-decoration: none;">Download {% now "M" %} Logs</a> 
   </center>
   </div>
     <div class="seperator" style="margin-top:25px;margin-bottom: 25px;">
@@ -324,7 +324,7 @@
     </div>
     <div class="mobile-user-2">
     <div class="logs-wrapper">
-      <form method="POST" action="{% url 'booking:user_download_log' %}">
+      <form method="POST" action="{% url 'booking:download_log2' %}">
           {% csrf_token %}
           <table class="user-logs-table">
           <!-- <br><br> -->
@@ -420,11 +420,10 @@
     </div>
   </div>
 </div>
-
-
+{%endif%}
 {% endblock content%} 
 {% block js %}
-<script src="{% static 'js/profile.js'%}"></script>
+<script src="{% static 'js/profile.js' %}"></script>
 
   
 <script

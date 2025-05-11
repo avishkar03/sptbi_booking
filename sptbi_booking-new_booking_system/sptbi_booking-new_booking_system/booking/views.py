@@ -279,7 +279,7 @@ def profile(request):
     y = datetime.now().strftime("%Y-%m-%d").split("-")[0]
     objs = User.objects.filter(is_superuser=False)
     active_objs = []
-    print(objs)
+    print(f"Objs : {objs}")
     for o in objs:
         if o.total > 0:
             active_objs.append(o)
@@ -287,10 +287,11 @@ def profile(request):
             email=o.email, month=mon, year=y).count()*0.5
         o.charges = 0 if o.free_slots < o.total else (o.free_slots - o.total) * 250
         o.save()
+    print(f"Active objs :{active_objs}")
     if request.method == "POST":
         if 'form1' in request.POST:
             email = request.POST.get("email")
-            return redirect(reverse('edit_user') + f'?email={email}')
+            return redirect(reverse('booking:edit_user') + f'?email={email}')
         elif 'form2' in request.POST:
             return redirect('change_password')
         elif 'form4' in request.POST:
@@ -336,7 +337,7 @@ def profile(request):
     # companies = [key['booked_by'] for key in keyset]
     # companies = list(set(companies))
     print({'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": active_objs, 'total': total, 'pg': pg, 'count': count, 'events': events, 'companies':companies})
-    return render(request, 'booking/profile.html', {'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": active_objs, 'total': total, 'pg': pg, 'count': count, 'events': events, 'companies':companies})
+    return render(request, 'booking/profile.html', {'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": objs, 'total': total, 'pg': pg, 'count': count, 'events': events, 'companies':companies})
 
 
 def edit_user(request):
@@ -372,7 +373,7 @@ def edit_user(request):
             u.delete()
             a.delete()
             return redirect('profile')
-    return render(request, 'booking/edituser.html', {'x': x, 'us': us, 'pg': pg, 'count': count, 'events': events})
+    return render(request, 'edituser.html', {'x': x, 'us': us, 'pg': pg, 'count': count, 'events': events})
 
 
 def change_password(request):
@@ -440,7 +441,7 @@ def download_log(request):
     currentmonth = datetime.now().strftime("%Y-%m-%d").split("-")[1]
     currentyear = datetime.now().strftime("%Y-%m-%d").split("-")[0]
     log = aTimeSlot.objects.filter(email=user.email, month=currentmonth, year=currentyear)
-    print(log)
+    print(user)
     response = HttpResponse(content_type='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment; filename="Booking Log SPTBI.xlsx"'
 
@@ -461,6 +462,7 @@ def download_log(request):
     return response
 
 def download_log_2(request):
+    # print("In download_log2")
     flag = 0
     if request.method == 'POST':
         s_month = re.split('-', request.POST.get('start'))
@@ -478,7 +480,7 @@ def download_log_2(request):
         
 
         if option != "all":
-            log = aTimeSlot.objects.filter(name=option,month__lte=end_month, month__gte=start_month, year__lte=end_year, year__gte=start_year)
+            log = aTimeSlot.objects.filter( month__lte=end_month, month__gte=start_month, year__lte=end_year, year__gte=start_year)
         else:
             flag+=1 
             log = aTimeSlot.objects.filter(month__lte=end_month, month__gte=start_month, year__lte=end_year, year__gte=start_year)
@@ -496,19 +498,32 @@ def download_log_2(request):
             result =  {name[i]: cnt[i] for i in range(len(name))}
             print(result)
 
+        print(log)
+
         response = HttpResponse(content_type='application/vnd.ms-excel')
         response['Content-Disposition'] = 'attachment; filename="Booking Log SPTBI.xlsx"'
 
         workbook = xlsxwriter.Workbook(response, {'remove_timezone': True})
         worksheet = workbook.add_worksheet()
 
+        # rooms = ['Meeting Room 1 - 1st Floor', 'Meeting Room 1 - 2nd Floor', 'Meeting Room 2 - 2nd Floor', 'Meeting Room - 8th Floor']
+        
         rooms = ['Meeting Room 1 - 1st Floor', 'Meeting Room 1 - 2nd Floor', 'Meeting Room 2 - 2nd Floor', 'Meeting Room - 8th Floor']
+        rooms2 = set()
+        floors = Floor.objects.filter(is_active=True)
+        for floor in floors:
+            if isinstance(floor.rooms, list):
+                rooms2.update(floor.rooms)
+        rooms2 = list(rooms2)  
+        print(sorted(rooms2))
+        rooms = rooms2 
+        
         headers = ['Company Name','Date', 'Slot','Room', 'Reason']
         for col, header in enumerate(headers):
             worksheet.write(0, col, header)
         for row, l in enumerate(log, start=1):
             data = [l.name,l.date, l.slot,
-                    rooms[l.room], l.reason,]
+                    rooms[ord(l.room[13]) - 49], l.reason,]
             for col, value in enumerate(data):
                 worksheet.write(row, col, value)
 
@@ -535,6 +550,7 @@ def download_log_2(request):
 
 def download_log_user(request):
     user = request.user
+    # print(request.POST)
     if request.method == 'POST':
         s_month = re.split('-', request.POST.get('start'))
         e_month = re.split('-', request.POST.get('end'))
@@ -545,8 +561,9 @@ def download_log_user(request):
         end_year = e_month[0]
 
         option = request.POST.get('selected')
-        print(option)
-       
+        print(option[10:-2])
+        user = User.objects.get(company_name=option[10:-2])
+        print(user)
         log = aTimeSlot.objects.filter(email=user.email,month__lte=end_month, month__gte=start_month, year__lte=end_year, year__gte=start_year)
 
         response = HttpResponse(content_type='application/vnd.ms-excel')
@@ -556,12 +573,22 @@ def download_log_user(request):
         worksheet = workbook.add_worksheet()
 
         rooms = ['Meeting Room 1 - 1st Floor', 'Meeting Room 1 - 2nd Floor', 'Meeting Room 2 - 2nd Floor', 'Meeting Room - 8th Floor']
+        rooms2 = set()
+        floors = Floor.objects.filter(is_active=True)
+        for floor in floors:
+            if isinstance(floor.rooms, list):
+                rooms2.update(floor.rooms)
+        rooms2 = list(rooms2)  
+        print(sorted(rooms2))
+        rooms = rooms2  
+        # print(f"log : {log}")    
         headers = ['Company Name','Date', 'Slot','Room', 'Reason']
         for col, header in enumerate(headers):
             worksheet.write(0, col, header)
         for row, l in enumerate(log, start=1):
+            print(ord(l.room[13]) - 49)
             data = [l.name,l.date, l.slot,
-                    rooms[l.room], l.reason,]
+                    rooms[ord(l.room[13]) - 49], l.reason,]
             for col, value in enumerate(data):
                 worksheet.write(row, col, value)
 
