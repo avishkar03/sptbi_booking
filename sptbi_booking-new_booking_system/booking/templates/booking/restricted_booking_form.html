@@ -1,0 +1,585 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load booking_filters %}
+
+{% block Title %}Restricted Booking - {{ floor.name }}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    /* Custom styles for restricted booking page */
+</style>
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+  <div style="display: none;" id="django-messages">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" data-message="{{ message }}" data-type="{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+  <script>
+    // Process Django messages on page load and display them as modal dialogs
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        const messagesContainer = document.getElementById('django-messages');
+        if (messagesContainer) {
+          const messageElements = messagesContainer.querySelectorAll('.alert');
+          messageElements.forEach(function(element) {
+            const messageText = element.dataset.message;
+            const messageType = element.dataset.type.toUpperCase();
+            if (messageText) {
+              window.CustomDialog.showModal({
+                title: messageType === 'SUCCESS' ? 'Success' :
+                       (messageType === 'ERROR' ? 'Error' :
+                       (messageType === 'WARNING' ? 'Warning' : 'Information')),
+                message: messageText,
+                type: messageType,
+                buttons: [
+                  {
+                    text: 'OK',
+                    type: 'primary',
+                    callback: modal => window.CustomDialog.closeModal(modal)
+                  }
+                ]
+              });
+            }
+          });
+        }
+      }, 500); // Slight delay to ensure all scripts are loaded
+    });
+  </script>
+{% endif %}
+
+<!-- Hidden booking container with data attributes for JS -->
+<div id="bookingContainer"
+    data-booking-type="{{ floor.booking_type }}"
+    data-csrf-token="{{ csrf_token }}"
+    data-booking-url="{% url 'booking:restricted_booking' floor.slug %}"
+    data-current-date="{{ date|date:'Y-m-d' }}"
+    data-is-admin="{% if user.is_staff %}true{% else %}false{% endif %}"
+    style="display: none;">
+</div>
+
+<div class="container-fluid px-4">
+    <div class="table-container">
+        <div class="date-navigation">
+            <div class="date-nav-wrapper">
+                <div class="date-nav-content">
+                    <a href="?date={{ prev_day }}" class="nav-arrow">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <span class="date-display" data-date="{{ selected_date|date:'Y-m-d' }}"><i class="bi bi-calendar"></i> {{ selected_date|date:"l, F d, Y" }}</span>
+                    <a href="?date={{ next_day }}" class="nav-arrow">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+            {% if user.is_staff %}
+            <div class="admin-options">
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link">
+                        Admin Options <i class="bi bi-caret-down-fill"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" id="addColumnBtn">Add Columns</a></li>
+                        <li><a class="dropdown-item" href="#" id="deleteColumnBtn">Delete Columns</a></li>
+                        <li><a class="dropdown-item" href="#" id="deleteSlotBtn">Delete Slot</a></li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="table-responsive">
+            <table class="booking-table mb-0">
+                <thead>
+                    <tr>
+                        <th class="time-slot-header">Time Slot</th>
+                        {% for room in rooms %}
+                        <th class="text-center room-header selectable-header">{{ room }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for time in time_slots %}
+                    <tr>
+                        <td class="time-slot">{{ time|time:"h:i a"|lower }}</td>
+                        {% for room in rooms %}
+                        <td class="booking-cell
+                            {% with time_key=time|format_time_key %}
+                                {% if booked_slots|get_item:room|get_item:time_key %}
+                                    {% with booking_data=booked_slots|get_item:room|get_item:time_key %}
+                                        {% if booking_data.status == 'pending' %}
+                                            booked pending
+                                        {% else %}
+                                            booked
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endif %}
+                            {% endwith %}"
+                            data-room="{{ room }}"
+                            data-time="{{ time|time:'h:i a'|lower }}"
+                            data-floor="{{ floor.slug }}">
+                            {% with time_key=time|format_time_key %}
+                            {% if booked_slots|get_item:room|get_item:time_key %}
+                                {% with booking_data=booked_slots|get_item:room|get_item:time_key %}
+                                    {% if booking_data.status == 'pending' %}
+                                        <span class="booking-info pending">{{ booking_data.reason }} (Pending)</span>
+                                    {% else %}
+                                        <span class="booked-text">{{ booking_data.reason }}</span>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                            {% endwith %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if not user_authenticated %}
+        <div class="alert alert-info mt-3">
+            <i class="bi bi-info-circle"></i>
+            To make a booking, please <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link">login</a> to your account.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap');
+
+/* Table Container and Navigation */
+.table-container {
+    position: relative;
+    width: 100%;
+    margin-top: 0;
+    overflow: hidden;
+}
+
+.date-navigation {
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin: 0;
+    padding: 1rem 2rem;
+    background-color: #f0f0f0;
+    width: 100%;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.date-nav-wrapper {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.date-nav-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    pointer-events: auto;
+}
+
+.admin-options {
+    position: relative;
+    margin-left: auto;
+    margin-right: 2rem;
+    z-index: 1;
+}
+
+.admin-options .nav-item.dropdown {
+    position: relative;
+}
+
+.admin-options .nav-link {
+    position: relative;
+    z-index: 0;
+    color: #fff;
+    font-weight: 500;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+    background-color: #1e3a8a;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.admin-options .nav-link:hover {
+    background-color: #1e40af;
+}
+
+.admin-options .dropdown-menu {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    min-width: 180px;
+    padding: 0;
+    margin: 0;
+    font-size: 0.875rem;
+    background-color: #1e3a8a;
+    border: none;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    z-index: -1;
+    transform-origin: top right;
+    transition: all 0.4s ease;
+    transform: translateY(-10px);
+    max-width: calc(100vw - 2rem);
+    width: max-content;
+    list-style: none;
+    pointer-events: none;
+}
+
+.admin-options .nav-item.dropdown:hover .dropdown-menu {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition-delay: 0.5s;
+}
+
+.admin-options .dropdown-menu:hover {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition-delay: 0s;
+}
+
+/* Add a hover area to prevent accidental closing */
+.admin-options .nav-item.dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background: transparent;
+}
+
+.admin-options .dropdown-item {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.admin-options .dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.admin-options .dropdown-item:hover {
+    background-color: #1e40af;
+    color: #fff;
+    padding-left: 1.75rem;
+}
+
+.nav-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    color: #212529;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: 900;
+}
+
+.nav-arrow:hover {
+    color: #0d6efd;
+    background: none;
+}
+
+.date-display {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #212529;
+    min-width: 200px;
+    text-align: center;
+    font-family: 'Anuphan', sans-serif;
+}
+
+/* Table Styling */
+.container-fluid {
+    padding: 0;
+}
+
+.booking-table {
+    font-family: 'Roboto', Arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0;
+    background-color: white;
+    font-size: 1rem; /* Moderate increase from 0.875rem */
+}
+
+.booking-table th,
+.booking-table td {
+    border: 1px solid #e5e7eb;
+    padding: 10px 15px; /* Moderate increase in padding */
+    vertical-align: middle;
+    line-height: 1.2; /* Moderate increase in line height */
+}
+
+.time-slot {
+    text-align: center;
+    font-weight: 500;
+    background-color: white;
+    white-space: nowrap;
+    color: #1f2937;
+    font-size: 1rem; /* Moderate increase from 0.95rem */
+    padding-right: 3.5rem !important;
+    padding-left: 2.5rem !important;
+}
+
+.time-slot-header {
+    width: 130px; /* Moderate increase from 85px */
+    background-color: white;
+    text-align: center;
+    white-space: nowrap;
+    color: #1e40af;
+    font-weight: 700;
+    font-size: 1rem; /* Moderate increase from 0.95rem */
+    padding-right: 3.5rem !important;
+    padding-left: 2.5rem !important;
+}
+
+.booking-cell {
+    height: 45px; /* Moderate increase from 28px to match screenshot */
+    text-align: center;
+    position: relative;
+    min-width: 220px; /* Moderate increase from 130px */
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.booking-cell.selected {
+    background-color: #1e40af !important;
+    color: white !important;
+}
+
+.booking-cell.booked {
+    background-color: #f3f4f6;
+    cursor: not-allowed;
+}
+
+.booking-cell.pending {
+    background-color: #ffebee !important; /* Red background for pending bookings */
+    cursor: not-allowed;
+}
+
+.booking-info.pending {
+    color: #d32f2f !important; /* Red text for pending bookings */
+    font-weight: normal;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.875rem;
+    text-align: center;
+    display: block;
+}
+
+.booking-cell:not(.booked):hover {
+    background-color: #e5e7eb;
+}
+
+.booked-text {
+    font-weight: normal;
+    font-family: 'Roboto', sans-serif;
+    color: #4b5563;
+    font-size: 0.875rem;
+    text-align: center;
+    display: block;
+}
+
+.book-slot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.813rem;
+}
+
+.booking-table th:not(.time-slot-header) {
+    color: #1e40af;
+    font-weight: 700;
+    font-size: 0.95rem;
+    background-color: #f8f9fa;
+    padding: 0.35rem;
+    padding-left: 3rem;
+}
+
+.selectable-header {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.selectable-header.selected {
+    background-color: #1e40af !important;
+    color: white !important;
+}
+
+/* Column selection styles */
+th:not(.time-slot-header) {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+th.selected {
+    background-color: #1e40af !important;
+    color: white !important;
+}
+
+.table-responsive {
+    position: relative;
+    z-index: 0;
+}
+
+/* Header selection styles */
+.room-header {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.room-header.selected {
+    background-color: #1e40af !important;
+    color: white !important;
+}
+
+.time-slot-header {
+    cursor: default;
+    user-select: none;
+}
+
+/* Ensure booked text remains visible on selection */
+.booking-cell.selected .booked-text {
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 914px) {
+    .container-fluid {
+        padding: 0.25rem;
+    }
+
+    .booking-table th,
+    .booking-table td {
+        padding: 8px 12px; /* Adjusted for mobile */
+    }
+
+    .booking-cell {
+        height: 40px; /* Adjusted for mobile */
+        min-width: 140px; /* Adjusted for mobile */
+    }
+
+    .admin-options .dropdown-menu {
+        position: absolute;
+        width: auto;
+        min-width: 200px;
+    }
+
+    .admin-options .nav-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.813rem;
+    }
+
+    .admin-options .dropdown-item {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.813rem;
+    }
+}
+
+#bookButton:hover {
+    background-color: white !important;
+    color: #1e3a8a !important;
+    border: 1px solid #1e3a8a !important;
+}
+
+.avi-dropdown {
+    position: absolute;
+    z-index: 1050;
+}
+</style>
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{% static 'js/custom-dialog.js' %}"></script>
+<script src="{% static 'js/message-handler.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    flatpickr(".date-display", {
+        defaultDate: "{{ selected_date|date:'Y-m-d' }}",
+        onChange: function(selectedDates, dateStr, instance) {
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set('date', dateStr);
+            window.location.href = newUrl.toString();
+        }
+    });
+
+    if (document.querySelector(".nav-item")) {
+        document.querySelector(".nav-item").addEventListener("mouseover", (e) => {
+            document.querySelector(".table-responsive").style.zIndex = -1;
+        });
+
+        document.querySelector(".nav-item").addEventListener("mouseout", (e) => {
+            document.querySelector(".table-responsive").style.zIndex = 0;
+        });
+    }
+
+    // Define bookedSlots for JavaScript
+    let bookedSlots;
+    try {
+        // Parse the booked slots data from the server
+        const bookedSlotsData = document.getElementById('booked_slots_data');
+        if (bookedSlotsData) {
+            bookedSlots = JSON.parse(bookedSlotsData.textContent);
+        }
+    } catch(e) {
+        console.error('Error parsing booked slots data:', e);
+    }
+
+    // Add booking functionality
+    const bookButton = document.getElementById('bookButton');
+    if (bookButton) {
+        bookButton.addEventListener('click', function() {
+            // Booking logic is handled by booking_with_approval.js
+        });
+    }
+});
+</script>
+
+<script src="{% static 'js/booking_with_approval.js' %}"></script>
+{% if user.is_staff %}
+<script src="{% static 'js/admin_options.js' %}"></script>
+{% endif %}
+{{ booked_slots|json_script:"booked_slots_data" }}
+
+{% endblock %}

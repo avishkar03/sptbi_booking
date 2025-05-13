@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Movie/Event ticket shape -->
+  <path d="M2 7l2-2h16l2 2v10l-2 2H4l-2-2V7z" />
+  
+  <!-- Perforation line -->
+  <path d="M8 5v14" stroke-dasharray="1,1" />
+  
+  <!-- Ticket number -->
+  <text x="13" y="10" font-family="sans-serif" font-size="3" fill="#ffffff" stroke="none">#123</text>
+  
+  <!-- Ticket details -->
+  <line x1="10" y1="13" x2="16" y2="13" />
+  <line x1="10" y1="16" x2="16" y2="16" />
+</svg>

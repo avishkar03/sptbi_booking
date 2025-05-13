@@ -1,0 +1,27 @@
+    // Add event listener for the 'Delete Slot' button
+    const deleteSlotBtn = document.getElementById('deleteSlotBtn');
+    if (deleteSlotBtn) {
+        // Function to handle the deletion process
+        const handleDeleteSlots = async () => {
+            const selectedCells = document.querySelectorAll('.booking-cell.selected');
+            if (selectedCells.length === 0) {
+                window.CustomDialog.showModal({
+                    title: 'No Selection',
+                    message: 'Please select at least one slot to delete',
+                    type: 'WARNING',
+                    buttons: [
+                        {
+                            text: 'OK',
+                            type: 'primary',
+                            callback: modal => window.CustomDialog.closeModal(modal)
+                        }
+                    ]
+                });
+                return;
+            }
+            
+            // Create confirmation dialog using our new function
+            window.CustomDialog.showConfirmation(
+                `Are you sure you want to delete ${selectedCells.length} selected slot(s)?`,
+                async () => {
+                    // This code runs when user confirms

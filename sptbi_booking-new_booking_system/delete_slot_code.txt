@@ -1,0 +1,150 @@
+    // Add event listener for the 'Delete Slot' button
+    const deleteSlotBtn = document.getElementById('deleteSlotBtn');
+    if (deleteSlotBtn) {
+        // Function to handle the deletion process
+        const handleDeleteSlots = async () => {
+            const selectedCells = document.querySelectorAll('.booking-cell.selected');
+            if (selectedCells.length === 0) {
+                window.CustomDialog.showModal({
+                    title: 'No Selection',
+                    message: 'Please select at least one slot to delete',
+                    type: 'WARNING',
+                    buttons: [
+                        {
+                            text: 'OK',
+                            type: 'primary',
+                            callback: modal => window.CustomDialog.closeModal(modal)
+                        }
+                    ]
+                });
+                return;
+            }
+            
+            // Create confirmation dialog using our new function
+            window.CustomDialog.showConfirmation(
+                `Are you sure you want to delete ${selectedCells.length} selected slot(s)?`,
+                async () => {
+                    // This code runs when user confirms
+                    const slotsToDelete = Array.from(selectedCells).map(cell => {
+                        const timeSlot = cell.closest('tr').querySelector('.time-slot').textContent;
+                        const roomHeader = bookingTable.querySelector('thead tr').children[cell.cellIndex].textContent;
+
+                        // Format time slot to match the expected format (HH:MM am/pm)
+                        let formattedTimeSlot = timeSlot
+                            .toLowerCase()
+                            .replace(/\./g, ':')
+                            .replace(/p\.m\.|p:m:/, 'pm')
+                            .replace(/a\.m\.|a:m:/, 'am')
+                            .trim();
+
+                        // Ensure proper format with a colon between hours and minutes
+                        let timeParts = formattedTimeSlot.match(/(\d+)[:\.]?(\d*)[\s]*(am|pm)/i);
+                        if (timeParts) {
+                            let hours = timeParts[1];
+                            let minutes = timeParts[2] || '00';
+                            let period = timeParts[3].toLowerCase();
+
+                            // Pad minutes with leading zero if needed
+                            if (minutes.length === 1) minutes = '0' + minutes;
+
+                            formattedTimeSlot = `${hours}:${minutes} ${period}`;
+                        }
+
+                        // Get the selected date from the URL
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const selectedDate = urlParams.get('date') || new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+                        // Create the slot data with both time and time_slot fields for compatibility
+                        return {
+                            floor: floorSlug,
+                            room: roomHeader.trim(),
+                            time_slot: formattedTimeSlot,
+                            time: formattedTimeSlot,  // Add time field for backward compatibility
+                            date: selectedDate  // Include the date
+                        };
+                    });
+
+                    try {
+                        const response = await fetch('/booking/delete_slots/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            body: JSON.stringify(slotsToDelete)
+                        });
+
+                        const data = await response.json();
+                        if (data.status === 'success') {
+                            // Remove the selected cells from the UI
+                            selectedCells.forEach(cell => {
+                                cell.classList.remove('selected');
+                                cell.classList.remove('booked');
+                                cell.style.backgroundColor = '';
+                                cell.style.color = '';
+                                cell.style.cursor = 'pointer';
+                                cell.innerHTML = '';
+                            });
+
+                            // Show success message
+                            window.CustomDialog.showModal({
+                                title: 'Deletion Successful',
+                                message: `Successfully deleted ${selectedCells.length} slot(s)`,
+                                type: 'SUCCESS',
+                                buttons: [
+                                    {
+                                        text: 'OK',
+                                        type: 'primary',
+                                        callback: modal => window.CustomDialog.closeModal(modal)
+                                    }
+                                ]
+                            });
+
+                            // Log success details
+                            console.log(`Successfully deleted ${selectedCells.length} slots`);
+                        } else {
+                            window.CustomDialog.showModal({
+                                title: 'Deletion Failed',
+                                message: data.message || 'Failed to delete the slots. Please try again.',
+                                type: 'ERROR',
+                                buttons: [
+                                    {
+                                        text: 'OK',
+                                        type: 'primary',
+                                        callback: modal => window.CustomDialog.closeModal(modal)
+                                    }
+                                ]
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        window.CustomDialog.showModal({
+                            title: 'Error',
+                            message: 'Failed to delete the slots. Please try again.',
+                            type: 'ERROR',
+                            buttons: [
+                                {
+                                    text: 'OK',
+                                    type: 'primary',
+                                    callback: modal => window.CustomDialog.closeModal(modal)
+                                }
+                            ]
+                        });
+                    }
+                },
+                null, // No cancel callback needed
+                {
+                    title: 'Delete Slots',
+                    type: 'WARNING',
+                    confirmText: 'Delete',
+                    cancelText: 'Cancel'
+                }
+            );
+        };
+        
+        // Attach the click event listener to the delete button
+        deleteSlotBtn.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link behavior
+            handleDeleteSlots();
+        });
+    }

@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% block Title %}Ticket History{% endblock %}
+{% block content %}
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+  .ticket-history-container {
+    width: 100%;
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 1200px;
+    margin-top: 60px; /* Add space below the navbar */
+  }
+
+  .header-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    position: relative;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .header-icon {
+    margin-right: 15px;
+    font-size: 32px;
+    color: #1c4386;
+    background: rgba(74, 144, 226, 0.1);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  .title-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ticket-history-title {
+    color: #1c4386;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    position: relative;
+    display: inline-block;
+    letter-spacing: 0.5px;
+  }
+
+  .title-subtitle {
+    color: #666;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+
+  .ticket-history-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, #1c4386, #4a90e2);
+    border-radius: 2px;
+  }
+
+  .header-decoration {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30%;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(28, 67, 134, 0), rgba(28, 67, 134, 0.3));
+  }
+
+  .ticket-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .ticket-table th {
+    background-color: #1c4386;
+    color: white;
+    font-weight: 600;
+    text-align: left;
+    padding: 15px;
+    font-size: 14px;
+    position: sticky;
+    top: 0;
+  }
+
+  .ticket-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+    vertical-align: middle;
+  }
+
+  .ticket-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .ticket-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+
+  .ticket-table tr:hover {
+    background-color: #f1f4f9;
+    transition: background-color 0.2s ease;
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 90px;
+  }
+
+  .status-open {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+  }
+
+  .status-in-progress {
+    background-color: #fff8e1;
+    color: #ff8f00;
+  }
+
+  .status-resolved {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  .status-closed {
+    background-color: #eeeeee;
+    color: #616161;
+  }
+
+  .timestamp {
+    white-space: nowrap;
+    color: #666;
+    font-size: 13px;
+  }
+
+  .empty-message {
+    text-align: center;
+    padding: 30px;
+    color: #757575;
+    font-style: italic;
+  }
+
+  .description-cell {
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .comments-cell {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .ticket-table {
+      display: block;
+      overflow-x: auto;
+    }
+
+    .ticket-history-title {
+      font-size: 20px;
+    }
+  }
+</style>
+
+<div class="ticket-history-container">
+  <div class="header-container">
+    <div class="header-icon">
+      <i class="fas fa-history"></i>
+    </div>
+    <div class="title-wrapper">
+      <h1 class="ticket-history-title">Ticket History</h1>
+      <span class="title-subtitle">View and track all ticket updates and changes</span>
+    </div>
+    <div class="header-decoration"></div>
+  </div>
+
+  <table class="ticket-table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Comments</th>
+        <th>Updated Date (IST)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for history in ticket_histories %}
+      <tr>
+        <td>{{ history.title }}</td>
+        <td class="description-cell" title="{{ history.description }}">{{ history.description }}</td>
+        <td>
+          {% if history.get_status_display == 'Open' %}
+            <span class="status-badge status-open">{{ history.get_status_display }}</span>
+          {% elif history.get_status_display == 'In Progress' %}
+            <span class="status-badge status-in-progress">{{ history.get_status_display }}</span>
+          {% elif history.get_status_display == 'Resolved' %}
+            <span class="status-badge status-resolved">{{ history.get_status_display }}</span>
+          {% elif history.get_status_display == 'Closed' %}
+            <span class="status-badge status-closed">{{ history.get_status_display }}</span>
+          {% else %}
+            <span class="status-badge">{{ history.get_status_display }}</span>
+          {% endif %}
+        </td>
+        <td class="comments-cell" title="{{ history.comments|default:'No comments' }}">{{ history.comments|default:"No comments" }}</td>
+        <td class="timestamp">{{ history.created_date|date:"j M Y, g:i A" }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="empty-message">No ticket history found</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
