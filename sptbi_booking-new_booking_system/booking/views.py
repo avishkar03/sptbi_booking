@@ -286,7 +286,7 @@ def profile(request):
     y = datetime.now().strftime("%Y-%m-%d").split("-")[0]
     objs = User.objects.filter(is_superuser=False)
     active_objs = []
-    print(objs)
+    print(f"Objs : {objs}")
     for o in objs:
         if o.total > 0:
             active_objs.append(o)
@@ -294,10 +294,11 @@ def profile(request):
             email=o.email, month=mon, year=y).count()*0.5
         o.charges = 0 if o.free_slots < o.total else (o.free_slots - o.total) * 250
         o.save()
+    print(f"Active objs :{active_objs}")
     if request.method == "POST":
         if 'form1' in request.POST:
             email = request.POST.get("email")
-            return redirect(reverse('edit_user') + f'?email={email}')
+            return redirect(reverse('booking:edit_user') + f'?email={email}')
         elif 'form2' in request.POST:
             return redirect('change_password')
         elif 'form4' in request.POST:
@@ -320,9 +321,10 @@ def profile(request):
     else:
         previous_month = str(int(month) - 1).zfill(2)
         previous_year = year
-    print(month, year)
+    print(user.email)
     timeslots_tm = aTimeSlot.objects.filter(
         email=user.email, month=month, year=year)
+    print(f"timeslots_tm : {timeslots_tm}")
     timeslots = sorted(timeslots_tm, key=lambda obj: obj.date)
     timeslots_pm = aTimeSlot.objects.filter(
         email=user.email, month=previous_month, year=previous_year)
@@ -336,13 +338,88 @@ def profile(request):
     logs = page_obj.object_list
     if not user.is_authenticated:
         return redirect("login")
-
-    # companies = aTimeSlot.objects.values('name').distinct()
+    
+    companies = aTimeSlot.objects.values('name').distinct()
     keyset = Booking.objects.values('booked_by')
-    companies = [key['booked_by'] for key in keyset]
-    companies = list(set(companies))
-    print(companies)
-    return render(request, 'booking/profile.html', {'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": active_objs, 'total': total, 'pg': pg, 'count': count, 'events': events, 'companies':companies})
+    # companies = [key['booked_by'] for key in keyset]
+    # companies = list(set(companies))
+    print({'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": active_objs, 'total': total, 'pg': pg, 'count': count, 'events': events, 'companies':companies})
+    return render(request, 'booking/profile.html', {'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": objs, 'total': total, 'pg': pg, 'count': count, 'events': events, 'companies':companies})
+
+
+
+
+# def profile(request):
+#     """User profile view."""
+#     visit_counter = Count.objects.get(name="Actual")
+#     visit_add = Count.objects.get(name="Extra")
+#     events = Event.objects.all()
+#     events = sorted(events, key=lambda x: x.orderno)            #commented out for now
+#     count_list = str(visit_counter.count + visit_add.count)
+#     count = list(count_list)
+#     pg = Programme.objects.all()
+#     pg = sorted(pg, key=lambda x: x.orderno)                    #commented out for now
+#     mon = datetime.now().strftime("%Y-%m-%d").split("-")[1]
+#     y = datetime.now().strftime("%Y-%m-%d").split("-")[0]
+#     objs = User.objects.filter(is_superuser=False)
+#     active_objs = []
+#     print(objs)
+#     for o in objs:
+#         if o.total > 0:
+#             active_objs.append(o)
+#         o.free_slots = aTimeSlot.objects.filter(
+#             email=o.email, month=mon, year=y).count()*0.5
+#         o.charges = 0 if o.free_slots < o.total else (o.free_slots - o.total) * 250
+#         o.save()
+#     if request.method == "POST":
+#         if 'form1' in request.POST:
+#             email = request.POST.get("email")
+#             return redirect(reverse('edit_user') + f'?email={email}')
+#         elif 'form2' in request.POST:
+#             return redirect('change_password')
+#         elif 'form4' in request.POST:
+#             email = request.POST.get("email")
+#             u = User.objects.get(email=email)
+#             u.lock = int(request.POST.get("lock"))
+#             u.save()
+#     user = request.user
+#     free_hours = User.objects.get(email=user.email).free_slots
+#     charges = User.objects.get(email=user.email).charges
+#     total = User.objects.get(email=user.email).total
+#     # objs = User.objects.all()
+#     date = datetime.now().strftime("%Y-%m-%d")
+#     month = date.split("-")[1]
+#     year = date.split("-")[0]
+#     if month == "01":
+#         previous_month = "12"
+#         # Subtract 1 from the year for January
+#         previous_year = str(int(year) - 1)
+#     else:
+#         previous_month = str(int(month) - 1).zfill(2)
+#         previous_year = year
+#     print(month, year)
+#     timeslots_tm = aTimeSlot.objects.filter(
+#         email=user.email, month=month, year=year)
+#     timeslots = sorted(timeslots_tm, key=lambda obj: obj.date)
+#     timeslots_pm = aTimeSlot.objects.filter(
+#         email=user.email, month=previous_month, year=previous_year)
+#     timeslotspm = sorted(timeslots_pm, key=lambda obj: obj.date)
+#     timeslots.extend(timeslotspm)
+#     per_page = 10
+
+#     paginator = Paginator(timeslots, per_page)
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+#     logs = page_obj.object_list
+#     if not user.is_authenticated:
+#         return redirect("login")
+
+#     # companies = aTimeSlot.objects.values('name').distinct()
+#     keyset = Booking.objects.values('booked_by')
+#     companies = [key['booked_by'] for key in keyset]
+#     companies = list(set(companies))
+#     print(companies)
+#     return render(request, 'booking/profile.html', {'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": active_objs, 'total': total, 'pg': pg, 'count': count, 'events': events, 'companies':companies})
 
 
 def edit_user(request):
@@ -467,6 +544,7 @@ def download_log(request):
     return response
 
 def download_log_2(request):
+    # print("In download_log2")
     flag = 0
     if request.method == 'POST':
         s_month = re.split('-', request.POST.get('start'))
@@ -481,12 +559,12 @@ def download_log_2(request):
         print(option)
         cnt = []
         name = []
-
+        
 
         if option != "all":
-            log = aTimeSlot.objects.filter(name=option,month__lte=end_month, month__gte=start_month, year__lte=end_year, year__gte=start_year)
+            log = aTimeSlot.objects.filter( month__lte=end_month, month__gte=start_month, year__lte=end_year, year__gte=start_year)
         else:
-            flag+=1
+            flag+=1 
             log = aTimeSlot.objects.filter(month__lte=end_month, month__gte=start_month, year__lte=end_year, year__gte=start_year)
             for l in log.distinct():
                 name.append(l.name)
@@ -502,19 +580,32 @@ def download_log_2(request):
             result =  {name[i]: cnt[i] for i in range(len(name))}
             print(result)
 
+        print(log)
+
         response = HttpResponse(content_type='application/vnd.ms-excel')
         response['Content-Disposition'] = 'attachment; filename="Booking Log SPTBI.xlsx"'
 
         workbook = xlsxwriter.Workbook(response, {'remove_timezone': True})
         worksheet = workbook.add_worksheet()
 
+        # rooms = ['Meeting Room 1 - 1st Floor', 'Meeting Room 1 - 2nd Floor', 'Meeting Room 2 - 2nd Floor', 'Meeting Room - 8th Floor']
+        
         rooms = ['Meeting Room 1 - 1st Floor', 'Meeting Room 1 - 2nd Floor', 'Meeting Room 2 - 2nd Floor', 'Meeting Room - 8th Floor']
+        rooms2 = set()
+        floors = Floor.objects.filter(is_active=True)
+        for floor in floors:
+            if isinstance(floor.rooms, list):
+                rooms2.update(floor.rooms)
+        rooms2 = list(rooms2)  
+        print(sorted(rooms2))
+        rooms = rooms2 
+        
         headers = ['Company Name','Date', 'Slot','Room', 'Reason']
         for col, header in enumerate(headers):
             worksheet.write(0, col, header)
         for row, l in enumerate(log, start=1):
             data = [l.name,l.date, l.slot,
-                    rooms[l.room], l.reason,]
+                    rooms[ord(l.room[13]) - 49], l.reason,]
             for col, value in enumerate(data):
                 worksheet.write(row, col, value)
 
@@ -541,6 +632,7 @@ def download_log_2(request):
 
 def download_log_user(request):
     user = request.user
+    # print(request.POST)
     if request.method == 'POST':
         s_month = re.split('-', request.POST.get('start'))
         e_month = re.split('-', request.POST.get('end'))
@@ -551,8 +643,9 @@ def download_log_user(request):
         end_year = e_month[0]
 
         option = request.POST.get('selected')
-        print(option)
-
+        print(option[10:-2])
+        user = User.objects.get(company_name=option[10:-2])
+        print(user)
         log = aTimeSlot.objects.filter(email=user.email,month__lte=end_month, month__gte=start_month, year__lte=end_year, year__gte=start_year)
 
         response = HttpResponse(content_type='application/vnd.ms-excel')
@@ -562,12 +655,22 @@ def download_log_user(request):
         worksheet = workbook.add_worksheet()
 
         rooms = ['Meeting Room 1 - 1st Floor', 'Meeting Room 1 - 2nd Floor', 'Meeting Room 2 - 2nd Floor', 'Meeting Room - 8th Floor']
+        rooms2 = set()
+        floors = Floor.objects.filter(is_active=True)
+        for floor in floors:
+            if isinstance(floor.rooms, list):
+                rooms2.update(floor.rooms)
+        rooms2 = list(rooms2)  
+        print(sorted(rooms2))
+        rooms = rooms2  
+        # print(f"log : {log}")    
         headers = ['Company Name','Date', 'Slot','Room', 'Reason']
         for col, header in enumerate(headers):
             worksheet.write(0, col, header)
         for row, l in enumerate(log, start=1):
+            print(ord(l.room[13]) - 49)
             data = [l.name,l.date, l.slot,
-                    rooms[l.room], l.reason,]
+                    rooms[ord(l.room[13]) - 49], l.reason,]
             for col, value in enumerate(data):
                 worksheet.write(row, col, value)
 
@@ -662,24 +765,16 @@ def save_columns(request):
 @login_required
 def save_booking(request):
     """Save multiple bookings."""
-    print("\n\n==== SAVE_BOOKING FUNCTION CALLED ====")
-    print(f"User: {request.user.username}, Admin: {request.user.is_staff}")
-    print(f"Method: {request.method}")
-    print(f"Path: {request.path}")
-
+    print("In save booking function")
     if request.method == 'POST':
         try:
             bookings_data = json.loads(request.body)
-            print(f"\n[DEBUG] Received booking data: {bookings_data}")  # Debug input data
-
             if not isinstance(bookings_data, list):
                 return JsonResponse({
                     'status': 'error',
                     'message': 'Data should be a list of bookings'
                 }, status=400)
-
-            saved_bookings = []  # To track all saved bookings
-
+            
             for data in bookings_data:
                 if not isinstance(data, dict):
                     return JsonResponse({
@@ -687,52 +782,56 @@ def save_booking(request):
                         'message': 'Each booking should be a dictionary'
                     }, status=400)
 
-                print(f"\n[DEBUG] Processing booking data: {data}")  # Debug current booking data
-
                 floor = get_object_or_404(Floor, slug=data['floor'])
-                print(f"[DEBUG] Found floor: {floor}")  # Debug floor info
-
-                # Parse the time slot
+                
+                # Parse time string
                 time_str = data['time_slot'].strip()
-                print(f"[INFO] Processing time string: '{time_str}'")
+                logger.info(f"Processing time string: '{time_str}'")
 
-                # Extract components with better regex
-                import re
                 time_match = re.match(r'(\d+)[:\.]?(\d*)\s*(am|pm)', time_str.lower())
-
+                
                 if time_match:
                     hours = int(time_match.group(1))
                     minutes = int(time_match.group(2) or 0)
                     period = time_match.group(3).lower()
-
-                    # Convert to 24-hour format if pm
+                    
                     if period == 'pm' and hours < 12:
                         hours += 12
                     elif period == 'am' and hours == 12:
                         hours = 0
-
-                    # Create a valid time object
+                    
                     time_obj = dt.time(hours, minutes)
-                    print(f"[INFO] Successfully parsed time: {time_obj}")
+                    logger.info(f"Successfully parsed time: {time_obj}")
                 else:
-                    print(f"[ERROR] Failed to parse time string: {time_str}")
+                    logger.error(f"Failed to parse time string: {time_str}")
                     return JsonResponse({
                         'status': 'error',
                         'message': f"Could not parse time string: {time_str}. Expected format: HH:MM am/pm"
                     }, status=400)
 
-                # Get the date from the query parameters or use current date
                 selected_date = data.get('date')
                 booking_date = datetime.now().date()
                 if selected_date:
                     try:
                         booking_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
-                        print(f"[DEBUG] Using provided date: {booking_date}")
                     except ValueError:
-                        print("[DEBUG] Using current date as fallback")
-                        pass
+                        pass  # fallback to today's date
 
-                # Create the booking
+                # Check for conflicts
+                conflict = Booking.objects.filter(
+                    floor=floor,
+                    room=data['room'],
+                    date=booking_date,
+                    time_slot=time_obj
+                ).exists()
+
+                if conflict:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': f"Time slot {time_str} for room {data['room']} on {booking_date} is already booked."
+                    }, status=409)
+
+                # Create Booking
                 booking = Booking.objects.create(
                     floor=floor,
                     room=data['room'],
@@ -742,46 +841,32 @@ def save_booking(request):
                     booked_by=request.user.company_name,
                     date=booking_date,
                 )
-
-                print(f"[DEBUG] Created booking:")
-                print(f"        ID: {booking.id}")
-                print(f"        Floor: {booking.floor}")
-                print(f"        Room: {booking.room}")
-                print(f"        Date: {booking.date}")
-                print(f"        Time: {booking.time_slot}")
-                print(f"        User: {booking.user}")
-                print(f"        Reason: {booking.reason}")
-
-                saved_bookings.append({
-                    'id': booking.id,
-                    'floor': booking.floor.slug,
-                    'room': booking.room,
-                    'date': str(booking.date),
-                    'time_slot': str(booking.time_slot),
-                    'reason': booking.reason,
-                    'user': booking.user.username,
-                    'booked_by': booking.booked_by
-                })
-
-            print(f"\n[DEBUG] Successfully saved {len(saved_bookings)} bookings")
-            print(f"[DEBUG] Saved bookings details: {saved_bookings}")
+                print(request.user.company_name)
+                # Create aTimeSlot
+                aTimeSlot.objects.create(
+                    slot=data['time_slot'],  # original AM/PM string
+                    room=data['room'],
+                    date=booking_date.strftime('%Y-%m-%d'),
+                    name=request.user.company_name,
+                    email=request.user.email,
+                    month=str(booking_date.month).zfill(2),
+                    year=str(booking_date.year),
+                    reason=data['reason']
+                )
 
             return JsonResponse({
                 'status': 'success',
-                'booked_by': bookings_data[-1]['reason'],  # Return the last booking reason
-                'saved_bookings': saved_bookings  # Optional: return all saved booking data
+                'booked_by': bookings_data[-1]['reason']
             })
 
         except Floor.DoesNotExist:
-            print(f"[ERROR] Floor not found in booking data: {data.get('floor')}")
             return JsonResponse({
                 'status': 'error',
                 'message': 'Floor not found'
             }, status=404)
+
         except Exception as e:
-            print(f"[ERROR] Error saving booking: {str(e)}")
-            import traceback
-            traceback.print_exc()  # Print full traceback
+            logger.exception("Unexpected error occurred while saving bookings.")
             return JsonResponse({
                 'status': 'error',
                 'message': str(e)
@@ -791,74 +876,140 @@ def save_booking(request):
         'status': 'error',
         'message': 'Invalid request method'
     }, status=405)
-#Approve booking
-# def approve_booking(request, booking_id):
-#     booking = get_object_or_404(Booking, id=booking_id)
-
-#     # Ensure the user is an admin or authorized to approve
-#     if not request.user.is_staff:
-#         return JsonResponse({
-#             'status': 'error',
-#             'message': 'You are not authorized to approve this booking'
-#         }, status=403)
-
-#     # Update the booking status to approved
-#     booking.status = 'approved'
-#     booking.save()
-
-#     # ✅ Send an approval notification email to the user
-#     if booking.email:  # Make sure email exists
-#         send_mail(
-#             subject='✅ Your Booking Was Approved',
-#             message=f"Hi {booking.booked_by},\n\nYour booking for:\n\n"
-#                     f"📍 Floor: {booking.floor.name}\n"
-#                     f"🏠 Room: {booking.room}\n"
-#                     f"🗓 Date: {booking.date}\n"
-#                     f"⏰ Time: {booking.time_slot}\n\n"
-#                     f"has been approved. 🎉\n\nThank you!",
-#             from_email=settings.DEFAULT_FROM_EMAIL,
-#             recipient_list=[booking.email],
-#             fail_silently=True  # You can set to False for debugging
-#         )
-#         # ✅ success message here
-#     messages.success(request, "Booking approved successfully! 😇")
-
-#     return redirect('booking')  # Make sure to use 'booking:booking' if you use app_name = 'booking'
 
 
-# Reject booking
-# def reject_booking(request, booking_id):
-#     booking = get_object_or_404(Booking, id=booking_id)
 
-#     # Ensure the user is an admin or autho ized to reject
-#     if not request.user.is_staff:
-#         return JsonResponse({
-#             'status': 'error',
-#             'message': 'You are not authorized to reject this booking'
-#         }, status=403)
+# def save_booking(request):
+#     """Save multiple bookings."""
+#     print("\n\n==== SAVE_BOOKING FUNCTION CALLED ====")
+#     print(f"User: {request.user.username}, Admin: {request.user.is_staff}")
+#     print(f"Method: {request.method}")
+#     print(f"Path: {request.path}")
 
-#     # Update the booking status to rejected
-#     booking.status = 'rejected'
-#     booking.save()
+#     if request.method == 'POST':
+#         try:
+#             bookings_data = json.loads(request.body)
+#             print(f"\n[DEBUG] Received booking data: {bookings_data}")  # Debug input data
 
-#     # ❌ Send a rejection notification email to the user
-#     if booking.email:
-#         send_mail(
-#             subject='❌ Your Booking Was Rejected',
-#             message=f"Hi {booking.booked_by},\n\nWe regret to inform you that your booking for:\n\n"
-#                     f"📍 Floor: {booking.floor.name}\n"
-#                     f"🏠 Room: {booking.room}\n"
-#                     f"🗓 Date: {booking.date}\n"
-#                     f"⏰ Time: {booking.time_slot}\n\n"
-#                     f"has been rejected.\n\nFeel free to try booking another slot.\n\nThanks!",
-#             from_email=settings.DEFAULT_FROM_EMAIL,
-#             recipient_list=[booking.email],
-#             fail_silently=True
-#             )
-#         messages.error(request, "Booking rejected.")
+#             if not isinstance(bookings_data, list):
+#                 return JsonResponse({
+#                     'status': 'error',
+#                     'message': 'Data should be a list of bookings'
+#                 }, status=400)
 
-#     return redirect('booking')  # Redirect to the main booking page or wherever you'd like
+#             saved_bookings = []  # To track all saved bookings
 
+#             for data in bookings_data:
+#                 if not isinstance(data, dict):
+#                     return JsonResponse({
+#                         'status': 'error',
+#                         'message': 'Each booking should be a dictionary'
+#                     }, status=400)
+
+#                 print(f"\n[DEBUG] Processing booking data: {data}")  # Debug current booking data
+
+#                 floor = get_object_or_404(Floor, slug=data['floor'])
+#                 print(f"[DEBUG] Found floor: {floor}")  # Debug floor info
+
+#                 # Parse the time slot
+#                 time_str = data['time_slot'].strip()
+#                 print(f"[INFO] Processing time string: '{time_str}'")
+
+#                 # Extract components with better regex
+#                 import re
+#                 time_match = re.match(r'(\d+)[:\.]?(\d*)\s*(am|pm)', time_str.lower())
+
+#                 if time_match:
+#                     hours = int(time_match.group(1))
+#                     minutes = int(time_match.group(2) or 0)
+#                     period = time_match.group(3).lower()
+
+#                     # Convert to 24-hour format if pm
+#                     if period == 'pm' and hours < 12:
+#                         hours += 12
+#                     elif period == 'am' and hours == 12:
+#                         hours = 0
+
+#                     # Create a valid time object
+#                     time_obj = dt.time(hours, minutes)
+#                     print(f"[INFO] Successfully parsed time: {time_obj}")
+#                 else:
+#                     print(f"[ERROR] Failed to parse time string: {time_str}")
+#                     return JsonResponse({
+#                         'status': 'error',
+#                         'message': f"Could not parse time string: {time_str}. Expected format: HH:MM am/pm"
+#                     }, status=400)
+
+#                 # Get the date from the query parameters or use current date
+#                 selected_date = data.get('date')
+#                 booking_date = datetime.now().date()
+#                 if selected_date:
+#                     try:
+#                         booking_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+#                         print(f"[DEBUG] Using provided date: {booking_date}")
+#                     except ValueError:
+#                         print("[DEBUG] Using current date as fallback")
+#                         pass
+
+#                 # Create the booking
+#                 booking = Booking.objects.create(
+#                     floor=floor,
+#                     room=data['room'],
+#                     time_slot=time_obj,
+#                     reason=data['reason'],
+#                     user=request.user,
+#                     booked_by=request.user.company_name,
+#                     date=booking_date,
+#                 )
+
+#                 print(f"[DEBUG] Created booking:")
+#                 print(f"        ID: {booking.id}")
+#                 print(f"        Floor: {booking.floor}")
+#                 print(f"        Room: {booking.room}")
+#                 print(f"        Date: {booking.date}")
+#                 print(f"        Time: {booking.time_slot}")
+#                 print(f"        User: {booking.user}")
+#                 print(f"        Reason: {booking.reason}")
+
+#                 saved_bookings.append({
+#                     'id': booking.id,
+#                     'floor': booking.floor.slug,
+#                     'room': booking.room,
+#                     'date': str(booking.date),
+#                     'time_slot': str(booking.time_slot),
+#                     'reason': booking.reason,
+#                     'user': booking.user.username,
+#                     'booked_by': booking.booked_by
+#                 })
+
+#             print(f"\n[DEBUG] Successfully saved {len(saved_bookings)} bookings")
+#             print(f"[DEBUG] Saved bookings details: {saved_bookings}")
+
+#             return JsonResponse({
+#                 'status': 'success',
+#                 'booked_by': bookings_data[-1]['reason'],  # Return the last booking reason
+#                 'saved_bookings': saved_bookings  # Optional: return all saved booking data
+#             })
+
+#         except Floor.DoesNotExist:
+#             print(f"[ERROR] Floor not found in booking data: {data.get('floor')}")
+#             return JsonResponse({
+#                 'status': 'error',
+#                 'message': 'Floor not found'
+#             }, status=404)
+#         except Exception as e:
+#             print(f"[ERROR] Error saving booking: {str(e)}")
+#             import traceback
+#             traceback.print_exc()  # Print full traceback
+#             return JsonResponse({
+#                 'status': 'error',
+#                 'message': str(e)
+#             }, status=400)
+
+#     return JsonResponse({
+#         'status': 'error',
+#         'message': 'Invalid request method'
+#     }, status=405)
 
 @login_required
 def delete_slots(request):
