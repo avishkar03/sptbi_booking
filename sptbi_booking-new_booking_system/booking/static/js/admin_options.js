@@ -13,44 +13,129 @@ document.addEventListener('DOMContentLoaded', function() {
     // Track selected column header
     let selectedHeader = null;
 
+    // Array to track selected cells for deletion
+    let selectedCellsArray = [];
+
     // We don't need to add event listeners to headers here since booking_with_approval.js handles that
     // Instead, we'll just set up a MutationObserver to track when headers get the 'selected' class
     if (bookingTable) {
-        console.log("Setting up MutationObserver for header selection in admin_options.js");
+        console.log("Setting up MutationObserver for header and cell selection in admin_options.js");
 
-        // Create a MutationObserver to watch for changes to the 'selected' class on headers
-        const headerObserver = new MutationObserver(function(mutations) {
+        // Create a MutationObserver to watch for changes to the 'selected' class on headers and cells
+        const selectionObserver = new MutationObserver(function(mutations) {
+            let selectionChanged = false;
+
             mutations.forEach(function(mutation) {
-                if (mutation.type === 'attributes' &&
-                    mutation.attributeName === 'class' &&
-                    mutation.target.tagName === 'TH') {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    const element = mutation.target;
 
-                    const header = mutation.target;
-
-                    // If this header now has the 'selected' class, update our selectedHeader
-                    if (header.classList.contains('selected')) {
-                        selectedHeader = header;
-                        console.log('Admin options detected selected header:', header.textContent);
+                    // Handle header selection
+                    if (element.tagName === 'TH') {
+                        // If this header now has the 'selected' class, update our selectedHeader
+                        if (element.classList.contains('selected')) {
+                            selectedHeader = element;
+                            console.log('Admin options detected selected header:', element.textContent);
+                        }
+                        // If this was our selected header and it lost the 'selected' class, clear our reference
+                        else if (selectedHeader === element) {
+                            selectedHeader = null;
+                            console.log('Admin options detected header deselection');
+                        }
                     }
-                    // If this was our selected header and it lost the 'selected' class, clear our reference
-                    else if (selectedHeader === header) {
-                        selectedHeader = null;
-                        console.log('Admin options detected header deselection');
+
+                    // Handle cell selection
+                    if (element.tagName === 'TD' && element.classList.contains('booking-cell')) {
+                        selectionChanged = true;
                     }
                 }
             });
+
+            // If any cell selection changed, update our array from the DOM
+            if (selectionChanged) {
+                // Use a small delay to ensure all DOM updates have been applied
+                setTimeout(() => {
+                    // Get all currently selected cells from the DOM
+                    const selectedCells = document.querySelectorAll('td.booking-cell.selected');
+                    selectedCellsArray = Array.from(selectedCells);
+                    console.log('Updated selected cells array. New count:', selectedCellsArray.length);
+
+                    // Debug: Log all selected cells
+                    if (selectedCellsArray.length > 0) {
+                        console.log("Currently selected cells:");
+                        selectedCellsArray.forEach((cell, idx) => {
+                            console.log(`Cell ${idx + 1}:`, {
+                                room: cell.dataset.room,
+                                time: cell.dataset.time,
+                                booked: cell.classList.contains('booked')
+                            });
+                        });
+                    }
+                }, 50); // Small delay to ensure DOM is updated
+            }
         });
 
         // Observe all headers
         const headers = bookingTable.querySelectorAll('th.room-header, th.selectable-header');
         headers.forEach(header => {
-            headerObserver.observe(header, { attributes: true });
+            selectionObserver.observe(header, { attributes: true });
 
             // Check if any header is already selected when the page loads
             if (header.classList.contains('selected')) {
                 selectedHeader = header;
                 console.log('Admin options found pre-selected header:', header.textContent);
             }
+        });
+
+        // Observe all booking cells
+        const cells = bookingTable.querySelectorAll('td.booking-cell');
+        cells.forEach(cell => {
+            selectionObserver.observe(cell, { attributes: true });
+        });
+
+        // Get all currently selected cells from the DOM
+        const selectedCells = document.querySelectorAll('td.booking-cell.selected');
+        selectedCellsArray = Array.from(selectedCells);
+
+        // Log initial selection state
+        if (selectedCellsArray.length > 0) {
+            console.log('Initial selected cells found:', selectedCellsArray.length);
+            selectedCellsArray.forEach((cell, index) => {
+                console.log(`Pre-selected cell ${index + 1}:`, {
+                    room: cell.dataset.room,
+                    time: cell.dataset.time
+                });
+            });
+        } else {
+            console.log('No cells selected initially');
+        }
+
+        // Add a direct click handler to all booking cells to ensure we're capturing all selection events
+        // This is a backup to the MutationObserver
+        bookingTable.addEventListener('click', function() {
+            // Use a small delay to ensure the booking_with_approval.js click handler has run
+            setTimeout(() => {
+                // Get all currently selected cells from the DOM
+                const currentSelectedCells = document.querySelectorAll('td.booking-cell.selected');
+                const newSelectedCellsArray = Array.from(currentSelectedCells);
+
+                // Only update if there's a change
+                if (newSelectedCellsArray.length !== selectedCellsArray.length) {
+                    console.log('Cell selection changed via click. New count:', newSelectedCellsArray.length);
+                    selectedCellsArray = newSelectedCellsArray;
+
+                    // Debug: Log all selected cells
+                    if (selectedCellsArray.length > 0) {
+                        console.log("Currently selected cells after click:");
+                        selectedCellsArray.forEach((cell, idx) => {
+                            console.log(`Cell ${idx + 1}:`, {
+                                room: cell.dataset.room,
+                                time: cell.dataset.time,
+                                booked: cell.classList.contains('booked')
+                            });
+                        });
+                    }
+                }
+            }, 100); // Small delay to ensure booking_with_approval.js has processed the click
         });
     }
 
@@ -110,38 +195,79 @@ document.addEventListener('DOMContentLoaded', function() {
         deleteSlotBtn.addEventListener('click', function() {
             console.log("Delete Slot button clicked");
 
-            // Check if any cell is selected
-            const selectedCells = document.querySelectorAll('td.booking-cell.selected');
+            // IMPORTANT: Always get the current selection directly from the DOM
+            // This ensures we have the most up-to-date selection regardless of any tracking issues
+            const selectedCells = Array.from(document.querySelectorAll('td.booking-cell.selected'));
             console.log("Found selected cells:", selectedCells.length);
 
+            // Force update our tracking array
+            selectedCellsArray = selectedCells;
+
+            // Debug: Log all selected cells with detailed information
+            if (selectedCells.length > 0) {
+                console.log("Selected cells details:");
+                selectedCells.forEach((cell, idx) => {
+                    console.log(`Cell ${idx + 1}:`, {
+                        room: cell.dataset.room,
+                        time: cell.dataset.time,
+                        floor: cell.dataset.floor,
+                        classes: cell.className,
+                        booked: cell.classList.contains('booked'),
+                        html: cell.outerHTML.substring(0, 100) // Log first 100 chars of HTML
+                    });
+                });
+            }
+
+            // Check if any cell is selected
             if (selectedCells.length === 0) {
-                showErrorPopup('No Slot Selected', 'Please select a booked slot first.');
+                showErrorPopup('No Selection', 'Please select at least one slot to delete');
                 return;
             }
 
-            // Make sure the selected cell is actually booked
-            const selectedCell = selectedCells[0];
-            console.log("Selected cell for deletion:", selectedCell);
-            console.log("Cell classes:", selectedCell.className);
-            console.log("Cell data:", {
-                room: selectedCell.dataset.room,
-                time: selectedCell.dataset.time,
-                floor: selectedCell.dataset.floor,
-                booked: selectedCell.classList.contains('booked')
+            // Filter out only booked cells
+            const bookedCells = selectedCells.filter(cell => cell.classList.contains('booked'));
+            console.log("Booked cells count:", bookedCells.length);
+
+            if (bookedCells.length === 0) {
+                showErrorPopup('No Selection', 'Please select at least one slot to delete');
+                return;
+            }
+
+            // Log details of all selected booked cells that will be deleted
+            console.log("Selected cells for deletion:");
+            bookedCells.forEach((cell) => {
+                console.log(`Selected cell for deletion:`, {
+                    room: cell.dataset.room,
+                    time: cell.dataset.time,
+                    floor: cell.dataset.floor,
+                    booked: cell.classList.contains('booked')
+                });
+
+                // Log the actual HTML of the cell for debugging
+                console.log("Cell classes:", cell.className);
+                console.log("Cell data:", {
+                    room: cell.dataset.room,
+                    time: cell.dataset.time,
+                    floor: cell.dataset.floor
+                });
             });
 
-            if (!selectedCell.classList.contains('booked')) {
-                showErrorPopup('Not a Booked Slot', 'Please select a booked slot to delete.');
-                return;
+            // Create confirmation message based on number of slots
+            let confirmMessage = '';
+            if (bookedCells.length === 1) {
+                confirmMessage = `Are you sure you want to delete the selected booking?`;
+            } else {
+                confirmMessage = `Are you sure you want to delete ${bookedCells.length} selected bookings?`;
             }
 
             // Show confirmation popup
             showConfirmationPopup(
-                'Delete Booking',
-                'Are you sure you want to delete the selected booking?',
-                'Delete Booking',
+                'Delete Booking' + (bookedCells.length > 1 ? 's' : ''),
+                confirmMessage,
+                'Delete Booking' + (bookedCells.length > 1 ? 's' : ''),
                 function() {
-                    deleteBooking(selectedCell);
+                    // Delete all selected booked cells
+                    deleteMultipleBookings(bookedCells);
                 }
             );
         });
@@ -398,55 +524,198 @@ document.addEventListener('DOMContentLoaded', function() {
         return { popup, overlay };
     }
 
-    // Function to delete a booking
-    function deleteBooking(cell) {
-        // Get booking details from the cell
-        const room = cell.dataset.room;
-        const timeSlot = cell.dataset.time;
-        const date = document.querySelector('.date-display').dataset.date ||
-                     document.querySelector('.date-display').textContent;
+    // Function to delete multiple bookings
+    function deleteMultipleBookings(cells) {
+        if (!cells || cells.length === 0) {
+            showErrorPopup('Error', 'No cells selected for deletion');
+            return;
+        }
+
+        console.log(`Starting deletion of ${cells.length} cells:`, cells);
+
+        // Get the date from the page
+        const dateElement = document.querySelector('.date-display');
+        let date;
+        if (dateElement) {
+            date = dateElement.dataset.date || dateElement.textContent.trim();
+            console.log("Date from page:", date);
+        } else {
+            // Fallback to current date
+            const today = new Date();
+            date = today.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+            console.warn("Date element not found, using current date:", date);
+        }
 
         // Get the current floor name from the URL
         const pathParts = window.location.pathname.split('/');
         const floorSlug = pathParts[pathParts.length - 2]; // e.g., "1st-floor"
+        console.log("Floor slug from URL:", floorSlug);
 
         // Get CSRF token
         const csrfToken = getCookie('csrftoken');
+        console.log("CSRF token obtained:", csrfToken ? "Yes" : "No");
 
-        // Make API request to delete booking
-        fetch('/booking/api/delete-booking/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({
-                floor_slug: floorSlug,
-                room: room,
-                time_slot: timeSlot,
-                date: date
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Clear the cell content and remove booked classes
-                cell.innerHTML = '';
-                cell.classList.remove('booked', 'pending', 'selected');
-                cell.style.backgroundColor = '';
-                cell.style.color = '';
+        // Show a loading message
+        const loadingPopup = showLoadingPopup(
+            'Deleting Bookings',
+            `Deleting ${cells.length} booking${cells.length > 1 ? 's' : ''}...`
+        );
 
-                // Show success message
-                showSuccessPopup('Success', 'Booking deleted successfully');
-            } else {
-                showErrorPopup('Error', data.message || 'Failed to delete booking');
-            }
-        })
-        .catch(error => {
-            console.error('Error deleting booking:', error);
-            showErrorPopup('Error', 'Failed to delete booking. Please try again.');
+        // Create a copy of the cells array to avoid modification issues during iteration
+        const cellsToProcess = Array.from(cells);
+
+        console.log(`Processing ${cellsToProcess.length} cells for deletion`);
+
+        // Log each cell to be processed
+        cellsToProcess.forEach((cell, idx) => {
+            console.log(`Cell to process ${idx + 1}:`, {
+                room: cell.dataset.room,
+                time: cell.dataset.time,
+                floor: cell.dataset.floor,
+                booked: cell.classList.contains('booked'),
+                html: cell.outerHTML.substring(0, 100) // Log first 100 chars of HTML
+            });
         });
+
+        // Process cells sequentially to avoid race conditions
+        let processedCount = 0;
+        let successCount = 0;
+        let errorCount = 0;
+        let results = [];
+
+        // Function to process a single cell
+        function processCell(index) {
+            // If all cells have been processed, show results
+            if (index >= cellsToProcess.length) {
+                console.log(`All cells processed. Success: ${successCount}, Errors: ${errorCount}`);
+                console.log("Deletion results:", results);
+
+                // Remove the loading popup
+                if (loadingPopup) {
+                    document.body.removeChild(loadingPopup.popup);
+                    document.body.removeChild(loadingPopup.overlay);
+                }
+
+                // Function to ensure UI is fully updated
+                function updateUI() {
+                    // Make sure all successfully processed cells are properly cleared
+                    results.forEach(result => {
+                        if (result.success && result.cell) {
+                            // Double-check that the cell is properly cleared
+                            result.cell.innerHTML = '';
+                            result.cell.classList.remove('booked', 'pending', 'selected');
+                            result.cell.style.backgroundColor = '';
+                            result.cell.style.color = '';
+                            result.cell.style.cursor = 'pointer';
+                            result.cell.style.border = '1px solid #ccc';
+                        }
+                    });
+                }
+
+                // Show appropriate message based on results
+                if (successCount === cellsToProcess.length) {
+                    // All deletions were successful
+                    showSuccessPopup(
+                        'Success',
+                        `Successfully deleted ${successCount} booking${successCount > 1 ? 's' : ''}`
+                    );
+                    // Update UI
+                    updateUI();
+                } else if (successCount > 0) {
+                    // Some deletions were successful
+                    showSuccessPopup(
+                        'Partial Success',
+                        `Successfully deleted ${successCount} booking${successCount > 1 ? 's' : ''}, but failed to delete ${errorCount} booking${errorCount > 1 ? 's' : ''}`
+                    );
+                    // Update UI
+                    updateUI();
+                } else {
+                    // No deletions were successful
+                    showErrorPopup(
+                        'Error',
+                        `Failed to delete any bookings. Please try again.`
+                    );
+                }
+                return;
+            }
+
+            const cell = cellsToProcess[index];
+            const room = cell.dataset.room;
+            const timeSlot = cell.dataset.time;
+
+            console.log(`Processing cell ${index + 1}/${cellsToProcess.length}:`, {
+                room: room,
+                time: timeSlot,
+                date: date,
+                floor: floorSlug
+            });
+
+            // Make API request to delete booking
+            fetch('/booking/api/delete-booking/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    floor_slug: floorSlug,
+                    room: room,
+                    time_slot: timeSlot,
+                    date: date
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(`Cell ${index + 1} response:`, data);
+
+                if (data.status === 'success') {
+                    // Clear the cell content and remove booked classes
+                    cell.innerHTML = '';
+                    cell.classList.remove('booked', 'pending', 'selected');
+                    cell.style.backgroundColor = '';
+                    cell.style.color = '';
+
+                    // Make sure the cell is properly reset to its default state
+                    // This ensures it looks like an empty cell without requiring a page refresh
+                    cell.style.cursor = 'pointer';
+                    cell.style.border = '1px solid #ccc';
+
+                    // Remove from selected cells array
+                    const arrayIndex = selectedCellsArray.indexOf(cell);
+                    if (arrayIndex !== -1) {
+                        selectedCellsArray.splice(arrayIndex, 1);
+                    }
+
+                    successCount++;
+                    console.log(`Success count: ${successCount}`);
+                    results.push({ success: true, cell: cell });
+                } else {
+                    console.error(`Error deleting booking ${index + 1}:`, data.message);
+                    errorCount++;
+                    results.push({ success: false, error: data.message, cell: cell });
+                }
+
+                // Process the next cell
+                processedCount++;
+                processCell(index + 1);
+            })
+            .catch(error => {
+                console.error(`Error deleting booking ${index + 1}:`, error);
+                errorCount++;
+                results.push({ success: false, error: error.message, cell: cell });
+
+                // Process the next cell
+                processedCount++;
+                processCell(index + 1);
+            });
+        }
+
+        // Start processing the first cell
+        processCell(0);
     }
+
+    // Note: The deleteBooking function has been replaced by deleteMultipleBookings
+    // which can handle both single and multiple bookings
 
     // Helper function to show confirmation popup
     function showConfirmationPopup(title, message, confirmText, onConfirm) {
@@ -457,72 +726,95 @@ document.addEventListener('DOMContentLoaded', function() {
         popup.style.left = '50%';
         popup.style.transform = 'translate(-50%, -50%)';
         popup.style.backgroundColor = '#fff';
-        popup.style.padding = '30px';
+        popup.style.padding = '0';
         popup.style.borderRadius = '5px';
         popup.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
         popup.style.zIndex = '9999';
         popup.style.minWidth = '400px';
-        popup.style.textAlign = 'center';
+        popup.style.maxWidth = '500px';
+        popup.style.overflow = 'hidden';
+
+        // Create header with warning icon
+        const headerContainer = document.createElement('div');
+        headerContainer.style.backgroundColor = '#FF9800'; // Orange color for deletion warning
+        headerContainer.style.color = 'white';
+        headerContainer.style.padding = '15px 20px';
+        headerContainer.style.display = 'flex';
+        headerContainer.style.alignItems = 'center';
+
+        // Create warning icon
+        const warningIcon = document.createElement('div');
+        warningIcon.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+            </svg>
+        `;
+        warningIcon.style.marginRight = '10px';
 
         // Create title
         const titleElement = document.createElement('h2');
-        titleElement.textContent = title;
+        titleElement.textContent = title.includes('Delete') ? 'Confirm Deletion' : title;
+        titleElement.style.margin = '0';
+        titleElement.style.fontSize = '18px';
+        titleElement.style.fontWeight = '500';
 
-        // Set title color based on action type
-        if (title.toLowerCase().includes('delete')) {
-            titleElement.style.color = '#e53e3e'; // Red for delete actions
-        } else if (title.toLowerCase().includes('add')) {
-            titleElement.style.color = '#38a169'; // Green for add actions
-        } else {
-            titleElement.style.color = '#1e3a8a'; // Blue for other actions
-        }
+        // Assemble header
+        headerContainer.appendChild(warningIcon);
+        headerContainer.appendChild(titleElement);
 
-        titleElement.style.marginBottom = '15px';
-        titleElement.style.fontSize = '24px';
+        // Create message container
+        const contentContainer = document.createElement('div');
+        contentContainer.style.padding = '20px';
+        contentContainer.style.backgroundColor = '#fff';
 
         // Create message
         const messageElement = document.createElement('p');
-        messageElement.textContent = message;
-        messageElement.style.marginBottom = '25px';
+
+        // Customize message for slot deletion
+        if (message.includes('delete') && message.includes('booking')) {
+            if (message.includes('selected bookings')) {
+                // Extract the number from the message
+                const numMatch = message.match(/delete (\d+) selected/);
+                const numSlots = numMatch ? numMatch[1] : '?';
+                messageElement.textContent = `Are you sure you want to delete ${numSlots} slot(s)?`;
+            } else {
+                messageElement.textContent = 'Are you sure you want to delete this slot?';
+            }
+        } else {
+            messageElement.textContent = message;
+        }
+
+        messageElement.style.margin = '0 0 20px 0';
         messageElement.style.fontSize = '16px';
         messageElement.style.color = '#333';
 
         // Create buttons container
         const buttonsContainer = document.createElement('div');
         buttonsContainer.style.display = 'flex';
-        buttonsContainer.style.justifyContent = 'center';
-        buttonsContainer.style.gap = '15px';
-
-        // Create confirm button
-        const confirmButton = document.createElement('button');
-        confirmButton.textContent = confirmText;
-        confirmButton.style.padding = '10px 20px';
-
-        // Set button color based on action type
-        if (confirmText.toLowerCase().includes('delete')) {
-            confirmButton.style.backgroundColor = '#e53e3e'; // Red for delete actions
-        } else if (confirmText.toLowerCase().includes('add')) {
-            confirmButton.style.backgroundColor = '#38a169'; // Green for add actions
-        } else {
-            confirmButton.style.backgroundColor = '#1e3a8a'; // Blue for other actions
-        }
-
-        confirmButton.style.color = 'white';
-        confirmButton.style.border = 'none';
-        confirmButton.style.borderRadius = '4px';
-        confirmButton.style.cursor = 'pointer';
-        confirmButton.style.minWidth = '120px';
+        buttonsContainer.style.justifyContent = 'flex-end';
+        buttonsContainer.style.gap = '10px';
 
         // Create cancel button
         const cancelButton = document.createElement('button');
         cancelButton.textContent = 'Cancel';
-        cancelButton.style.padding = '10px 20px';
-        cancelButton.style.backgroundColor = '#f3f4f6';
-        cancelButton.style.color = '#1f2937';
-        cancelButton.style.border = 'none';
+        cancelButton.style.padding = '8px 16px';
+        cancelButton.style.backgroundColor = '#f5f5f5';
+        cancelButton.style.color = '#333';
+        cancelButton.style.border = '1px solid #ddd';
         cancelButton.style.borderRadius = '4px';
         cancelButton.style.cursor = 'pointer';
-        cancelButton.style.minWidth = '120px';
+        cancelButton.style.fontSize = '14px';
+
+        // Create delete button
+        const confirmButton = document.createElement('button');
+        confirmButton.textContent = confirmText.includes('Delete') ? 'Delete' : confirmText;
+        confirmButton.style.padding = '8px 16px';
+        confirmButton.style.backgroundColor = '#FF9800'; // Orange for delete
+        confirmButton.style.color = 'white';
+        confirmButton.style.border = 'none';
+        confirmButton.style.borderRadius = '4px';
+        confirmButton.style.cursor = 'pointer';
+        confirmButton.style.fontSize = '14px';
 
         // Create overlay
         const overlay = document.createElement('div');
@@ -536,26 +828,59 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Add event listeners
         confirmButton.addEventListener('click', function() {
-            document.body.removeChild(popup);
-            document.body.removeChild(overlay);
-            onConfirm();
+            // Add fade-out animation
+            popup.style.transition = 'opacity 0.2s ease-out';
+            overlay.style.transition = 'opacity 0.2s ease-out';
+            popup.style.opacity = '0';
+            overlay.style.opacity = '0';
+
+            // Remove elements after animation completes
+            setTimeout(function() {
+                if (document.body.contains(popup)) document.body.removeChild(popup);
+                if (document.body.contains(overlay)) document.body.removeChild(overlay);
+                onConfirm();
+            }, 200);
         });
 
         cancelButton.addEventListener('click', function() {
-            document.body.removeChild(popup);
-            document.body.removeChild(overlay);
+            // Add fade-out animation
+            popup.style.transition = 'opacity 0.2s ease-out';
+            overlay.style.transition = 'opacity 0.2s ease-out';
+            popup.style.opacity = '0';
+            overlay.style.opacity = '0';
+
+            // Remove elements after animation completes
+            setTimeout(function() {
+                if (document.body.contains(popup)) document.body.removeChild(popup);
+                if (document.body.contains(overlay)) document.body.removeChild(overlay);
+            }, 200);
         });
 
         // Assemble popup
-        buttonsContainer.appendChild(confirmButton);
         buttonsContainer.appendChild(cancelButton);
-        popup.appendChild(titleElement);
-        popup.appendChild(messageElement);
-        popup.appendChild(buttonsContainer);
+        buttonsContainer.appendChild(confirmButton);
+        contentContainer.appendChild(messageElement);
+        contentContainer.appendChild(buttonsContainer);
+
+        popup.appendChild(headerContainer);
+        popup.appendChild(contentContainer);
 
         // Add to document
         document.body.appendChild(overlay);
         document.body.appendChild(popup);
+
+        // Add fade-in animation
+        popup.style.opacity = '0';
+        overlay.style.opacity = '0';
+        popup.style.transition = 'opacity 0.3s ease-in';
+        overlay.style.transition = 'opacity 0.3s ease-in';
+
+        // Trigger reflow to ensure the transition works
+        void popup.offsetWidth;
+
+        // Set opacity to 1 to fade in
+        popup.style.opacity = '1';
+        overlay.style.opacity = '1';
     }
 
     // Helper function to show error popup
@@ -567,37 +892,72 @@ document.addEventListener('DOMContentLoaded', function() {
         popup.style.left = '50%';
         popup.style.transform = 'translate(-50%, -50%)';
         popup.style.backgroundColor = '#fff';
-        popup.style.padding = '30px';
+        popup.style.padding = '0';
         popup.style.borderRadius = '5px';
         popup.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
         popup.style.zIndex = '9999';
-        popup.style.minWidth = '400px';
-        popup.style.textAlign = 'center';
+        popup.style.minWidth = '300px';
+        popup.style.maxWidth = '400px';
+        popup.style.overflow = 'hidden';
+
+        // Create header with warning icon
+        const headerContainer = document.createElement('div');
+        headerContainer.style.backgroundColor = '#FF9800'; // Orange color for warning
+        headerContainer.style.color = 'white';
+        headerContainer.style.padding = '15px 20px';
+        headerContainer.style.display = 'flex';
+        headerContainer.style.alignItems = 'center';
+
+        // Create warning icon
+        const warningIcon = document.createElement('div');
+        warningIcon.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+            </svg>
+        `;
+        warningIcon.style.marginRight = '10px';
 
         // Create title
         const titleElement = document.createElement('h2');
-        titleElement.textContent = title;
-        titleElement.style.color = '#e53e3e';
-        titleElement.style.marginBottom = '15px';
-        titleElement.style.fontSize = '24px';
+        titleElement.textContent = title === 'No Slot Selected' ? 'No Selection' : title;
+        titleElement.style.margin = '0';
+        titleElement.style.fontSize = '18px';
+        titleElement.style.fontWeight = '500';
+
+        // Assemble header
+        headerContainer.appendChild(warningIcon);
+        headerContainer.appendChild(titleElement);
+
+        // Create message container
+        const contentContainer = document.createElement('div');
+        contentContainer.style.padding = '15px 20px';
+        contentContainer.style.backgroundColor = '#fff';
 
         // Create message
         const messageElement = document.createElement('p');
-        messageElement.textContent = message;
-        messageElement.style.marginBottom = '25px';
+        messageElement.textContent = message === 'Please select at least one booked slot first.' ?
+            'Please select at least one slot to delete' : message;
+        messageElement.style.margin = '0';
         messageElement.style.fontSize = '16px';
         messageElement.style.color = '#333';
 
-        // Create close button
-        const closeButton = document.createElement('button');
-        closeButton.textContent = 'Close';
-        closeButton.style.padding = '10px 20px';
-        closeButton.style.backgroundColor = '#e53e3e';
-        closeButton.style.color = 'white';
-        closeButton.style.border = 'none';
-        closeButton.style.borderRadius = '4px';
-        closeButton.style.cursor = 'pointer';
-        closeButton.style.minWidth = '120px';
+        // Create buttons container
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.style.display = 'flex';
+        buttonsContainer.style.justifyContent = 'flex-end';
+        buttonsContainer.style.marginTop = '15px';
+
+        // Create OK button
+        const okButton = document.createElement('button');
+        okButton.textContent = 'OK';
+        okButton.style.padding = '6px 15px';
+        okButton.style.backgroundColor = '#FF9800'; // Orange for warning
+        okButton.style.color = 'white';
+        okButton.style.border = 'none';
+        okButton.style.borderRadius = '4px';
+        okButton.style.cursor = 'pointer';
+        okButton.style.fontSize = '14px';
+        okButton.style.fontWeight = '500';
 
         // Create overlay
         const overlay = document.createElement('div');
@@ -610,23 +970,51 @@ document.addEventListener('DOMContentLoaded', function() {
         overlay.style.zIndex = '9998';
 
         // Add event listener
-        closeButton.addEventListener('click', function() {
-            document.body.removeChild(popup);
-            document.body.removeChild(overlay);
+        okButton.addEventListener('click', function() {
+            // Add fade-out animation
+            popup.style.transition = 'opacity 0.2s ease-out';
+            overlay.style.transition = 'opacity 0.2s ease-out';
+            popup.style.opacity = '0';
+            overlay.style.opacity = '0';
+
+            // Remove elements after animation completes
+            setTimeout(function() {
+                if (document.body.contains(popup)) document.body.removeChild(popup);
+                if (document.body.contains(overlay)) document.body.removeChild(overlay);
+            }, 200);
         });
 
         // Assemble popup
-        popup.appendChild(titleElement);
-        popup.appendChild(messageElement);
-        popup.appendChild(closeButton);
+        buttonsContainer.appendChild(okButton);
+        contentContainer.appendChild(messageElement);
+        contentContainer.appendChild(buttonsContainer);
+
+        popup.appendChild(headerContainer);
+        popup.appendChild(contentContainer);
 
         // Add to document
         document.body.appendChild(overlay);
         document.body.appendChild(popup);
+
+        // Add fade-in animation
+        popup.style.opacity = '0';
+        overlay.style.opacity = '0';
+        popup.style.transition = 'opacity 0.3s ease-in';
+        overlay.style.transition = 'opacity 0.3s ease-in';
+
+        // Trigger reflow to ensure the transition works
+        void popup.offsetWidth;
+
+        // Set opacity to 1 to fade in
+        popup.style.opacity = '1';
+        overlay.style.opacity = '1';
     }
 
     // Helper function to show success popup
     function showSuccessPopup(title, message) {
+        // Check if this is a deletion success message
+        const isDeletionSuccess = message.includes('deleted');
+
         // Create popup container
         const popup = document.createElement('div');
         popup.style.position = 'fixed';
@@ -634,62 +1022,177 @@ document.addEventListener('DOMContentLoaded', function() {
         popup.style.left = '50%';
         popup.style.transform = 'translate(-50%, -50%)';
         popup.style.backgroundColor = '#fff';
-        popup.style.padding = '30px';
+        popup.style.padding = '0';
         popup.style.borderRadius = '5px';
         popup.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
         popup.style.zIndex = '9999';
-        popup.style.minWidth = '400px';
-        popup.style.textAlign = 'center';
+        popup.style.minWidth = '300px';
+        popup.style.maxWidth = '400px';
+        popup.style.overflow = 'hidden';
 
-        // Create title
-        const titleElement = document.createElement('h2');
-        titleElement.textContent = title.includes('Success') ? 'Success!' : title;
-        titleElement.style.color = '#38a169'; // Green for success
-        titleElement.style.marginBottom = '15px';
-        titleElement.style.fontSize = '24px';
+        if (isDeletionSuccess) {
+            // Create header with success icon for deletion success
+            const headerContainer = document.createElement('div');
+            headerContainer.style.backgroundColor = '#4CAF50'; // Green color for success
+            headerContainer.style.color = 'white';
+            headerContainer.style.padding = '15px 20px';
+            headerContainer.style.display = 'flex';
+            headerContainer.style.alignItems = 'center';
 
-        // Create message
-        const messageElement = document.createElement('p');
-        messageElement.textContent = message;
-        messageElement.style.marginBottom = '25px';
-        messageElement.style.fontSize = '16px';
-        messageElement.style.color = '#333';
+            // Create success icon (white checkmark)
+            const successIcon = document.createElement('div');
+            successIcon.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                </svg>
+            `;
+            successIcon.style.marginRight = '10px';
 
-        // Create close button
-        const closeButton = document.createElement('button');
-        closeButton.textContent = 'Close';
-        closeButton.style.padding = '10px 20px';
-        closeButton.style.backgroundColor = '#38a169';
-        closeButton.style.color = 'white';
-        closeButton.style.border = 'none';
-        closeButton.style.borderRadius = '4px';
-        closeButton.style.cursor = 'pointer';
-        closeButton.style.minWidth = '120px';
+            // Create title
+            const titleElement = document.createElement('h2');
+            titleElement.textContent = 'Deletion Successful';
+            titleElement.style.margin = '0';
+            titleElement.style.fontSize = '18px';
+            titleElement.style.fontWeight = '500';
 
-        // Create overlay
-        const overlay = document.createElement('div');
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
-        overlay.style.zIndex = '9998';
+            // Assemble header
+            headerContainer.appendChild(successIcon);
+            headerContainer.appendChild(titleElement);
 
-        // Add event listener
-        closeButton.addEventListener('click', function() {
-            document.body.removeChild(popup);
-            document.body.removeChild(overlay);
-        });
+            // Create message container
+            const contentContainer = document.createElement('div');
+            contentContainer.style.padding = '15px 20px';
+            contentContainer.style.backgroundColor = '#fff';
 
-        // Assemble popup
-        popup.appendChild(titleElement);
-        popup.appendChild(messageElement);
-        popup.appendChild(closeButton);
+            // Create message
+            const messageElement = document.createElement('p');
+            messageElement.textContent = message;
+            messageElement.style.margin = '0';
+            messageElement.style.fontSize = '16px';
+            messageElement.style.color = '#333';
 
-        // Add to document
-        document.body.appendChild(overlay);
-        document.body.appendChild(popup);
+            // Create buttons container
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.style.display = 'flex';
+            buttonsContainer.style.justifyContent = 'flex-end';
+            buttonsContainer.style.marginTop = '15px';
+
+            // Create OK button
+            const okButton = document.createElement('button');
+            okButton.textContent = 'OK';
+            okButton.style.padding = '6px 15px';
+            okButton.style.backgroundColor = '#4CAF50'; // Green for success
+            okButton.style.color = 'white';
+            okButton.style.border = 'none';
+            okButton.style.borderRadius = '4px';
+            okButton.style.cursor = 'pointer';
+            okButton.style.fontSize = '14px';
+            okButton.style.fontWeight = '500';
+
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            overlay.style.zIndex = '9998';
+
+            // Add event listener
+            okButton.addEventListener('click', function() {
+                // Add fade-out animation
+                popup.style.transition = 'opacity 0.2s ease-out';
+                overlay.style.transition = 'opacity 0.2s ease-out';
+                popup.style.opacity = '0';
+                overlay.style.opacity = '0';
+
+                // Remove elements after animation completes
+                setTimeout(function() {
+                    if (document.body.contains(popup)) document.body.removeChild(popup);
+                    if (document.body.contains(overlay)) document.body.removeChild(overlay);
+                }, 200);
+            });
+
+            // Assemble popup
+            buttonsContainer.appendChild(okButton);
+            contentContainer.appendChild(messageElement);
+            contentContainer.appendChild(buttonsContainer);
+
+            popup.appendChild(headerContainer);
+            popup.appendChild(contentContainer);
+
+            // Add to document
+            document.body.appendChild(overlay);
+            document.body.appendChild(popup);
+
+            // Add fade-in animation
+            popup.style.opacity = '0';
+            overlay.style.opacity = '0';
+            popup.style.transition = 'opacity 0.3s ease-in';
+            overlay.style.transition = 'opacity 0.3s ease-in';
+
+            // Trigger reflow to ensure the transition works
+            void popup.offsetWidth;
+
+            // Set opacity to 1 to fade in
+            popup.style.opacity = '1';
+            overlay.style.opacity = '1';
+        } else {
+            // Use the original style for non-deletion success messages
+            popup.style.padding = '30px';
+            popup.style.textAlign = 'center';
+
+            // Create title
+            const titleElement = document.createElement('h2');
+            titleElement.textContent = title.includes('Success') ? 'Success!' : title;
+            titleElement.style.color = '#38a169'; // Green for success
+            titleElement.style.marginBottom = '15px';
+            titleElement.style.fontSize = '24px';
+
+            // Create message
+            const messageElement = document.createElement('p');
+            messageElement.textContent = message;
+            messageElement.style.marginBottom = '25px';
+            messageElement.style.fontSize = '16px';
+            messageElement.style.color = '#333';
+
+            // Create close button
+            const closeButton = document.createElement('button');
+            closeButton.textContent = 'Close';
+            closeButton.style.padding = '10px 20px';
+            closeButton.style.backgroundColor = '#38a169';
+            closeButton.style.color = 'white';
+            closeButton.style.border = 'none';
+            closeButton.style.borderRadius = '4px';
+            closeButton.style.cursor = 'pointer';
+            closeButton.style.minWidth = '120px';
+
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            overlay.style.zIndex = '9998';
+
+            // Add event listener
+            closeButton.addEventListener('click', function() {
+                document.body.removeChild(popup);
+                document.body.removeChild(overlay);
+            });
+
+            // Assemble popup
+            popup.appendChild(titleElement);
+            popup.appendChild(messageElement);
+            popup.appendChild(closeButton);
+
+            // Add to document
+            document.body.appendChild(overlay);
+            document.body.appendChild(popup);
+        }
     }
 
     // Helper function to get CSRF token from cookies

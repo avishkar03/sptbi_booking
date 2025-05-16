@@ -273,6 +273,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Add a class to make CSS targeting easier
                         cell.classList.add('booked');
 
+                        // Add "Booked by" prefix to existing bookings if not already present
+                        const textElement = cell.querySelector('.booked-text');
+                        if (textElement && !textElement.textContent.trim().startsWith('Booked by:')) {
+                            textElement.textContent = 'Booked by: ' + textElement.textContent.trim();
+                        }
+
                         // Log the first few cells for debugging
                         if (index < 3) {
                             console.log(`Booked cell ${index}: isAdmin=${cell.dataset.isAdmin}, cursor=${cell.style.cursor}`);
@@ -422,8 +428,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Flag to prevent multiple submissions
         let isSubmitting = false;
 
-        // Create a debounced version of the booking function
-        const debouncedBookingHandler = debounce(async function() {
+        // Create a handler for the booking function (without debounce delay)
+        const bookingHandler = async function() {
             // Prevent multiple submissions
             if (isSubmitting) {
                 console.log('Booking submission already in progress, ignoring duplicate click');
@@ -525,16 +531,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         cell.style.backgroundColor = '#f3f4f6';
                         cell.style.color = '#374151';
                         cell.style.cursor = 'not-allowed';
-                        cell.innerHTML = `<span class="booked-text">${reason}</span>`;
+                        cell.innerHTML = `<span class="booked-text">Booked by: ${reason}</span>`;
                     });
 
                     // Reset the input
                     bookingReason.value = '';
 
-                    // Show success message
+                    // Show success message immediately
                     window.CustomDialog.showModal({
                         title: 'Booking Successful',
-                        message: `Successfully booked ${selectedCells.length} slot(s) for "${reason}"`,
+                        message: `Successfully booked ${selectedCells.length} slot(s) with reason "Booked by: ${reason}"`,
                         type: 'SUCCESS',
                         buttons: [
                             {
@@ -582,10 +588,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 isSubmitting = false;
                 console.log('Booking submission completed, isSubmitting =', isSubmitting);
             }
-        }, 300); // 300ms debounce time
+        }; // No delay needed
 
-        // Attach the debounced handler to the button
-        bookButtonRef.addEventListener('click', debouncedBookingHandler);
+        // Attach the handler to the button
+        bookButtonRef.addEventListener('click', bookingHandler);
     }
 
     // Rest of the existing code...
@@ -1018,142 +1024,372 @@ document.addEventListener('DOMContentLoaded', function() {
     // }
 
 
-const deleteSlotBtn = document.getElementById('deleteSlotBtn');
-if (deleteSlotBtn) {
-    deleteSlotBtn.addEventListener('click', async function(event) {
-        event.preventDefault(); // Prevent default link behavior
+    // Initialize delete slot functionality
+    const deleteSlotBtn = document.getElementById('deleteSlotBtn');
+    if (deleteSlotBtn) {
+        deleteSlotBtn.addEventListener('click', async function(event) {
+            event.preventDefault(); // Prevent default link behavior
 
-        const selectedCells = document.querySelectorAll('.booking-cell.selected');
-        if (selectedCells.length === 0) {
-            window.CustomDialog.showModal({
-                title: 'No Selection',
-                message: 'Please select at least one slot to delete',
-                type: 'WARNING',
-                buttons: [
-                    {
-                        text: 'OK',
-                        type: 'primary',
-                        callback: modal => window.CustomDialog.closeModal(modal)
-                    }
-                ]
-            });
-            return;
-        }
-
-        // Show confirmation dialog
-        window.CustomDialog.showConfirmation(
-            `Are you sure you want to delete ${selectedCells.length} slot(s)?`,
-            async () => {
-                // This is the confirm callback — proceed with deletion here
-                const slotsToDelete = Array.from(selectedCells).map(cell => {
-                    const timeSlot = cell.closest('tr').querySelector('.time-slot').textContent;
-                    const roomHeader = bookingTable.querySelector('thead tr').children[cell.cellIndex].textContent;
-
-                    // Format time slot
-                    let formattedTimeSlot = timeSlot
-                        .toLowerCase()
-                        .replace(/\./g, ':')
-                        .replace(/p\.m\.|p:m:/, 'pm')
-                        .replace(/a\.m\.|a:m:/, 'am')
-                        .trim();
-
-                    let timeParts = formattedTimeSlot.match(/(\d+)[:\.]?(\d*)[\s]*(am|pm)/i);
-                    if (timeParts) {
-                        let hours = timeParts[1];
-                        let minutes = timeParts[2] || '00';
-                        let period = timeParts[3].toLowerCase();
-                        if (minutes.length === 1) minutes = '0' + minutes;
-                        formattedTimeSlot = `${hours}:${minutes} ${period}`;
-                    }
-
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const selectedDate = urlParams.get('date') || new Date().toISOString().split('T')[0];
-
-                    return {
-                        floor: floorSlug,
-                        room: roomHeader.trim(),
-                        time_slot: formattedTimeSlot,
-                        time: formattedTimeSlot,
-                        date: selectedDate
-                    };
+            const selectedCells = document.querySelectorAll('.booking-cell.selected');
+            if (selectedCells.length === 0) {
+                window.CustomDialog.showModal({
+                    title: 'No Selection',
+                    message: 'Please select at least one slot to delete',
+                    type: 'WARNING',
+                    buttons: [
+                        {
+                            text: 'OK',
+                            type: 'primary',
+                            callback: modal => window.CustomDialog.closeModal(modal)
+                        }
+                    ]
                 });
-
-                try {
-                    const response = await fetch('/booking/delete_slots/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': getCookie('csrftoken')
-                        },
-                        body: JSON.stringify(slotsToDelete)
-                    });
-
-                    const data = await response.json();
-                    if (data.status === 'success') {
-                        selectedCells.forEach(cell => {
-                            cell.classList.remove('selected');
-                            cell.classList.remove('booked');
-                            cell.style.backgroundColor = '';
-                            cell.style.color = '';
-                            cell.style.cursor = 'pointer';
-                            cell.innerHTML = '';
-                        });
-
-                        window.CustomDialog.showModal({
-                            title: 'Deletion Successful',
-                            message: `Successfully deleted ${selectedCells.length} slot(s)`,
-                            type: 'SUCCESS',
-                            buttons: [
-                                {
-                                    text: 'OK',
-                                    type: 'primary',
-                                    callback: modal => window.CustomDialog.closeModal(modal)
-                                }
-                            ]
-                        });
-
-                        console.log(`Successfully deleted ${selectedCells.length} slots`);
-                    } else {
-                        window.CustomDialog.showModal({
-                            title: 'Deletion Failed',
-                            message: data.message || 'Failed to delete the slots. Please try again.',
-                            type: 'ERROR',
-                            buttons: [
-                                {
-                                    text: 'OK',
-                                    type: 'primary',
-                                    callback: modal => window.CustomDialog.closeModal(modal)
-                                }
-                            ]
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    window.CustomDialog.showModal({
-                        title: 'Error',
-                        message: 'Failed to delete the slots. Please try again.',
-                        type: 'ERROR',
-                        buttons: [
-                            {
-                                text: 'OK',
-                                type: 'primary',
-                                callback: modal => window.CustomDialog.closeModal(modal)
-                            }
-                        ]
-                    });
-                }
-            },
-            null, // No cancel callback needed
-            {
-                title: 'Confirm Deletion',
-                type: 'WARNING',
-                confirmText: 'Delete',
-                cancelText: 'Cancel'
+                return;
             }
-        );
-    });
-}
 
+            // Create a custom confirmation dialog with fade-out animation
+            const overlay = document.createElement('div');
+            overlay.className = 'custom-modal-overlay delete-confirmation-overlay';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+            overlay.style.zIndex = '9999';
+            overlay.style.opacity = '0';
+            overlay.style.transition = 'opacity 0.3s ease';
 
+            const modal = document.createElement('div');
+            modal.className = 'custom-modal delete-confirmation-modal';
+            modal.style.position = 'fixed';
+            modal.style.top = '50%';
+            modal.style.left = '50%';
+            modal.style.transform = 'translate(-50%, -50%) scale(0.9)';
+            modal.style.backgroundColor = '#fff';
+            modal.style.borderRadius = '5px';
+            modal.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
+            modal.style.zIndex = '10000';
+            modal.style.minWidth = '300px';
+            modal.style.maxWidth = '400px';
+            modal.style.opacity = '0';
+            modal.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            modal.style.overflow = 'hidden';
 
+            // Create header with warning icon
+            const headerContainer = document.createElement('div');
+            headerContainer.style.backgroundColor = '#FF9800'; // Orange color for warning
+            headerContainer.style.color = 'white';
+            headerContainer.style.padding = '15px 20px';
+            headerContainer.style.display = 'flex';
+            headerContainer.style.alignItems = 'center';
+
+            // Create warning icon
+            const warningIcon = document.createElement('div');
+            warningIcon.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                </svg>
+            `;
+            warningIcon.style.marginRight = '10px';
+
+            // Create title
+            const titleElement = document.createElement('h2');
+            titleElement.textContent = 'Confirm Deletion';
+            titleElement.style.margin = '0';
+            titleElement.style.fontSize = '18px';
+            titleElement.style.fontWeight = '500';
+
+            // Assemble header
+            headerContainer.appendChild(warningIcon);
+            headerContainer.appendChild(titleElement);
+
+            // Create message container
+            const contentContainer = document.createElement('div');
+            contentContainer.style.padding = '15px 20px';
+            contentContainer.style.backgroundColor = '#fff';
+
+            // Create message
+            const messageElement = document.createElement('p');
+            messageElement.textContent = `Are you sure you want to delete ${selectedCells.length} slot(s)?`;
+            messageElement.style.margin = '0';
+            messageElement.style.fontSize = '16px';
+            messageElement.style.color = '#333';
+
+            // Create buttons container
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.style.display = 'flex';
+            buttonsContainer.style.justifyContent = 'flex-end';
+            buttonsContainer.style.marginTop = '15px';
+            buttonsContainer.style.gap = '10px';
+
+            // Create cancel button
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.style.padding = '6px 15px';
+            cancelButton.style.backgroundColor = '#f5f5f5';
+            cancelButton.style.color = '#333';
+            cancelButton.style.border = '1px solid #ddd';
+            cancelButton.style.borderRadius = '4px';
+            cancelButton.style.cursor = 'pointer';
+            cancelButton.style.fontSize = '14px';
+            cancelButton.style.fontWeight = '500';
+
+            // Create delete button
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.style.padding = '6px 15px';
+            deleteButton.style.backgroundColor = '#FF9800'; // Orange for warning
+            deleteButton.style.color = 'white';
+            deleteButton.style.border = 'none';
+            deleteButton.style.borderRadius = '4px';
+            deleteButton.style.cursor = 'pointer';
+            deleteButton.style.fontSize = '14px';
+            deleteButton.style.fontWeight = '500';
+
+            // Add event listeners with fade-out animation
+            cancelButton.addEventListener('click', function() {
+                // Add fade-out animation
+                modal.style.opacity = '0';
+                modal.style.transform = 'translate(-50%, -50%) scale(0.9)';
+                overlay.style.opacity = '0';
+
+                // Remove elements after animation completes
+                setTimeout(function() {
+                    // Remove any existing confirmation dialogs
+                    const existingConfirmationModals = document.querySelectorAll('.delete-confirmation-modal, .delete-confirmation-overlay');
+                    existingConfirmationModals.forEach(element => {
+                        if (document.body.contains(element)) {
+                            document.body.removeChild(element);
+                        }
+                    });
+
+                    // Also remove our specific modal and overlay
+                    if (document.body.contains(modal)) document.body.removeChild(modal);
+                    if (document.body.contains(overlay)) document.body.removeChild(overlay);
+                }, 300);
+            });
+
+            deleteButton.addEventListener('click', function() {
+                // Add fade-out animation
+                modal.style.opacity = '0';
+                modal.style.transform = 'translate(-50%, -50%) scale(0.9)';
+                overlay.style.opacity = '0';
+
+                // Remove elements after animation completes and then proceed with deletion
+                setTimeout(async function() {
+                    // First, remove any existing confirmation dialogs to prevent stacking
+                    const existingConfirmationModals = document.querySelectorAll('.delete-confirmation-modal, .delete-confirmation-overlay');
+                    existingConfirmationModals.forEach(element => {
+                        if (document.body.contains(element)) {
+                            document.body.removeChild(element);
+                        }
+                    });
+
+                    // Then remove our specific modal and overlay
+                    if (document.body.contains(modal)) document.body.removeChild(modal);
+                    if (document.body.contains(overlay)) document.body.removeChild(overlay);
+
+                    // This is the confirm callback — proceed with deletion here
+                    const slotsToDelete = Array.from(selectedCells).map(cell => {
+                        const timeSlot = cell.closest('tr').querySelector('.time-slot').textContent;
+                        const roomHeader = bookingTable.querySelector('thead tr').children[cell.cellIndex].textContent;
+
+                        // Format time slot
+                        let formattedTimeSlot = timeSlot
+                            .toLowerCase()
+                            .replace(/\./g, ':')
+                            .replace(/p\.m\.|p:m:/, 'pm')
+                            .replace(/a\.m\.|a:m:/, 'am')
+                            .trim();
+
+                        let timeParts = formattedTimeSlot.match(/(\d+)[:\.]?(\d*)[\s]*(am|pm)/i);
+                        if (timeParts) {
+                            let hours = timeParts[1];
+                            let minutes = timeParts[2] || '00';
+                            let period = timeParts[3].toLowerCase();
+                            if (minutes.length === 1) minutes = '0' + minutes;
+                            formattedTimeSlot = `${hours}:${minutes} ${period}`;
+                        }
+
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const selectedDate = urlParams.get('date') || new Date().toISOString().split('T')[0];
+
+                        return {
+                            floor: floorSlug,
+                            room: roomHeader.trim(),
+                            time_slot: formattedTimeSlot,
+                            time: formattedTimeSlot,
+                            date: selectedDate
+                        };
+                    });
+
+                    try {
+                        const response = await fetch('/booking/delete_slots/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            body: JSON.stringify(slotsToDelete)
+                        });
+
+                        const data = await response.json();
+                        if (data.status === 'success') {
+                            // Store the deletion timestamp in localStorage to trigger updates in other tabs
+                            if (data.deletion_timestamp) {
+                                localStorage.setItem('lastDeletionTimestamp', data.deletion_timestamp);
+                                console.log(`Set deletion timestamp: ${data.deletion_timestamp}`);
+                            }
+
+                            // Clear any cached booking data
+                            if (window.bookedSlots) {
+                                // First, use the slots we sent to delete
+                                slotsToDelete.forEach(slot => {
+                                    if (window.bookedSlots[slot.room] &&
+                                        window.bookedSlots[slot.room][slot.time_slot]) {
+                                        delete window.bookedSlots[slot.room][slot.time_slot];
+                                        console.log(`Removed ${slot.room} at ${slot.time_slot} from cached data`);
+                                    }
+                                });
+
+                                // Then, use the detailed deleted_slots data from the server response
+                                if (data.deleted_slots && Array.isArray(data.deleted_slots)) {
+                                    data.deleted_slots.forEach(slot => {
+                                        if (window.bookedSlots[slot.room] &&
+                                            window.bookedSlots[slot.room][slot.time_slot]) {
+                                            delete window.bookedSlots[slot.room][slot.time_slot];
+                                            console.log(`Removed server-reported slot: ${slot.room} at ${slot.time_slot} from cached data`);
+                                        }
+                                    });
+                                }
+                            }
+
+                            // Also clear any global selection tracking variables
+                            if (window.selectedCells) {
+                                window.selectedCells = [];
+                            }
+
+                            // Clear any saved selection state from localStorage
+                            try {
+                                // Get the current date from the URL or use today's date
+                                const urlParams = new URLSearchParams(window.location.search);
+                                const currentDate = urlParams.get('date') || new Date().toISOString().split('T')[0];
+
+                                // Create the storage key
+                                const storageKey = `bookingSelections_${floorSlug}_${currentDate}`;
+
+                                // Remove the saved selections
+                                localStorage.removeItem(storageKey);
+                                console.log(`Cleared saved selections from localStorage for key: ${storageKey}`);
+                            } catch (error) {
+                                console.error('Error clearing selection state:', error);
+                            }
+
+                            // Update the UI
+                            selectedCells.forEach(cell => {
+                                cell.classList.remove('selected');
+                                cell.classList.remove('booked');
+                                cell.style.backgroundColor = '';
+                                cell.style.color = '';
+                                cell.style.cursor = 'pointer';
+                                cell.innerHTML = '';
+
+                                // Also update data attributes to ensure fresh state
+                                cell.removeAttribute('data-booked');
+                                cell.dataset.booked = 'false';
+                            });
+
+                            // Add a small delay before showing the success dialog to ensure the confirmation dialog is gone
+                            setTimeout(() => {
+                                window.CustomDialog.showModal({
+                                    title: 'Deletion Successful',
+                                    message: `Successfully deleted ${selectedCells.length} slot(s)`,
+                                    type: 'SUCCESS',
+                                    buttons: [
+                                        {
+                                            text: 'OK',
+                                            type: 'primary',
+                                            callback: modal => {
+                                                window.CustomDialog.closeModal(modal);
+                                                // Force a page refresh to ensure clean state
+                                                window.location.reload();
+                                            }
+                                        }
+                                    ]
+                                });
+                            }, 100);
+
+                            console.log(`Successfully deleted ${selectedCells.length} slots`);
+                        } else {
+                            // Add a small delay before showing the error dialog
+                            setTimeout(() => {
+                                window.CustomDialog.showModal({
+                                    title: 'Deletion Failed',
+                                    message: data.message || 'Failed to delete the slots. Please try again.',
+                                    type: 'ERROR',
+                                    buttons: [
+                                        {
+                                            text: 'OK',
+                                            type: 'primary',
+                                            callback: modal => window.CustomDialog.closeModal(modal)
+                                        }
+                                    ]
+                                });
+                            }, 100);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        // Add a small delay before showing the error dialog
+                        setTimeout(() => {
+                            window.CustomDialog.showModal({
+                                title: 'Error',
+                                message: 'Failed to delete the slots. Please try again.',
+                                type: 'ERROR',
+                                buttons: [
+                                    {
+                                        text: 'OK',
+                                        type: 'primary',
+                                        callback: modal => window.CustomDialog.closeModal(modal)
+                                    }
+                                ]
+                            });
+                        }, 100);
+                    }
+                }, 300);
+            });
+
+            // Assemble the modal
+            buttonsContainer.appendChild(cancelButton);
+            buttonsContainer.appendChild(deleteButton);
+            contentContainer.appendChild(messageElement);
+            contentContainer.appendChild(buttonsContainer);
+
+            modal.appendChild(headerContainer);
+            modal.appendChild(contentContainer);
+
+            // Add to document
+            document.body.appendChild(overlay);
+            document.body.appendChild(modal);
+
+            // Add fade-in animation
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+                modal.style.opacity = '1';
+                modal.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 50);
+        });
+    }
+
+    // Add "Booked by" prefix to all existing booked cells on page load
+    function addPrefixToExistingBookings() {
+        document.querySelectorAll('.booking-cell .booked-text').forEach(el => {
+            if (!el.textContent.trim().startsWith('Booked by:')) {
+                el.textContent = `Booked by: ${el.textContent.trim()}`;
+            }
+        });
+    }
+
+    // Run the function after a short delay to ensure all elements are loaded
+    setTimeout(addPrefixToExistingBookings, 500);
 });

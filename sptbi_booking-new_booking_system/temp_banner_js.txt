@@ -1,0 +1,93 @@
+// Slick initialization
+$(".autoplay").slick({
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  autoplay: true,
+  autoplaySpeed: 5000, // 5 seconds per slide
+  speed: 800,
+  arrows: false,
+  dots: false,
+  infinite: true,
+  pauseOnHover: true
+});
+
+// Create pagination dots
+const slideCount = $('.autoplay').slick('getSlick').slideCount;
+const paginationContainer = document.querySelector('.banner-pagination');
+
+if (paginationContainer) {
+  // Clear existing dots
+  paginationContainer.innerHTML = '';
+
+  // Create dots
+  for (let i = 0; i < slideCount; i++) {
+    const dot = document.createElement('div');
+    dot.classList.add('pagination-dot');
+    if (i === 0) dot.classList.add('active');
+    dot.dataset.slideIndex = i;
+    paginationContainer.appendChild(dot);
+
+    // Add click event
+    dot.addEventListener('click', function() {
+      $('.autoplay').slick('slickGoTo', i);
+    });
+  }
+}
+
+// Progress bar animation
+const progressBar = document.querySelector('.banner-progress-bar');
+let animationFrame;
+let startTime;
+const duration = 5000; // Match with autoplaySpeed
+
+function animateProgressBar(timestamp) {
+  if (!startTime) startTime = timestamp;
+  const elapsed = timestamp - startTime;
+  const progress = Math.min(elapsed / duration * 100, 100);
+
+  progressBar.style.width = `${progress}%`;
+
+  if (elapsed < duration) {
+    animationFrame = requestAnimationFrame(animateProgressBar);
+  }
+}
+
+function resetProgressBar() {
+  if (animationFrame) {
+    cancelAnimationFrame(animationFrame);
+  }
+  progressBar.style.width = '0%';
+  startTime = null;
+  animationFrame = requestAnimationFrame(animateProgressBar);
+}
+
+// Start progress bar animation
+resetProgressBar();
+
+// Update pagination dots and reset progress bar on slide change
+$('.autoplay').on('beforeChange', function(event, slick, currentSlide, nextSlide) {
+  // Update pagination dots
+  document.querySelectorAll('.pagination-dot').forEach(dot => {
+    dot.classList.remove('active');
+  });
+
+  const currentDot = document.querySelector(`.pagination-dot[data-slide-index="${nextSlide}"]`);
+  if (currentDot) currentDot.classList.add('active');
+
+  // Reset progress bar
+  resetProgressBar();
+});
+
+// Add hover pause functionality
+$('.banner-slide').hover(
+  function() {
+    $('.autoplay').slick('slickPause');
+    if (animationFrame) {
+      cancelAnimationFrame(animationFrame);
+    }
+  },
+  function() {
+    $('.autoplay').slick('slickPlay');
+    resetProgressBar();
+  }
+);

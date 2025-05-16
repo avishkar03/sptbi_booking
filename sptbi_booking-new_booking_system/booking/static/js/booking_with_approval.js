@@ -176,6 +176,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         el.style.color = '#000000'; // Black for main text
                     }
+
+                    // Add "Booked by" prefix if not already present
+                    if (el.classList.contains('booking-info') && !el.textContent.trim().startsWith('Booked by:')) {
+                        // Extract the reason text (everything before " (Pending)")
+                        const pendingIndex = el.textContent.indexOf(' (Pending)');
+                        if (pendingIndex > -1) {
+                            const reasonText = el.textContent.substring(0, pendingIndex).trim();
+                            el.textContent = `Booked by: ${reasonText} (Pending)`;
+                        }
+                    }
                 });
             } else {
                 // Restore regular booking styling
@@ -186,6 +196,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const textElements = cell.querySelectorAll('span');
                 textElements.forEach(el => {
                     el.style.color = '#4b5563'; // Dark gray for text
+
+                    // Add "Booked by" prefix if not already present
+                    if (el.classList.contains('booked-text') && !el.textContent.trim().startsWith('Booked by:')) {
+                        el.textContent = `Booked by: ${el.textContent.trim()}`;
+                    }
                 });
             }
 
@@ -393,33 +408,61 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Format the time slots for display in the message
-            let timeSlotText = '';
-            if (cellsToProcess.length > 0) {
-                // Get the room and time information from the selected cells
-                const timeSlots = cellsToProcess.map(cell => {
-                    const room = cell.dataset.room;
-                    const time = cell.dataset.time;
-                    return `${time} in ${room}`;
-                });
+            // Create a more concise message for multiple bookings
+            let confirmationMessage = '';
 
-                // Join the time slots with commas and 'and' for the last one
-                if (timeSlots.length === 1) {
-                    timeSlotText = timeSlots[0];
-                } else if (timeSlots.length === 2) {
-                    timeSlotText = `${timeSlots[0]} and ${timeSlots[1]}`;
-                } else {
-                    const lastSlot = timeSlots.pop();
-                    timeSlotText = `${timeSlots.join(', ')} and ${lastSlot}`;
+            // Count the actual number of valid slots being processed
+            // Filter out any invalid cells or duplicates
+            const validCells = cellsToProcess.filter(cell =>
+                cell && cell.dataset && cell.dataset.room && cell.dataset.time
+            );
+
+            // Create a unique identifier for each cell to detect duplicates
+            const uniqueCellIds = new Set();
+            const uniqueCells = validCells.filter(cell => {
+                const cellId = `${cell.dataset.room}_${cell.dataset.time}_${cell.dataset.floor || ''}`;
+                if (uniqueCellIds.has(cellId)) {
+                    return false; // Skip duplicates
                 }
+                uniqueCellIds.add(cellId);
+                return true;
+            });
+
+            // Log the actual count for debugging
+            console.log(`Original cells: ${cellsToProcess.length}, Valid unique cells: ${uniqueCells.length}`);
+
+            // Create the prefixed reason for consistency
+            const prefixedReason = `Booked by: ${reason}`;
+
+            if (uniqueCells.length === 0) {
+                confirmationMessage = "No slots selected"; // Fallback, should never happen
+            } else if (uniqueCells.length === 1) {
+                // For a single booking, show the full details
+                const cell = uniqueCells[0];
+                const room = cell.dataset.room;
+                const time = cell.dataset.time;
+                confirmationMessage = `Booking request submitted for ${time} in ${room} with reason "${prefixedReason}"`;
             } else {
-                timeSlotText = "0 slots"; // Fallback, should never happen
+                // For multiple bookings, show a summary
+                // Get unique rooms
+                const uniqueRooms = [...new Set(uniqueCells.map(cell => cell.dataset.room))];
+
+                // We could get the date from the page if needed in the future
+                // const dateElement = document.querySelector('.date-display');
+
+                if (uniqueRooms.length === 1) {
+                    // All bookings in the same room
+                    confirmationMessage = `Successfully submitted ${uniqueCells.length} booking requests in ${uniqueRooms[0]} with reason "${prefixedReason}"`;
+                } else {
+                    // Bookings across multiple rooms
+                    confirmationMessage = `Successfully submitted ${uniqueCells.length} booking requests across ${uniqueRooms.length} rooms with reason "${prefixedReason}"`;
+                }
             }
 
-            // Show success message with specific time slot information
+            // Show success message with the concise information
             window.CustomDialog.showModal({
                 title: 'Request Submitted',
-                message: `Booking request submitted for ${timeSlotText}`,
+                message: confirmationMessage,
                 type: 'REQUEST',
                 buttons: [
                     {
@@ -445,7 +488,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 cell.classList.add('booked'); // Add booked class to prevent selection and apply grey background
                 cell.classList.remove('selected');
                 // Use black text with red "Pending" status
-                cell.innerHTML = `<span class="booking-info pending" style="color: #000000;">${reason} <span style="color: #990000;">(Pending)</span></span>`;
+                cell.innerHTML = `<span class="booking-info pending" style="color: #000000;">Booked by: ${reason} <span style="color: #990000;">(Pending)</span></span>`;
 
                 // Set red background color for pending bookings
                 cell.style.backgroundColor = '#ffebee';
@@ -453,7 +496,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Clear selections and reason
             reasonInput.value = '';
+
+            // Clear the global selectedCells array
             selectedCells = [];
+
+            // Also clear any localStorage selection state
+            try {
+                // Get the floor slug from the page
+                const floorSlugMeta = document.querySelector('meta[name="floor-slug"]');
+                const floorSlug = floorSlugMeta ? floorSlugMeta.content :
+                                (window.location.pathname.includes('/restricted-booking/') ?
+                                window.location.pathname.split('/restricted-booking/')[1].split('/')[0] : '');
+
+                if (floorSlug) {
+                    // Get the current date from the URL or use today's date
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const currentDate = urlParams.get('date') || new Date().toISOString().split('T')[0];
+
+                    // Create the storage key
+                    const storageKey = `bookingSelections_${floorSlug}_${currentDate}`;
+
+                    // Remove the saved selections
+                    localStorage.removeItem(storageKey);
+                    console.log(`Cleared saved selections from localStorage for key: ${storageKey}`);
+                }
+            } catch (error) {
+                console.error('Error clearing selection state:', error);
+            }
 
             // Log the cells to process again to make sure they're still valid
             console.log("Cells to process after clearing:", cellsToProcess.length);
@@ -467,109 +536,199 @@ document.addEventListener('DOMContentLoaded', function() {
                 try {
                     console.log("Processing bookings for cells:", cellsToProcess.length);
 
-                if (cellsToProcess.length === 0) {
-                    console.error("No cells to process! This is likely the issue.");
-                    return;
-                }
-
-                // Log all the data we're about to send
-                console.log("Booking URL:", bookingUrl);
-                console.log("Floor slug:", floorSlug);
-                console.log("Date:", date);
-                console.log("Reason:", reason);
-                console.log("CSRF Token:", getCookie('csrftoken'));
-
-                // Double-check that we have cells to process
-                if (cellsToProcess.length === 0) {
-                    console.error("No cells to process in the async function! This shouldn't happen.");
-                    return;
-                }
-
-                console.log("Starting to process bookings for cells:", cellsToProcess.length);
-
-                // Process one booking at a time to ensure they all get processed
-                for (let i = 0; i < cellsToProcess.length; i++) {
-                    const cell = cellsToProcess[i];
-
-                    // Verify the cell has the required data
-                    if (!cell || !cell.dataset || !cell.dataset.room || !cell.dataset.time) {
-                        console.error(`Invalid cell at index ${i}:`, cell);
-                        continue;
+                    if (cellsToProcess.length === 0) {
+                        console.error("No cells to process! This is likely the issue.");
+                        return;
                     }
 
-                    const room = cell.dataset.room;
-                    const timeSlot = cell.dataset.time;
+                    // Log all the data we're about to send
+                    console.log("Booking URL:", bookingUrl);
+                    console.log("Floor slug:", floorSlug);
+                    console.log("Date:", date);
+                    console.log("Original Reason:", reason);
+                    console.log("Prefixed Reason:", prefixedReason);
+                    console.log("CSRF Token:", getCookie('csrftoken'));
 
-                    console.log(`Sending booking request ${i+1}/${cellsToProcess.length} for ${room} at ${timeSlot}`);
+                    // Double-check that we have cells to process
+                    if (cellsToProcess.length === 0) {
+                        console.error("No cells to process in the async function! This shouldn't happen.");
+                        return;
+                    }
 
-                    // Log the exact request we're sending
-                    const requestBody = {
-                        room: room,
-                        time_slot: timeSlot,
+                    console.log("Starting to process bookings for cells:", cellsToProcess.length);
+
+                    // Add "Booked by" prefix to the reason
+                    const prefixedReason = `Booked by: ${reason}`;
+
+                    // Prepare batch booking data - collect all cells into a single request
+                    const batchBookingData = {
                         floor: floorSlug,
                         date: date,
-                        reason: reason
+                        reason: prefixedReason,
+                        bookings: [] // Array to hold all booking slots
                     };
-                    console.log("Request body:", JSON.stringify(requestBody));
 
-                    try {
-                        // Send booking request with retry logic
-                        let retries = 3;
-                        let success = false;
+                    // Use the uniqueCells array we created earlier to avoid duplicates
+                    // If it doesn't exist, create it now
+                    const validCells = cellsToProcess.filter(cell =>
+                        cell && cell.dataset && cell.dataset.room && cell.dataset.time
+                    );
 
-                        while (retries > 0 && !success) {
-                            try {
-                                console.log(`Attempt ${4-retries} for ${room} at ${timeSlot}`);
+                    // Create a unique identifier for each cell to detect duplicates
+                    const uniqueCellIds = new Set();
+                    const uniqueCells = validCells.filter(cell => {
+                        const cellId = `${cell.dataset.room}_${cell.dataset.time}_${cell.dataset.floor || ''}`;
+                        if (uniqueCellIds.has(cellId)) {
+                            return false; // Skip duplicates
+                        }
+                        uniqueCellIds.add(cellId);
+                        return true;
+                    });
 
-                                // Send booking request
-                                const response = await fetch(bookingUrl, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRFToken': getCookie('csrftoken')
-                                    },
-                                    body: JSON.stringify(requestBody)
-                                });
+                    console.log(`Preparing batch with ${uniqueCells.length} unique cells out of ${cellsToProcess.length} total cells`);
 
-                                console.log(`Response status for ${room} at ${timeSlot}:`, response.status);
+                    // Add each unique cell's data to the batch request
+                    for (let i = 0; i < uniqueCells.length; i++) {
+                        const cell = uniqueCells[i];
+                        const room = cell.dataset.room;
+                        const timeSlot = cell.dataset.time;
+
+                        // Add this booking to the batch
+                        batchBookingData.bookings.push({
+                            room: room,
+                            time_slot: timeSlot
+                        });
+
+                        console.log(`Added booking ${i+1}/${uniqueCells.length} for ${room} at ${timeSlot} to batch`);
+                    }
+
+                    console.log("Batch booking data:", JSON.stringify(batchBookingData));
+
+                    // Check if we have any valid bookings to process
+                    if (batchBookingData.bookings.length === 0) {
+                        console.error("No valid bookings to process after validation");
+                        return;
+                    }
+
+                    // Send batch booking request with retry logic
+                    let retries = 3;
+                    let success = false;
+
+                    while (retries > 0 && !success) {
+                        try {
+                            console.log(`Batch booking attempt ${4-retries}`);
+
+                            // Send batch booking request to a new endpoint
+                            // Extract the floor slug from the URL
+                            const urlParts = bookingUrl.split('/');
+                            const floorSlugIndex = urlParts.indexOf('restricted-booking') + 1;
+                            const floorSlugFromUrl = urlParts[floorSlugIndex];
+
+                            // Construct the batch booking URL correctly
+                            const batchBookingUrl = `/booking/restricted-booking/${floorSlugFromUrl}/batch/`;
+                            console.log("Using batch booking URL:", batchBookingUrl);
+
+                            // First try the batch endpoint
+                            let response = await fetch(batchBookingUrl, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': getCookie('csrftoken')
+                                },
+                                body: JSON.stringify(batchBookingData)
+                            });
+
+                            // If batch endpoint doesn't exist, fall back to individual bookings
+                            if (response.status === 404) {
+                                console.log("Batch endpoint not found, falling back to individual bookings");
+
+                                // Process one booking at a time as before
+                                // First, create a batch ID to group these bookings together
+                                const batchId = Date.now().toString(); // Use timestamp as batch ID
+                                console.log(`Created batch ID: ${batchId} for ${cellsToProcess.length} bookings`);
+
+                                // Process one booking at a time as before, but use uniqueCells
+                                // to avoid duplicates
+                                for (let i = 0; i < uniqueCells.length; i++) {
+                                    const cell = uniqueCells[i];
+                                    const room = cell.dataset.room;
+                                    const timeSlot = cell.dataset.time;
+
+                                    const requestBody = {
+                                        room: room,
+                                        time_slot: timeSlot,
+                                        floor: floorSlug,
+                                        date: date,
+                                        reason: prefixedReason, // Use the prefixed reason
+                                        is_batch: true, // Flag to indicate this is part of a batch
+                                        batch_size: batchBookingData.bookings.length, // Total number of bookings in this batch
+                                        batch_index: i, // Position in the batch (for email control)
+                                        batch_id: batchId // Unique ID to group these bookings together
+                                    };
+
+                                    console.log(`Sending individual booking ${i+1}/${cellsToProcess.length}:`, requestBody);
+
+                                    response = await fetch(bookingUrl, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRFToken': getCookie('csrftoken')
+                                        },
+                                        body: JSON.stringify(requestBody)
+                                    });
+
+                                    if (response.ok) {
+                                        const data = await response.json();
+                                        if (data.success || data.status === 'success') {
+                                            successCount++;
+                                        }
+                                    }
+                                }
+
+                                // If we processed at least one booking successfully, consider it a success
+                                if (successCount > 0) {
+                                    success = true;
+                                } else {
+                                    retries--;
+                                }
+                            } else {
+                                // Process the batch response
+                                console.log(`Batch response status:`, response.status);
 
                                 if (response.ok) {
                                     const data = await response.json();
-                                    console.log(`Response data for ${room} at ${timeSlot}:`, data);
+                                    console.log(`Batch response data:`, data);
 
                                     if (data.success || data.status === 'success') {
                                         // Handle success
-                                        successCount++;
-                                        console.log(`Booking successful for ${room} at ${timeSlot}`);
+                                        successCount = data.success_count || batchBookingData.bookings.length;
+                                        console.log(`Batch booking successful for ${successCount} slots`);
                                         success = true;
                                     } else {
                                         // Handle error from server
-                                        console.error(`Error booking ${room} at ${timeSlot}: ${data.error || data.message || 'Unknown error'}`);
+                                        console.error(`Error in batch booking: ${data.error || data.message || 'Unknown error'}`);
                                         retries--;
                                     }
                                 } else {
-                                    console.error(`HTTP error ${response.status} for ${room} at ${timeSlot}`);
+                                    console.error(`HTTP error ${response.status} for batch booking`);
                                     retries--;
                                 }
-                            } catch (fetchError) {
-                                console.error(`Network error for ${room} at ${timeSlot}:`, fetchError);
-                                retries--;
                             }
-
-                            // Wait a bit before retrying
-                            if (!success && retries > 0) {
-                                console.log(`Waiting before retry for ${room} at ${timeSlot}...`);
-                                await new Promise(resolve => setTimeout(resolve, 1000));
-                            }
+                        } catch (fetchError) {
+                            console.error(`Network error for batch booking:`, fetchError);
+                            retries--;
                         }
 
-                        if (!success) {
-                            console.error(`Failed to book ${room} at ${timeSlot} after multiple attempts`);
+                        // Wait a bit before retrying
+                        if (!success && retries > 0) {
+                            console.log(`Waiting before retry for batch booking...`);
+                            await new Promise(resolve => setTimeout(resolve, 1000));
                         }
-                    } catch (error) {
-                        console.error(`Fatal error for ${room} at ${timeSlot}:`, error);
                     }
-                }
+
+                    if (!success) {
+                        console.error(`Failed to process batch booking after multiple attempts`);
+                    }
                 } catch (error) {
                     console.error("Error in background booking process:", error);
                 } finally {
@@ -699,10 +858,70 @@ document.addEventListener('DOMContentLoaded', function() {
         // Store the last update timestamp
         let lastUpdateTimestamp = Date.now() / 1000; // Convert to seconds
 
+        // Store the last deletion timestamp (used in the storage event listener)
+        const lastDeletionTimestamp = localStorage.getItem('lastDeletionTimestamp') || '0';
+        console.log(`Current deletion timestamp: ${lastDeletionTimestamp}`);
+
+        // Function to clear any selection state for the current page
+        function clearSelectionState() {
+            try {
+                // Get the floor slug from the page
+                const floorSlugMeta = document.querySelector('meta[name="floor-slug"]');
+                const floorSlug = floorSlugMeta ? floorSlugMeta.content :
+                                 (window.location.pathname.includes('/restricted-booking/') ?
+                                  window.location.pathname.split('/restricted-booking/')[1].split('/')[0] : '');
+
+                if (!floorSlug) {
+                    console.log('Could not determine floor slug for clearing selection state');
+                    return;
+                }
+
+                // Get the current date from the URL or use today's date
+                const urlParams = new URLSearchParams(window.location.search);
+                const currentDate = urlParams.get('date') || new Date().toISOString().split('T')[0];
+
+                // Create the storage key
+                const storageKey = `bookingSelections_${floorSlug}_${currentDate}`;
+
+                // Remove the saved selections
+                localStorage.removeItem(storageKey);
+                console.log(`Cleared saved selections from localStorage for key: ${storageKey}`);
+
+                // Also clear any selected cells in the UI
+                const selectedCells = document.querySelectorAll('.booking-cell.selected');
+                selectedCells.forEach(cell => {
+                    cell.classList.remove('selected');
+                    // Restore original styling if needed
+                    if (typeof restoreBookedCellStyling === 'function' && cell.classList.contains('booked')) {
+                        restoreBookedCellStyling(cell);
+                    }
+                });
+
+                // Reset the global selectedCells array
+                window.selectedCells = [];
+            } catch (error) {
+                console.error('Error clearing selection state:', error);
+            }
+        }
+
         // Listen for booking approval events from other tabs/windows
         window.addEventListener('storage', function(event) {
             if (event.key === 'bookingApproved' || event.key === 'bookingRejected') {
                 console.log(`Booking ${event.key === 'bookingApproved' ? 'approved' : 'rejected'} event detected`);
+
+                // Clear any selection state before reloading
+                clearSelectionState();
+
+                // Reload the page to reflect the changes
+                window.location.reload();
+            }
+
+            // Listen for deletion events
+            if (event.key === 'lastDeletionTimestamp') {
+                console.log('Booking deletion event detected');
+
+                // Clear any selection state before reloading
+                clearSelectionState();
 
                 // Reload the page to reflect the changes
                 window.location.reload();
@@ -733,4 +952,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize real-time updates
     setupRealTimeUpdates();
+
+    // Add "Booked by" prefix to all existing booked cells on page load
+    function addPrefixToExistingBookings() {
+        // For regular booked cells
+        document.querySelectorAll('.booking-cell .booked-text').forEach(el => {
+            if (!el.textContent.trim().startsWith('Booked by:')) {
+                el.textContent = `Booked by: ${el.textContent.trim()}`;
+            }
+        });
+
+        // For pending cells
+        document.querySelectorAll('.booking-cell .booking-info.pending').forEach(el => {
+            if (!el.textContent.trim().startsWith('Booked by:')) {
+                const pendingIndex = el.textContent.indexOf(' (Pending)');
+                if (pendingIndex > -1) {
+                    const reasonText = el.textContent.substring(0, pendingIndex).trim();
+                    el.textContent = `Booked by: ${reasonText} (Pending)`;
+                }
+            }
+        });
+    }
+
+    // Run the function after a short delay to ensure all elements are loaded
+    setTimeout(addPrefixToExistingBookings, 500);
 });

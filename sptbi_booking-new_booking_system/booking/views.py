@@ -338,7 +338,7 @@ def profile(request):
     logs = page_obj.object_list
     if not user.is_authenticated:
         return redirect("login")
-    
+
     companies = aTimeSlot.objects.values('name').distinct()
     keyset = Booking.objects.values('booked_by')
     # companies = [key['booked_by'] for key in keyset]
@@ -559,12 +559,12 @@ def download_log_2(request):
         print(option)
         cnt = []
         name = []
-        
+
 
         if option != "all":
             log = aTimeSlot.objects.filter( month__lte=end_month, month__gte=start_month, year__lte=end_year, year__gte=start_year)
         else:
-            flag+=1 
+            flag+=1
             log = aTimeSlot.objects.filter(month__lte=end_month, month__gte=start_month, year__lte=end_year, year__gte=start_year)
             for l in log.distinct():
                 name.append(l.name)
@@ -589,17 +589,17 @@ def download_log_2(request):
         worksheet = workbook.add_worksheet()
 
         # rooms = ['Meeting Room 1 - 1st Floor', 'Meeting Room 1 - 2nd Floor', 'Meeting Room 2 - 2nd Floor', 'Meeting Room - 8th Floor']
-        
+
         rooms = ['Meeting Room 1 - 1st Floor', 'Meeting Room 1 - 2nd Floor', 'Meeting Room 2 - 2nd Floor', 'Meeting Room - 8th Floor']
         rooms2 = set()
         floors = Floor.objects.filter(is_active=True)
         for floor in floors:
             if isinstance(floor.rooms, list):
                 rooms2.update(floor.rooms)
-        rooms2 = list(rooms2)  
+        rooms2 = list(rooms2)
         print(sorted(rooms2))
-        rooms = rooms2 
-        
+        rooms = rooms2
+
         headers = ['Company Name','Date', 'Slot','Room', 'Reason']
         for col, header in enumerate(headers):
             worksheet.write(0, col, header)
@@ -660,10 +660,10 @@ def download_log_user(request):
         for floor in floors:
             if isinstance(floor.rooms, list):
                 rooms2.update(floor.rooms)
-        rooms2 = list(rooms2)  
+        rooms2 = list(rooms2)
         print(sorted(rooms2))
-        rooms = rooms2  
-        # print(f"log : {log}")    
+        rooms = rooms2
+        # print(f"log : {log}")
         headers = ['Company Name','Date', 'Slot','Room', 'Reason']
         for col, header in enumerate(headers):
             worksheet.write(0, col, header)
@@ -774,7 +774,12 @@ def save_booking(request):
                     'status': 'error',
                     'message': 'Data should be a list of bookings'
                 }, status=400)
-            
+
+            # Lists to collect booking information for the email
+            booked_slots = []
+            booking_date = None
+            reason = None
+
             for data in bookings_data:
                 if not isinstance(data, dict):
                     return JsonResponse({
@@ -783,23 +788,23 @@ def save_booking(request):
                     }, status=400)
 
                 floor = get_object_or_404(Floor, slug=data['floor'])
-                
+
                 # Parse time string
                 time_str = data['time_slot'].strip()
                 logger.info(f"Processing time string: '{time_str}'")
 
                 time_match = re.match(r'(\d+)[:\.]?(\d*)\s*(am|pm)', time_str.lower())
-                
+
                 if time_match:
                     hours = int(time_match.group(1))
                     minutes = int(time_match.group(2) or 0)
                     period = time_match.group(3).lower()
-                    
+
                     if period == 'pm' and hours < 12:
                         hours += 12
                     elif period == 'am' and hours == 12:
                         hours = 0
-                    
+
                     time_obj = dt.time(hours, minutes)
                     logger.info(f"Successfully parsed time: {time_obj}")
                 else:
@@ -853,6 +858,44 @@ def save_booking(request):
                     year=str(booking_date.year),
                     reason=data['reason']
                 )
+
+                # Collect booking information for the email
+                booked_slots.append({
+                    'room': data['room'],
+                    'time': time_str,
+                    'date': booking_date.strftime('%Y-%m-%d')
+                })
+                reason = data['reason']  # Store the reason (should be the same for all slots)
+
+            # Send a single email notification for all booked slots
+            if booked_slots and request.user.email:
+                try:
+                    # Create a formatted list of booked slots for the email
+                    slots_text = ""
+                    for slot in booked_slots:
+                        slots_text += f"- {slot['room']} at {slot['time']} on {slot['date']}\n"
+
+                    subject = f"Booking Confirmation - {len(booked_slots)} slot(s)"
+                    message = f"""Your booking has been confirmed:
+
+Reason: {reason}
+
+Booked Slots:
+{slots_text}
+
+Thank you for using our booking system.
+"""
+                    from_email = settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'admin@sptbi.com'
+                    send_mail(
+                        subject=subject,
+                        message=message,
+                        from_email=from_email,
+                        recipient_list=[request.user.email],
+                        fail_silently=True,
+                    )
+                    logger.info(f"Sent booking confirmation email to {request.user.email} for {len(booked_slots)} slots")
+                except Exception as email_error:
+                    logger.error(f"Failed to send booking confirmation email: {str(email_error)}")
 
             return JsonResponse({
                 'status': 'success',
@@ -1012,58 +1055,130 @@ def save_booking(request):
 #     }, status=405)
 
 @login_required
+# def delete_slots(request):
+#     if request.method == 'POST':
+#         try:
+#             slots_data = json.loads(request.body)
+#             deleted_count = 0
+
+#             print(f"[DEBUG] Received delete slots data: {slots_data}")
+
+#             for slot in slots_data:
+#                 floor = get_object_or_404(Floor, slug=slot['floor'])
+
+#                 # Get the time field - could be 'time' or 'time_slot'
+#                 time_value = slot.get('time_slot') or slot.get('time')
+
+#                 if not time_value:
+#                     print(f"[ERROR] No time value found in slot data: {slot}")
+#                     continue
+
+#                 print(f"[DEBUG] Processing delete for: Floor={slot['floor']}, Room={slot['room']}, Time={time_value}, Date={slot['date']}")
+
+#                 try:
+#                     # Parse the time string
+#                     time_obj = datetime.strptime(time_value, '%I:%M %p').time()
+#                     print(f"[DEBUG] Parsed time: {time_obj}")
+
+#                     # Find and delete bookings
+#                     bookings = Booking.objects.filter(
+#                         floor=floor,
+#                         room=slot['room'],
+#                         time_slot=time_obj,
+#                         date=slot['date']
+#                     )
+
+#                     count = bookings.count()
+#                     print(f"[DEBUG] Found {count} bookings to delete")
+
+#                     if count > 0:
+#                         bookings.delete()
+#                         deleted_count += count
+#                         print(f"[DEBUG] Deleted {count} bookings")
+
+#                 except ValueError as e:
+#                     print(f"[ERROR] Time parsing error: {e}")
+#                     return JsonResponse({
+#                         'status': 'error',
+#                         'message': f'Invalid time format: {time_value}. Expected format: HH:MM am/pm'
+#                     }, status=400)
+
+#             print(f"[DEBUG] Total deleted: {deleted_count}")
+#             return JsonResponse({
+#                 'status': 'success',
+#                 'message': f'Successfully deleted {deleted_count} slots'
+#             })
+
+#         except Exception as e:
+#             return JsonResponse({
+#                 'status': 'error',
+#                 'message': str(e)
+#             }, status=400)
+
+#     return JsonResponse({'status': 'error', 'message': 'Invalid method'}, status=405)
+
 def delete_slots(request):
     if request.method == 'POST':
         try:
+            from django.core.cache import cache
+
             slots_data = json.loads(request.body)
             deleted_count = 0
+            deleted_slots = []  # Track which slots were deleted for detailed response
 
             print(f"[DEBUG] Received delete slots data: {slots_data}")
 
             for slot in slots_data:
                 floor = get_object_or_404(Floor, slug=slot['floor'])
+                bookings = Booking.objects.filter(
+                    floor=floor,
+                    room=slot['room'],
+                    time_slot=datetime.strptime(slot['time_slot'], '%I:%M %p').time(),
+                    date=slot['date']
+                )
 
-                # Get the time field - could be 'time' or 'time_slot'
-                time_value = slot.get('time_slot') or slot.get('time')
+                if bookings.exists():
+                    for booking in bookings:
+                        # Track the deleted booking details
+                        deleted_slots.append({
+                            'id': booking.id,
+                            'floor': booking.floor.slug,
+                            'room': booking.room,
+                            'time_slot': booking.time_slot.strftime('%I:%M %p').lower().lstrip('0'),
+                            'date': str(booking.date),
+                            'reason': booking.reason,
+                            'user': booking.user.username if booking.user else 'unknown'
+                        })
 
-                if not time_value:
-                    print(f"[ERROR] No time value found in slot data: {slot}")
-                    continue
+                        # Delete any corresponding time slots
+                        correspondingTimeSlot = aTimeSlot.objects.filter(email=booking.user.email, room=booking.room, reason=booking.reason)
+                        print(f" Corresponding time slot: {correspondingTimeSlot}")
+                        if correspondingTimeSlot.exists():
+                            correspondingTimeSlot[0].delete()
 
-                print(f"[DEBUG] Processing delete for: Floor={slot['floor']}, Room={slot['room']}, Time={time_value}, Date={slot['date']}")
+                    # Delete the bookings
+                    bookings.delete()
+                    deleted_count += 1
 
-                try:
-                    # Parse the time string
-                    time_obj = datetime.strptime(time_value, '%I:%M %p').time()
-                    print(f"[DEBUG] Parsed time: {time_obj}")
+            # Update the last booking update timestamp to force refresh
+            cache.set('last_booking_update', datetime.now().timestamp(), 86400)  # Store for 24 hours
+            print(f"Updated cache timestamp after deletion: {cache.get('last_booking_update')}")
 
-                    # Find and delete bookings
-                    bookings = Booking.objects.filter(
-                        floor=floor,
-                        room=slot['room'],
-                        time_slot=time_obj,
-                        date=slot['date']
-                    )
+            # Generate a unique cache key for this specific deletion
+            deletion_timestamp = str(int(datetime.now().timestamp()))
+            cache.set('last_deletion_timestamp', deletion_timestamp, 86400)  # Store for 24 hours
 
-                    count = bookings.count()
-                    print(f"[DEBUG] Found {count} bookings to delete")
+            # Also clear any cached booking data for these slots
+            for slot in deleted_slots:
+                cache_key = f"booking_{slot['floor']}_{slot['room']}_{slot['date']}_{slot['time_slot']}"
+                cache.delete(cache_key)
+                print(f"Cleared cache for {cache_key}")
 
-                    if count > 0:
-                        bookings.delete()
-                        deleted_count += count
-                        print(f"[DEBUG] Deleted {count} bookings")
-
-                except ValueError as e:
-                    print(f"[ERROR] Time parsing error: {e}")
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': f'Invalid time format: {time_value}. Expected format: HH:MM am/pm'
-                    }, status=400)
-
-            print(f"[DEBUG] Total deleted: {deleted_count}")
             return JsonResponse({
                 'status': 'success',
-                'message': f'Successfully deleted {deleted_count} slots'
+                'message': f'Successfully deleted {deleted_count} slots',
+                'deletion_timestamp': deletion_timestamp,  # Return the timestamp to the client
+                'deleted_slots': deleted_slots  # Return details of deleted slots for client-side cleanup
             })
 
         except Exception as e:

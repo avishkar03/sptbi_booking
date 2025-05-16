@@ -3,7 +3,7 @@ from django.urls import path
 from django.urls import reverse
 from django.urls.conf import include
 from . import views
-from .restricted_booking_view import restricted_booking_view, approve_booking, reject_booking, check_booking_updates, api_approve_booking, api_reject_booking
+from .restricted_booking_view import restricted_booking_view, approve_booking, reject_booking, check_booking_updates, api_approve_booking, api_reject_booking, batch_booking_view
 # from . import view_restricted
 from .views import book_room
 from .tests import test_email
@@ -47,4 +47,7 @@ urlpatterns = [
     path('api/add-column/', add_column_api, name='add_column_api'),
     path('api/delete-column/', delete_column_api, name='delete_column_api'),
     path('api/delete-booking/', delete_booking_api, name='delete_booking_api'),
+
+    # Batch booking endpoint
+    path('restricted-booking/<slug:floor_slug>/batch/', batch_booking_view, name='batch_booking'),
 ]

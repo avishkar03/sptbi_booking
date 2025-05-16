@@ -127,9 +127,21 @@
                             {% if booked_slots|get_item:room|get_item:time_key %}
                                 {% with booking_data=booked_slots|get_item:room|get_item:time_key %}
                                     {% if booking_data.status == 'pending' %}
-                                        <span class="booking-info pending">{{ booking_data.reason }} (Pending)</span>
+                                        <span class="booking-info pending">
+                                            {% if booking_data.reason|slice:":10" == "Booked by:" %}
+                                                {{ booking_data.reason }} (Pending)
+                                            {% else %}
+                                                Booked by: {{ booking_data.reason }} (Pending)
+                                            {% endif %}
+                                        </span>
                                     {% else %}
-                                        <span class="booked-text">{{ booking_data.reason }}</span>
+                                        <span class="booked-text">
+                                            {% if booking_data.reason|slice:":10" == "Booked by:" %}
+                                                {{ booking_data.reason }}
+                                            {% else %}
+                                                Booked by: {{ booking_data.reason }}
+                                            {% endif %}
+                                        </span>
                                     {% endif %}
                                 {% endwith %}
                             {% endif %}

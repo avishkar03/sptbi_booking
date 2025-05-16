@@ -1,5 +1,5 @@
-{% extends 'base.html' %} {% load static %} 
-{% block Title %} Home {% endblock %} 
+{% extends 'base.html' %} {% load static %}
+{% block Title %} Home {% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}" />
 <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
@@ -7,6 +7,42 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
 <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />
 {% endblock %} {% block title %}Home{% endblock %} {% block content %}
+<!-- Modern Banner Section -->
+<div class="modern-banner-container">
+  <div class="modern-slideshow">
+    <div class="autoplay">
+      {% for banner in banners %}
+      <a href="{{banner.site}}">
+        <div class="banner-slide{% if forloop.first %} active{% endif %}">
+          <div class="banner-image-container">
+            {% if banner.gif %}
+              <img src="{{banner.gif.url}}" alt="Banner GIF" class="banner-media" />
+            {% else %}
+              <img src="{{banner.image.url}}" alt="Banner Image" class="banner-media" />
+            {% endif %}
+          </div>
+          <div class="banner-overlay"></div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    <!-- Modern Navigation Controls -->
+    <div class="banner-navigation">
+      <!-- Pagination indicators -->
+      <div class="banner-pagination">
+        <!-- Will be populated dynamically by JS -->
+      </div>
+
+      <!-- Progress bar for current slide -->
+      <div class="banner-progress-container">
+        <div class="banner-progress-bar"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Modern Banner Section -->
+
+<!-- Original code (commented out)
 <div class="split-slideshow">
   <div class="slideshow">
     <div class="autoplay">
@@ -22,6 +58,7 @@
     <button class="next-button"><i class="bi bi-caret-right-fill"></i></button>
   </div>
 </div>
+-->
 <div class="about-section">
   <div class="container">
     <div class="about-content">
@@ -61,7 +98,7 @@
             <p>
               {{i.vision | safe}}
           </p>
-    
+
           </div>
         </div>
       </div>
@@ -215,8 +252,8 @@
   </div>
 </div>
 {% endif %}
-{% endblock %} 
-{% block js %} 
+{% endblock %}
+{% block js %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>

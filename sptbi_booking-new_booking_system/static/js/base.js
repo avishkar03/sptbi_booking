@@ -11,10 +11,13 @@ const scrollToFooter = () => {
 const link = document.querySelector('a[href="#footer"]');
 link.addEventListener("click", scrollToFooter);
 
+// No custom ticker initialization needed - using HTML marquee tag
+
 // Enhanced scroll event handler for sticky navbar
 window.addEventListener("scroll", function () {
   const header = document.querySelector(".header");
   const navbar = document.querySelector(".navbar");
+  const newsTicker = document.querySelector(".news-ticker-container");
   const hamburger = document.querySelector(".menu-container");
   const scrolled = window.scrollY > header.offsetHeight;
 
@@ -25,6 +28,16 @@ window.addEventListener("scroll", function () {
     // Make navbar sticky and visible with smooth transition
     navbar.classList.add("navbar-visible");
     navbar.classList.add("sticky");
+
+    // Make news ticker sticky if it exists
+    if (newsTicker) {
+      newsTicker.style.position = "fixed";
+      newsTicker.style.top = navbar.offsetHeight + "px";
+      newsTicker.style.left = "0";
+      newsTicker.style.width = "100%";
+      newsTicker.style.zIndex = "9998"; // Just below navbar
+      newsTicker.style.boxShadow = "0 3px 5px rgba(0,0,0,0.2)";
+    }
 
     // Handle hamburger menu for mobile
     if (hamburger) {
@@ -40,7 +53,8 @@ window.addEventListener("scroll", function () {
     navbar.style.opacity = "1";
 
     // Add padding to body to prevent content jump
-    document.body.style.paddingTop = navbar.offsetHeight + "px";
+    const totalHeight = navbar.offsetHeight + (newsTicker ? newsTicker.offsetHeight : 0);
+    document.body.style.paddingTop = totalHeight + "px";
   } else {
     // Show header
     header.classList.remove("header-hidden");
@@ -48,6 +62,16 @@ window.addEventListener("scroll", function () {
     // Remove sticky and visible classes from navbar
     navbar.classList.remove("navbar-visible");
     navbar.classList.remove("sticky");
+
+    // Reset news ticker position if it exists
+    if (newsTicker) {
+      newsTicker.style.position = "";
+      newsTicker.style.top = "";
+      newsTicker.style.left = "";
+      newsTicker.style.width = "";
+      newsTicker.style.zIndex = "";
+      newsTicker.style.boxShadow = "";
+    }
 
     // Handle hamburger menu for mobile
     if (hamburger) {

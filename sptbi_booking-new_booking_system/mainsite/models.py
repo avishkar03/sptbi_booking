@@ -66,7 +66,7 @@ class Features(models.Model):
 
     def __str__(self):
         return self.title
-    
+
 class Team(models.Model):
     name = models.CharField(max_length=100)
     designation = models.CharField(max_length=100)
@@ -76,15 +76,15 @@ class Team(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 class VisionMission(models.Model):
     vision = models.TextField()
     mission = models.TextField()
 
     def __str__(self):
         return self.vision
-    
-    
+
+
 class Stat(models.Model):
     startups = models.IntegerField()
     current = models.IntegerField()
@@ -93,7 +93,7 @@ class Stat(models.Model):
 
     def __str__(self):
         return str(self.startups) + " Startups, " + str(self.current) + " Current, " + str(self.graduated) + " Graduated"
-    
+
 class News(models.Model):
     image = models.ImageField(upload_to='static/assets/news')
     title = models.CharField(max_length=1000)
@@ -104,7 +104,7 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
-    
+
 class Testimonial(models.Model):
     name = models.CharField(max_length=100)
     company_name = models.CharField(max_length=100)
@@ -112,14 +112,14 @@ class Testimonial(models.Model):
     description = models.TextField()
 
     def __str__(self):
-        return self.name    
-   
+        return self.name
+
 class Facility(models.Model):
     name = models.CharField(max_length=200)
     image = models.ImageField(upload_to='static/assets/facility')
     def __str__(self):
         return self.name
-    
+
 class ProgrammeYear(models.Model):
     yearNo = models.IntegerField()
     programme = models.ForeignKey('Programme', on_delete=models.CASCADE)
@@ -136,7 +136,7 @@ class Project(models.Model):
 
     def __str__(self):
         return self.title
-    
+
 class Programme(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
@@ -156,18 +156,24 @@ class Programme(models.Model):
 
     def get_slug(self):
         return slugify(self.title)
-    
+
     def __str__(self):
         return self.title
-    
+
 class Banner(models.Model):
     title = models.CharField(max_length=200)
-    image = models.ImageField(upload_to='static/assets/banner')
-    site = models.CharField(max_length=200, null=True, blank=True)    
-    
+    image = models.ImageField(upload_to='static/assets/banner', null=True, blank=True)
+    gif = models.FileField(
+        upload_to='static/assets/banner',
+        null=True,
+        blank=True,
+        help_text="Upload a GIF file here. This will be displayed instead of the image if provided."
+    )
+    site = models.CharField(max_length=200, null=True, blank=True)
+
     def __str__(self):
         return self.title
-    
+
 class Partner(models.Model):
     name = models.CharField(max_length=200)
     image = models.ImageField(upload_to='static/assets/partners')
@@ -175,19 +181,19 @@ class Partner(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 class Partner_type(models.Model):
     name = models.CharField(max_length=200)
     partners = models.ManyToManyField(Partner)
     def __str__(self):
         return self.name
-    
+
 class Count(models.Model):
     name = models.CharField(max_length=200)
     count = models.IntegerField()
     def __str__(self):
         return self.name + ' ' + str(self.count)
-    
+
 class Image(models.Model):
     name = models.CharField(max_length=200)
     image = models.ImageField(upload_to='static/assets/images')
@@ -199,16 +205,16 @@ class Image(models.Model):
     ]
     aspect = models.CharField(
         max_length=100, choices=ASPECT_RATIO_CHOICES, null=True, blank=True)
-    
+
     def __str__(self):
         return self.name
-    
+
 class InfraFacility(models.Model):
     name = models.CharField(max_length=200)
     imgs = models.ManyToManyField(Image)
     def __str__(self):
         return self.name
-    
+
 class IotDevice(models.Model):
     name = models.CharField(max_length=200)
     image = models.ImageField(upload_to='static/assets/iot')
@@ -221,7 +227,7 @@ class IotDevice(models.Model):
 
     class Meta:
         verbose_name = "Equipment Device"
-    
+
 class Iot(models.Model):
     name = models.CharField(max_length=200)
     devices = models.ManyToManyField(IotDevice)
@@ -231,7 +237,7 @@ class Iot(models.Model):
 
     class Meta:
         verbose_name = "Equipment Types"
-    
+
 class Mentor(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=400)
@@ -240,21 +246,21 @@ class Mentor(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 class Mentor_type(models.Model):
     name = models.CharField(max_length=200)
     mentors = models.ManyToManyField(Mentor)
-    
+
     def __str__(self):
         return self.name
-    
+
 class Sponsor(models.Model):
     name = models.CharField(max_length=200)
     image = models.ImageField(upload_to='static/assets/sponsors')
     website = models.CharField(max_length=200)
     def __str__(self):
         return self.name
-    
+
 class Event(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, null=True, blank=True)
@@ -274,7 +280,7 @@ class Event(models.Model):
 
     def get_slug(self):
         return slugify(self.title)
-    
+
     def __str__(self):
         return self.title
 

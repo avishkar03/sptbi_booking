@@ -1,0 +1,33 @@
+<!-- Modern Banner Section -->
+<div class="modern-banner-container">
+  <div class="modern-slideshow">
+    <div class="autoplay">
+      {% for banner in banners %}
+      <div class="banner-slide">
+        <a href="{{banner.site}}">
+          <div class="banner-image-container">
+            {% if banner.gif %}
+              <img src="{{banner.gif.url}}" alt="Banner GIF" class="banner-media" />
+            {% else %}
+              <img src="{{banner.image.url}}" alt="Banner Image" class="banner-media" />
+            {% endif %}
+            <div class="banner-overlay"></div>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+    <!-- Modern Navigation Controls -->
+    <div class="banner-navigation">
+      <!-- Pagination indicators -->
+      <div class="banner-pagination">
+        <!-- Will be populated dynamically by JS -->
+      </div>
+      <!-- Progress bar for current slide -->
+      <div class="banner-progress-container">
+        <div class="banner-progress-bar"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Modern Banner Section -->

@@ -1,0 +1,125 @@
+/* Banner container */
+.modern-banner-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 300px;
+  display: block;
+}
+
+/* Slideshow container */
+.modern-slideshow {
+  width: 100%;
+  height: auto;
+  margin: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Banner slide */
+.banner-slide {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Image container */
+.banner-image-container {
+  width: 100%;
+  height: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Banner image */
+.banner-image-container .banner-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Changed back to cover for better display */
+  transition: transform 0.5s ease;
+  display: block;
+}
+
+/* Hover effect */
+.banner-slide:hover .banner-image-container .banner-media {
+  transform: scale(1.03);
+}
+
+/* Overlay */
+.banner-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
+}
+
+/* Banner navigation */
+.banner-navigation {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+
+/* Pagination dots */
+.banner-pagination {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.pagination-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  margin: 0 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pagination-dot.active {
+  background-color: white;
+}
+
+/* Progress bar */
+.banner-progress-container {
+  width: 100px;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.banner-progress-bar {
+  height: 100%;
+  width: 0;
+  background-color: white;
+  border-radius: 2px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .banner-image-container {
+    height: 250px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-image-container {
+    height: 200px;
+    width: 100%;
+  }
+}

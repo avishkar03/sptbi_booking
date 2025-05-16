@@ -291,6 +291,90 @@ nav {
     animation: slideDown 0.3s ease-in-out !important; /* Add slide down animation */
 }
 
+/* Modern News Ticker Container Styles */
+.news-ticker-container {
+    width: 100%;
+    height: 36px; /* Increased height */
+    background: linear-gradient(to right, #0a1a3a, #122a54, #0a1a3a);
+    position: relative;
+    z-index: 50;
+    /* Removed white borders */
+    /* Add subtle inner glow for modern effect */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.news-ticker-content {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Marquee styling */
+.news-ticker-content marquee {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+/* Ticker items styling */
+.ticker-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 18px; /* Increased padding */
+    color: white;
+    font-size: 15px; /* Increased font size */
+    font-weight: 500; /* Slightly bolder */
+    font-family: 'Anuphan', sans-serif;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); /* Enhanced text shadow */
+    letter-spacing: 0.2px; /* Better readability */
+}
+
+/* Separator styling */
+.ticker-separator {
+    display: inline-flex;
+    align-items: center;
+    color: #f0f0f0;
+    font-size: 16px; /* Increased font size */
+    opacity: 0.7; /* Reduced opacity for modern look */
+    padding: 0 8px; /* Increased padding */
+    font-weight: 300;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); /* Enhanced text shadow */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .news-ticker-container {
+        height: 34px; /* Adjusted for medium screens */
+    }
+
+    .ticker-item {
+        padding: 0 15px;
+        font-size: 14px; /* Slightly smaller on medium screens */
+    }
+
+    .ticker-separator {
+        font-size: 15px;
+        padding: 0 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .news-ticker-container {
+        height: 32px; /* Adjusted for small screens */
+    }
+
+    .ticker-item {
+        padding: 0 12px;
+        font-size: 13px; /* Smaller on mobile but still readable */
+        letter-spacing: 0.1px;
+    }
+
+    .ticker-separator {
+        font-size: 14px;
+        padding: 0 5px;
+    }
+}
+
 /* Animation for navbar sliding down */
 @keyframes slideDown {
     from {
@@ -339,6 +423,12 @@ nav {
     transition: 0.3s ease-in-out;
     opacity: 1;
     height: 40px;
+}
+
+/* Header-navbar spacer */
+.header-navbar-spacer {
+    height: 0;
+    width: 100%;
 }
 
 nav .logo {

@@ -4,9 +4,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>{% block Title %}Document{% endblock %} | SP-TBI </title>
     {% block head %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}?v={% now 'U' %}" />
 {% endblock %}
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'assets/apple-touch-icon.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'assets/favicon-32x32.png' %}">
@@ -16,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}?v={% now 'U' %}" />
     <style>
         /* Define the CSS animation outside the loop */
         {% for c in count %}
@@ -439,6 +442,24 @@
         {% endif %}
       </ul>
     </nav>
+
+    <!-- Modern Marquee Ticker Implementation -->
+    <div class="news-ticker-container">
+      <div class="news-ticker-content">
+        <marquee behavior="scroll" direction="left" scrollamount="3" onmouseover="this.stop();" onmouseout="this.start();" style="display: flex; align-items: center; height: 100%;">
+          <span class="ticker-item">Applications for Seed Funding are now open - Apply before June 30th, 2024</span>
+          <span class="ticker-separator">•</span>
+          <span class="ticker-item">New Incubation Program starting in July 2024 - Register your interest now</span>
+          <span class="ticker-separator">•</span>
+          <span class="ticker-item">Upcoming Workshop on AI & ML for Startups on May 15th, 2024</span>
+          <span class="ticker-separator">•</span>
+          <span class="ticker-item">Mentorship sessions available for all incubatees - Book your slot today</span>
+          <span class="ticker-separator">•</span>
+          <span class="ticker-item">Congratulations to our startups selected for the national innovation awards</span>
+        </marquee>
+      </div>
+    </div>
+
     <div class="menu-container">
       <div class="hamburger-menu">
         <div class="menu-icon" id="hamburger-1">
@@ -608,7 +629,7 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="{% static 'js/custom-dialog.js' %}"></script>
   <script src="{% static 'js/message-handler.js' %}"></script>
-  <script src="{% static 'js/base.js' %}"></script>
+  <script src="{% static 'js/base.js' %}?v={% now 'U' %}"></script>
   <script src="{% static 'js/responsive-menu.js' %}"></script>
 
   <!-- Fixed Smooth Navbar Scrolling Script with Double Scrollbar Fix -->

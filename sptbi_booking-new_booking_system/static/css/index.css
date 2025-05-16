@@ -9,6 +9,584 @@ html{
     scroll-behavior: smooth;
 }
 
+/* Modern Banner Styles */
+.modern-banner-container {
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  margin-top: 0;
+  margin-bottom: 0;
+  position: relative;
+  border-radius: 0;
+  box-shadow: none;
+  background: none;
+  transition: all 0.3s ease-in-out;
+  display: block;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  box-sizing: border-box;
+}
+
+/* Add hover effect to the container */
+.modern-banner-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+.modern-slideshow {
+  width: 100%;
+  height: auto;
+  margin: auto;
+  margin-bottom: 0; /* Ensure no bottom margin */
+  position: relative;
+  border-radius: 12px; /* Match parent container */
+  overflow: visible;
+  background-color: transparent;
+  cursor: grab;
+  /* Modern enhancements */
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  perspective: 1000px; /* For 3D effects */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Consistent with container */
+}
+
+.modern-slideshow:active,
+.modern-slideshow.dragging {
+  cursor: grabbing; /* Change cursor when actively dragging */
+}
+
+.modern-slideshow.dragging .banner-slide {
+  pointer-events: none; /* Prevent clicks during drag */
+}
+
+/* Banner slider styles */
+.banner-slider {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+/* Banner slide styles */
+.banner-slide {
+  display: none; /* Hide all slides by default */
+  width: 100%;
+  position: relative;
+  overflow: visible;
+  border-radius: 12px; /* Match container */
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); /* Smooth transition with easing */
+  outline: none;
+  transform: translateZ(0); /* Hardware acceleration */
+  backface-visibility: hidden; /* Prevent flickering */
+  will-change: transform, opacity; /* Optimize for animations */
+}
+
+.banner-slide.active {
+  display: block; /* Only show active slide */
+  animation: fadeInScale 0.7s forwards; /* Add entrance animation */
+}
+
+/* Add entrance animation */
+@keyframes fadeInScale {
+  from {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.banner-image-container {
+  width: 100%;
+  height: auto;
+  min-height: 200px;
+  position: relative;
+  overflow: hidden;
+  padding: 0; /* Remove padding */
+  margin: 0; /* Ensure no margin */
+  border-radius: 0; /* Remove border radius */
+  transition: all 0.3s ease;
+}
+
+.banner-image-container .banner-media {
+  position: relative;
+  display: block;
+  margin: 0;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: all 0.5s ease;
+  pointer-events: none;
+  border-radius: 0; /* Remove rounded corners */
+  box-shadow: none; /* Remove shadow */
+  filter: none; /* Remove filter */
+}
+
+.banner-slide:hover .banner-image-container .banner-media {
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+
+/* Swipe hint animation */
+.swipe-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  animation: fadeInOut 3s ease-in-out;
+  pointer-events: none;
+}
+
+.swipe-arrow {
+  width: 30px;
+  height: 30px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M14 5l-5 5 5 5V5z'/%3E%3Cpath d='M10 5l-5 5 5 5V5z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: swipeLeft 1.5s infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  20%, 80% { opacity: 1; }
+}
+
+@keyframes swipeLeft {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-10px); }
+}
+
+/* Slick slider core styles */
+.slick-slider {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  user-select: none;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.slick-list {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.slick-list:focus {
+  outline: none;
+}
+
+.slick-list.dragging {
+  cursor: grabbing;
+}
+
+.banner-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 35%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+  opacity: 0.8;
+  transition: opacity 0.4s ease;
+}
+
+/* Modern overlay with gradient and content */
+.banner-modern-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, transparent 50%, rgba(0, 0, 0, 0.2) 100%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 5%;
+  z-index: 5;
+}
+
+.banner-content-container {
+  max-width: 50%;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.2s;
+}
+
+/* Modern button styling */
+.banner-button {
+  display: inline-block;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #1c4386 0%, #2a5db0 100%);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-family: 'Anuphan', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(28, 67, 134, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.banner-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(28, 67, 134, 0.4);
+}
+
+.banner-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(28, 67, 134, 0.3);
+}
+
+/* Button shine effect */
+.banner-button::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(45deg);
+  transition: all 0.5s ease;
+  opacity: 0;
+}
+
+.banner-button:hover::after {
+  opacity: 1;
+  transform: rotate(45deg) translate(50%, 50%);
+}
+
+.banner-slide.active .banner-modern-overlay {
+  opacity: 1;
+}
+
+.banner-slide.active .banner-content-container {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.banner-slide:hover .banner-overlay {
+  opacity: 0.95;
+}
+
+.banner-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+/* Banner Navigation Styling */
+.banner-navigation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Allow clicks to pass through to the banner */
+  z-index: 100; /* Increased z-index to ensure visibility */
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove navigation arrows as per user preference */
+.banner-arrow {
+  display: none; /* Hide navigation arrows */
+}
+
+/* Pagination indicators */
+.banner-pagination {
+  position: absolute;
+  bottom: 15px; /* Moved up slightly */
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto; /* Make indicators clickable */
+  z-index: 10; /* Ensure dots are above slides */
+  margin: 0;
+  padding: 0;
+}
+
+.pagination-dot {
+  width: 12px;
+  height: 6px; /* Make dots more like pills */
+  border-radius: 3px; /* Rounded rectangle shape */
+  background-color: rgba(255, 255, 255, 0.5);
+  margin: 0 8px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden; /* For the gradient effect */
+}
+
+.pagination-dot::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.3), rgba(255,255,255,0.6));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.pagination-dot:hover::after {
+  opacity: 1;
+}
+
+.pagination-dot.active {
+  width: 24px; /* Wider when active */
+  background-color: #ffffff;
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.5);
+}
+
+/* Add drag indicator on hover */
+.modern-slideshow:hover::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  width: 30px;
+  height: 30px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transform: translateY(-50%);
+  opacity: 0.6;
+  pointer-events: none;
+  animation: fadeInOut 2s infinite;
+  z-index: 5;
+}
+
+/* Progress bar for current slide */
+.banner-progress-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px; /* Slightly thicker progress bar */
+  background-color: rgba(255, 255, 255, 0.15); /* More subtle background */
+  overflow: hidden;
+  z-index: 5;
+  margin: 0;
+  padding: 0;
+}
+
+.banner-progress-bar {
+  height: 100%;
+  width: 0;
+  background-color: #ffffff; /* White progress bar */
+  transition: width 0.1s linear;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5); /* Glow effect */
+  border-radius: 0 2px 2px 0; /* Rounded right edge */
+}
+
+/* Drag indicator */
+.modern-slideshow.dragging::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.banner-indicators {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.banner-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  margin: 0 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.banner-indicator.active {
+  width: 20px;
+  border-radius: 10px;
+  background-color: #0b3c7c;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 992px) {
+  .modern-banner-container {
+    width: 100vw;
+    max-width: 100vw;
+    margin: 0;
+    padding: 0;
+  }
+
+  .modern-slideshow {
+    width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .banner-slide {
+    border-radius: 0;
+  }
+
+  .banner-image-container {
+    padding: 0;
+  }
+
+  .banner-pagination {
+    bottom: 12px;
+  }
+
+  .pagination-dot {
+    width: 8px;
+    height: 8px;
+    margin: 0 6px;
+  }
+
+  .banner-progress-container {
+    height: 3px;
+  }
+
+  /* Hide drag indicator on tablet */
+  .modern-slideshow:hover::after {
+    display: none;
+  }
+}
+
+/* Medium mobile devices */
+@media (max-width: 768px) {
+  .modern-banner-container {
+    width: 100vw;
+    max-width: 100vw;
+    margin: 0;
+    padding: 0;
+  }
+
+  .modern-slideshow {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .banner-slide {
+    border-radius: 0;
+  }
+
+  .banner-image-container {
+    padding: 0;
+  }
+
+  .banner-pagination {
+    bottom: 10px;
+  }
+
+  /* Add swipe hint for mobile */
+  .modern-slideshow.show-swipe-hint::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M14 5l-5 5 5 5V5z'/%3E%3Cpath d='M10 5l-5 5 5 5V5z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+    animation: swipeHint 1.5s ease-in-out;
+  }
+
+  @keyframes swipeHint {
+    0% { opacity: 0; transform: translate(-70%, -50%); }
+    20% { opacity: 0.7; transform: translate(-50%, -50%); }
+    80% { opacity: 0.7; transform: translate(-30%, -50%); }
+    100% { opacity: 0; transform: translate(-10%, -50%); }
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .modern-slideshow {
+    width: 100%;
+    border-radius: 8px; /* Adjusted border radius for small screens */
+  }
+
+  .banner-slide {
+    border-radius: 8px;
+  }
+
+  .banner-image-container {
+    padding-bottom: 60%; /* Taller aspect ratio for small mobile */
+  }
+
+  .banner-pagination {
+    bottom: 8px;
+  }
+
+  .pagination-dot {
+    width: 6px;
+    height: 6px;
+    margin: 0 5px;
+  }
+
+  .pagination-dot.active {
+    transform: scale(1.3);
+  }
+
+  .banner-progress-container {
+    height: 3px;
+  }
+}
+
+/* Original Banner Styles (kept for reference) */
 .slideshow {
   width: 90%;
   height: auto;
@@ -55,7 +633,8 @@ html{
 
 .about-section {
   width: 100%;
-  padding: 100px 0 50px;
+  padding: 0 0 50px; /* Removed top padding completely */
+  margin-top: 0; /* Reset margin */
 }
 
 .container {
@@ -391,7 +970,7 @@ html{
         background:#009bd5;
       }
     }
-  } 
+  }
 } */
 
 .partners{
@@ -766,7 +1345,7 @@ figure.snip1208.hover button {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
   cursor: pointer;
 }
-.facility .card .front, 
+.facility .card .front,
 .facility .card .back {
   position: absolute;
   width: 100%;
@@ -794,15 +1373,15 @@ figure.snip1208.hover button {
     text-decoration: none;
     color: inherit;
 }
-.testi a, 
-.testi button, 
+.testi a,
+.testi button,
 .testi div[role="button"]{
     -webkit-tap-highlight-color: transparent;
 }
 .testi ul { list-style: none; }
-.testi h1, 
-.testi h2, 
-.testi h3, 
+.testi h1,
+.testi h2,
+.testi h3,
 .testi h4{font-weight: 500; line-height: normal;}
 .testi h1{font-size: 2.5em;}
 .testi h2{font-size: 2em;}
@@ -836,7 +1415,7 @@ figure.snip1208.hover button {
 .testi .wrapper1{
     display: flex;
     flex-direction: column;
-    align-items: center;   
+    align-items: center;
     gap: 60px;
     padding: 30px 0;
 }
@@ -1236,7 +1815,7 @@ figure.snip1208.hover button {
   background-color: #1c4386;
   color: white;
   cursor: pointer;
-  transition: all 0.2s ease-in-out; 
+  transition: all 0.2s ease-in-out;
 }
 .contents .buttons .button:hover {
   color: #1c4386;
