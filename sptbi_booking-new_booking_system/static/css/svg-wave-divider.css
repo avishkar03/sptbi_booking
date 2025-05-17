@@ -1,0 +1,119 @@
+/**
+ * SVG Wave Divider CSS
+ * Provides stylish wave dividers with continuous animations
+ */
+
+.editorial {
+  display: block;
+  width: 100vw;
+  height: 60px;
+  max-height: 60px;
+  margin: 0;
+  z-index: 5;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Wave colors - customized to match site theme */
+.wave-primary {
+  fill: rgba(28, 67, 134, 0.7); /* Primary blue color */
+}
+
+.wave-secondary {
+  fill: rgba(28, 67, 134, 0.4); /* Lighter blue */
+}
+
+.wave-tertiary {
+  fill: rgba(28, 67, 134, 0.2); /* Even lighter blue */
+}
+
+.wave-light {
+  fill: #ffffff; /* White */
+}
+
+/* Animation for each wave layer */
+.parallax1 > use {
+  animation: move-forever1 10s linear infinite;
+}
+
+.parallax2 > use {
+  animation: move-forever2 8s linear infinite;
+}
+
+.parallax3 > use {
+  animation: move-forever3 6s linear infinite;
+}
+
+.parallax4 > use {
+  animation: move-forever4 4s linear infinite;
+}
+
+/* Animation keyframes for wave movement */
+@keyframes move-forever1 {
+  0% {
+    transform: translate(85px, 0%);
+  }
+  100% {
+    transform: translate(-90px, 0%);
+  }
+}
+
+@keyframes move-forever2 {
+  0% {
+    transform: translate(-90px, 0%);
+  }
+  100% {
+    transform: translate(85px, 0%);
+  }
+}
+
+@keyframes move-forever3 {
+  0% {
+    transform: translate(85px, 0%);
+  }
+  100% {
+    transform: translate(-90px, 0%);
+  }
+}
+
+@keyframes move-forever4 {
+  0% {
+    transform: translate(-90px, 0%);
+  }
+  100% {
+    transform: translate(85px, 0%);
+  }
+}
+
+/* Inverted wave divider (flipped vertically) */
+.editorial.inverted {
+  transform: rotate(180deg);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .editorial {
+    height: 40px;
+    max-height: 40px;
+    width: 100vw;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
+}
+
+/* Accessibility - disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .parallax1 > use,
+  .parallax2 > use,
+  .parallax3 > use,
+  .parallax4 > use {
+    animation: none;
+  }
+}

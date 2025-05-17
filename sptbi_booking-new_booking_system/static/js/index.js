@@ -495,23 +495,8 @@ document.addEventListener('DOMContentLoaded', function() {
 //   autoplaySpeed: 1000,
 // });
 
-const aboutContent = document.querySelector(".about-content");
-const aboutPhoto = document.querySelector(".about-photo");
-const aboutText = document.querySelector(".about-text");
-
-function animateOnScroll(entries) {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      aboutContent.style.opacity = 1;
-      aboutPhoto.style.transform = "translateX(0)";
-      aboutText.style.transform = "translateX(0)";
-    }
-  });
-}
-
-const observer = new IntersectionObserver(animateOnScroll, { threshold: 0.5 });
-
-observer.observe(aboutContent);
+// Removed custom animation code for About section to avoid conflicts with scroll-animations.js
+// Animation is now handled by the scroll-animations.js file
 
 $(".facility").on("click", function () {
   $(".card").toggleClass("flipped");

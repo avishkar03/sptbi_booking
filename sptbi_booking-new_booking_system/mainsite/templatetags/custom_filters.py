@@ -16,3 +16,14 @@ def even(value):
 @register.filter(name='zip_lists')
 def zip_lists(list1, list2):
     return zip(list1, list2)
+
+@register.filter(name='get_range')
+def get_range(value):
+    """
+    Filter - returns a list containing range made from given value
+    Usage (in template):
+    {% for i in total_pages|get_range %}
+        <div class="news-carousel-dot {% if forloop.first %}active{% endif %}"></div>
+    {% endfor %}
+    """
+    return range(int(value))

@@ -1,0 +1,289 @@
+/* Modern News & Events Section with Horizontal Scrolling */
+
+/* Main container for news section */
+.news-section {
+  padding: 3rem 0;
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh; /* Make section at least full viewport height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  scroll-snap-align: start; /* For page section scrolling */
+}
+
+.news-section-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #1c4386;
+  font-family: 'Anuphan', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 600;
+  position: relative;
+}
+
+.news-section-title::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: #1c4386;
+  margin: 0.5rem auto;
+  border-radius: 2px;
+}
+
+/* Horizontal scrolling container */
+.news-carousel-container {
+  position: relative;
+  padding: 0 2rem;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+/* Navigation arrows */
+.news-carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: #1c4386;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.news-carousel-nav:hover {
+  background: #0d2b5e;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.news-carousel-prev {
+  left: 10px;
+}
+
+.news-carousel-next {
+  right: 10px;
+}
+
+/* Carousel track */
+.news-carousel-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  padding: 1rem 0;
+  gap: 1.5rem;
+  scroll-snap-type: x mandatory; /* Enable horizontal snap scrolling */
+  position: relative;
+  z-index: 5;
+}
+
+/* Hide scrollbar */
+.news-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* News card */
+.news-card {
+  scroll-snap-align: start; /* Snap to start of each card */
+  flex: 0 0 auto;
+  width: 350px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.news-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Ribbon style removed for consistency */
+
+/* Card image container */
+.news-card-image {
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.news-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.news-card:hover .news-card-image img {
+  transform: scale(1.1);
+}
+
+/* Overlay style removed for consistency */
+
+/* Consistent Date Badge Design */
+.news-card-date {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #1c4386;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  z-index: 5;
+  min-width: 50px;
+  border: 2px solid white;
+  overflow: hidden;
+}
+
+/* Add a subtle shine effect */
+.news-card-date::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.1) 30%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.news-card-day {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+}
+
+.news-card-month {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  margin-top: 2px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  position: relative;
+  z-index: 2;
+}
+
+/* All alternative date styles have been removed for consistency */
+
+/* Card content */
+.news-card-content {
+  padding: 1.5rem;
+}
+
+.news-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1c4386;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.news-card-description {
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.news-card-button {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #1c4386;
+  color: white;
+  border-radius: 6px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid #1c4386;
+}
+
+.news-card-button:hover {
+  background: white;
+  color: #1c4386;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .news-card {
+    width: 300px;
+  }
+
+  .news-carousel-nav {
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+  }
+
+  .news-section-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .news-card {
+    width: 280px;
+  }
+
+  .news-carousel-container {
+    padding: 0 1rem;
+  }
+
+  .news-carousel-nav {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+  }
+}
+
+/* Pagination dots */
+.news-carousel-dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+  gap: 8px;
+}
+
+.news-carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ccc;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.news-carousel-dot.active {
+  background: #1c4386;
+  transform: scale(1.2);
+}

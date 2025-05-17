@@ -539,157 +539,173 @@ nav .logo {
     padding: 20px 30px;
     background: #1c4386;
     margin-top: 5rem;
-    text-align: left;
+    color: #fff;
 }
 
 .container {
+    max-width: 1200px;
     margin: auto;
+    padding: 0 30px;
 }
 
 .row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
 }
 
-.footer-col {
-    /* flex: 1; */
-    /* width: 50%; */
-    padding: 0 15px;
-}
+@media (max-width: 768px) {
+    .footer {
+        padding: 20px;
+    }
 
-@media (min-width: 981px) {
-    .footer-col {
-        flex: 1;
+    .container {
+        padding: 0 20px;
+    }
+
+    .row {
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
 }
 
-.col-content {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.footer-col h4 {
-    font-size: 1.2rem;
-    font-weight: 300;
+.footer h4 {
+    font-size: 20px;
+    font-weight: 600;
     color: #fff;
-    margin-bottom: 30px;
-    position: relative;
+    margin-bottom: 20px;
 }
 
-.footer-col h4::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -10px;
-    height: 2.5px;
-    width: 50px;
-    box-sizing: border-box;
-    background: #e91e63;
+.footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.footer-col ul li:not(:last-child) {
+.footer ul li {
     margin-bottom: 10px;
 }
 
-.footer-col ul li a,
-.footer-col p {
+.footer ul li a,
+.footer p {
     color: #fff;
-    font-weight: 300;
+    font-size: 15px;
+    text-decoration: none;
     display: block;
-    opacity: 0.6;
     transition: all 0.3s ease;
-    margin-top: 0;
+    text-decoration: none;
+    margin: 8px 0;
+    line-height: 1.6;
 }
 
-.footer-col ul li a:hover,
-.footer-col p:hover {
-    opacity: 1;
-    padding-left: 8px;
+.footer a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.footer p {
+    margin-bottom: 15px;
 }
 
 .footer-wrapper {
-    position: relative;
-    margin: 1rem auto 1rem auto;
-    /* top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); */
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .footer-wrapper span {
     font-family: Poppins;
     color: white;
-    border: 3px solid #fff;
-    padding: 2px 5px;
-    border-radius: 12.5px;
-    margin: 0 5px;
+    font-size: 14px;
+    opacity: 0.8;
+    margin: 0 3px;
+}
+
+.visitor-count {
+    margin: 10px 0;
+    display: inline-block;
+}
+
+.visitor-count-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #fff;
+    font-size: 14px;
 }
 
 .numbox {
     display: inline-block;
-    overflow: hidden;
-    height: 1em;
-    line-height: 1em;
-    font-weight: bold;
-    font-size: 2em;
+    font-weight: 600;
+    font-size: 1.5em;
+    color: #fff;
+    margin: 0 2px;
 }
 
 .numbox::after {
     position: relative;
     white-space: pre;
     content: "0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9";
+    animation: countAnimation 0.3s ease-out;
+}
+
+@keyframes countAnimation {
+    from {
+        transform: translateY(-90%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.social-links {
+    margin-top: 10px;
 }
 
 .social-links a {
     display: inline-block;
-    height: 40px;
-    width: 40px;
-    margin: 0 3px;
-    text-align: center;
-    line-height: 40px;
-    border-radius: 50%;
+    margin: 0 10px;
     color: #fff;
-    background: rgba(255, 255, 255, 0.2);
-    transition: all 0.25s;
+    text-decoration: none;
+}
+
+.social-links a i {
+    position: relative;
+    z-index: 1;
 }
 
 iframe {
     width: 100%;
     border: none;
-    height: 100%;
+    height: 250px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease;
+}
+
+iframe:hover {
+    transform: translateY(-5px);
 }
 
 .social-links a:hover {
-    transform: scale(1.15);
-    color: #24262b;
-    background: #fff;
+    transform: translateY(-3px) scale(1.1);
+    color: #fff;
+}
+
+.social-links a:hover:before {
+    opacity: 1;
 }
 
 .center-info i {
     display: inline-block;
-    height: 40px;
-    width: 40px;
-    margin: 0 3px;
+    width: 30px;
     text-align: center;
-    line-height: 40px;
-    border-radius: 50%;
     color: #fff;
-    background: rgba(255, 255, 255, 0.2);
-    transition: all 0.25s;
-}
-
-.center-info i:hover {
-    transform: scale(1.15);
-    color: #24262b;
-    background: #fff;
+    margin: 0 5px;
 }
 
 .center-info a {
     font-family: Poppins;
-    font-weight: 200;
     text-decoration: none;
     color: #fff;
 }
@@ -706,56 +722,35 @@ iframe {
     color: #fff;
 }
 
-@media(max-width: 980px) {
-    .footer-col {
-        width: 100% !important;
+@media(max-width: 768px) {
+    .footer {
+        padding: 20px;
+    }
+
+    .row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .footer-wrapper {
+        margin-top: 20px;
     }
 }
-
-@media (max-width: 768px) {
-    .menu-icon {
-        display: block;
-    }
-
-    .menu {
-        flex-direction: column;
-        display: none;
-        text-align: center;
-    }
-
-    .menu li {
-        width: 100%;
-    }
-
-    .menu li a {
-        border-bottom: 1px solid #777;
-    }
-
-    #menu-toggle:checked+.menu {
-        display: flex;
-    }
-
-    .footer-col {
-        width: 50%;
-        margin-bottom: 30px;
-    }
 }
 
 .footer-bottom {
-    margin: 0;
+    text-align: center;
+    padding: 15px 0;
+    margin-top: 20px;
 }
 
 .footer-bottom p {
-    margin-bottom: 0;
-    color: white;
-    opacity: 0.6;
+    margin: 0;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.6;
+    letter-spacing: 0.5px;
 }
-
-/* @media(max-width: 980px) {
-    .footer-bottom p {
-        font-size: 20px;
-    }
-} */
 
 .seperator {
     padding: 1rem 35% 0;
@@ -773,7 +768,7 @@ iframe {
     position: absolute;
     margin: auto;
     height: 1px;
-    background: #1c4386;
+    background: #e0e0e0;
     width: 45%;
     top: 45%;
 }
@@ -787,9 +782,10 @@ iframe {
 }
 
 .diamond {
-    height: 8px;
-    width: 8px;
-    border: 2px solid #1c4386;
+    position: absolute;
+    height: 6px;
+    width: 6px;
+    background-color: #1c4386;
     left: 0;
     right: 0;
     bottom: 0;

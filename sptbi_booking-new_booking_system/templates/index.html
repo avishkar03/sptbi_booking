@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />
 {% endblock %} {% block title %}Home{% endblock %} {% block content %}
 <!-- Modern Banner Section -->
-<div class="modern-banner-container">
+<div class="modern-banner-container" data-scroll="fade-in" data-duration="1200">
   <div class="modern-slideshow">
     <div class="autoplay">
       {% for banner in banners %}
@@ -59,28 +59,55 @@
   </div>
 </div>
 -->
-<div class="about-section">
+<div class="about-section parallax-section" data-scroll="fade-in" data-duration="1200" data-speed="0.1">
   <div class="container">
-    <div class="about-content">
-      <div class="about-photo">
+    <div class="about-content" data-stagger=".stagger-item" data-stagger-delay="200">
+      <div class="about-photo stagger-item" data-scroll="fade-in-left">
         <img src="{% static 'assets/office.png'%}" alt="About Photo" />
       </div>
-      <div class="about-text">
-        <h2>About Us</h2>
-        {% for a in about %}
-        <p>
-         {{a.text | safe}}
+      <div class="about-text stagger-item" data-scroll="fade-in-right">
+        <h2 class="section-title" data-scroll="fade-in">About Us</h2>
+        <p class="stagger-item" data-scroll="fade-in">
+          Science and Technology Park - Technology Business Incubator <span class="highlight">(SP-TBI)</span> is a premier incubation center established to nurture innovative startups and foster entrepreneurship in the technology sector.
         </p>
-        {% endfor %}
+        <p class="stagger-item" data-scroll="fade-in">
+          Located at Bhavan's Campus, Andheri (West), we provide state-of-the-art infrastructure and comprehensive support to help transform innovative ideas into successful business ventures. Our focus spans across various technological domains including IoT, AI/ML, Robotics, Clean Energy, and Healthcare.
+        </p>
+        <p class="stagger-item" data-scroll="fade-in">
+          With a track record of incubating over <span class="highlight">50+ successful startups</span>, our ecosystem offers entrepreneurs access to cutting-edge laboratories, dedicated workspace, expert mentorship, funding opportunities, and invaluable industry connections. We are committed to fostering innovation and contributing to India's startup ecosystem.
+        </p>
       </div>
     </div>
   </div>
 </div>
-<div class="seperator">
-  <div class="lines">
-    <div class="diamond"></div>
-  </div>
-</div>
+<!-- SVG Wave Divider -->
+<svg class="editorial"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 24 150 28"
+     preserveAspectRatio="none">
+  <defs>
+    <path id="gentle-wave"
+      d="M-160 44c30 0
+         58-18 88-18s
+         58 18 88 18
+         58-18 88-18
+         58 18 88 18
+         v44h-352z" />
+  </defs>
+  <g class="parallax1">
+    <use xlink:href="#gentle-wave" x="50" y="3" class="wave-primary"/>
+  </g>
+  <g class="parallax2">
+    <use xlink:href="#gentle-wave" x="50" y="0" class="wave-secondary"/>
+  </g>
+  <g class="parallax3">
+    <use xlink:href="#gentle-wave" x="50" y="9" class="wave-tertiary"/>
+  </g>
+  <g class="parallax4">
+    <use xlink:href="#gentle-wave" x="50" y="6" class="wave-light"/>
+  </g>
+</svg>
 <div class="vision-mission">
   <div class="vision-mission-content">
     {% for i in vm %}
@@ -139,16 +166,39 @@
   {% endfor %}
 </div>
 
-<div class="seperator">
-  <div class="lines">
-    <div class="diamond"></div>
+<!-- SVG Wave Divider (Inverted) -->
+<svg class="editorial inverted"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 24 150 28"
+     preserveAspectRatio="none">
+  <defs>
+    <path id="gentle-wave"
+      d="M-160 44c30 0
+         58-18 88-18s
+         58 18 88 18
+         58-18 88-18
+         58 18 88 18
+         v44h-352z" />
+  </defs>
+  <g class="parallax1">
+    <use xlink:href="#gentle-wave" x="50" y="3" class="wave-primary"/>
+  </g>
+  <g class="parallax2">
+    <use xlink:href="#gentle-wave" x="50" y="0" class="wave-secondary"/>
+  </g>
+  <g class="parallax3">
+    <use xlink:href="#gentle-wave" x="50" y="9" class="wave-tertiary"/>
+  </g>
+  <g class="parallax4">
+    <use xlink:href="#gentle-wave" x="50" y="6" class="wave-light"/>
+  </g>
+</svg>
+<div class="offerings parallax-section" data-scroll="fade-in" data-duration="1200" data-speed="0.15">
+  <div class="heading" data-scroll="fade-in-up" data-delay="200">
+    <h1 class="section-title" data-scroll="zoom-in" data-delay="400">What We Offer</h1>
   </div>
-</div>
-<div class="offerings">
-  <div class="heading">
-    <h1>What We Offer</h1>
-  </div>
-  <div class="facilities">
+  <div class="facilities" data-scroll="fade-in" data-delay="600">
     <div id="modal-container">
       <div class="modal-background">
         <div class="modal">
@@ -160,12 +210,12 @@
         </div>
       </div>
     </div>
-    <div class="container-wrapper">
+    <div class="container-wrapper" data-stagger=".contents" data-stagger-delay="200">
       {% for obj in objs %}
-      <div class="contents">
+      <div class="contents" data-scroll="zoom-in" data-duration="800">
         <input type=hidden value="{{obj.description}}" id="modaltitle-{{forloop.counter}}" />
-        <img src="{{obj.image.url}}" />
-        <div class="buttons">
+        <img src="{{obj.image.url}}" data-scroll="fade-in" data-delay="200" />
+        <div class="buttons" data-scroll="fade-in-up" data-delay="400">
           <div id="{{forloop.counter}}" class="button">{{obj.title}}</div>
         </div>
       </div>
@@ -173,52 +223,148 @@
     </div>
   </div>
 </div>
-<div class="seperator">
-  <div class="lines">
-    <div class="diamond"></div>
+<!-- SVG Wave Divider -->
+<svg class="editorial"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 24 150 28"
+     preserveAspectRatio="none">
+  <defs>
+    <path id="gentle-wave"
+      d="M-160 44c30 0
+         58-18 88-18s
+         58 18 88 18
+         58-18 88-18
+         58 18 88 18
+         v44h-352z" />
+  </defs>
+  <g class="parallax1">
+    <use xlink:href="#gentle-wave" x="50" y="3" class="wave-primary"/>
+  </g>
+  <g class="parallax2">
+    <use xlink:href="#gentle-wave" x="50" y="0" class="wave-secondary"/>
+  </g>
+  <g class="parallax3">
+    <use xlink:href="#gentle-wave" x="50" y="9" class="wave-tertiary"/>
+  </g>
+  <g class="parallax4">
+    <use xlink:href="#gentle-wave" x="50" y="6" class="wave-light"/>
+  </g>
+</svg>
+<!-- News section with horizontal scrolling -->
+<div class="news-section" data-scroll="fade-in" data-duration="1200">
+  <h2 class="news-section-title" data-scroll="zoom-in" data-delay="200">News & Events</h2>
+
+  <!-- Navigation arrows -->
+  <div class="news-carousel-prev">
+    <i class="bi bi-chevron-left"></i>
   </div>
-</div>
-<div class="news">
-  <center> <h1> News & Events </h1> </center>
-  <div class="wrapper">
-    {% for news in news %}
-    <figure class="snip1208">
-      <img src="{{news.image.url}}" alt="{{news.title}}"/>
-      <div class="date"><span class="day">{{news.day}}</span><span class="month">{{news.month}}</span></div><i class="ion-film-marker"></i>
-      <figcaption>
-        <h3>{{news.title}}</h3>
-        <p>
-          {{news.description | safe}}
-        </p>
-        <a href="{{news.link}}"><button>Read More</button></a>
-      </figcaption>
-    </figure>
-    {% endfor %}
+  <div class="news-carousel-next">
+    <i class="bi bi-chevron-right"></i>
   </div>
-</div>
-<div class="seperator">
-  <div class="lines">
-    <div class="diamond"></div>
+
+  <!-- Carousel container with horizontal scrolling -->
+  <div class="news-carousel-container">
+    <!-- Carousel track -->
+    <div class="news-carousel-track">
+      {% for news in news %}
+      <div class="news-card">
+        <div class="news-card-image">
+          <img src="{{news.image.url}}" alt="{{news.title}}" />
+          <div class="news-card-date">
+            <span class="news-card-day">{{news.day}}</span>
+            <span class="news-card-month">{{news.month}}</span>
+          </div>
+        </div>
+        <div class="news-card-content">
+          <h3 class="news-card-title">{{news.title}}</h3>
+          <p class="news-card-description">
+            {{news.description | safe}}
+          </p>
+          <a href="{{news.link}}" class="news-card-button">Read More</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   </div>
+
+  <!-- Hidden pagination dots (for accessibility) -->
+  <div class="news-carousel-dots" aria-hidden="true"></div>
 </div>
+<!-- SVG Wave Divider (Inverted) -->
+<svg class="editorial inverted"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 24 150 28"
+     preserveAspectRatio="none">
+  <defs>
+    <path id="gentle-wave"
+      d="M-160 44c30 0
+         58-18 88-18s
+         58 18 88 18
+         58-18 88-18
+         58 18 88 18
+         v44h-352z" />
+  </defs>
+  <g class="parallax1">
+    <use xlink:href="#gentle-wave" x="50" y="3" class="wave-primary"/>
+  </g>
+  <g class="parallax2">
+    <use xlink:href="#gentle-wave" x="50" y="0" class="wave-secondary"/>
+  </g>
+  <g class="parallax3">
+    <use xlink:href="#gentle-wave" x="50" y="9" class="wave-tertiary"/>
+  </g>
+  <g class="parallax4">
+    <use xlink:href="#gentle-wave" x="50" y="6" class="wave-light"/>
+  </g>
+</svg>
 <div class="partners">
-  {% for partner_type in Partner_types%}
+  {% for partner_type in Partner_types %}
   <div class="contain">
     <div class="ourpartners">
       <h1>{{partner_type.name}}</h1>
-      <section class="customer-logos slider">
-        {% for partner in partner_type.partners.all %}
-        <div class="slide"><a href="{{partner.website}}"><img src="{{partner.image.url}}"></img></a></div>
-        {% endfor %}
+      <div class="partner-marquee-wrapper">
+        <div class="partner-marquee">
+          {% for partner in partner_type.partners.all %}
+          <div class="slide"><a href="{{partner.website}}"><img src="{{partner.image.url}}" alt="{{partner.name}}"></a></div>
+          {% endfor %}
+          {% for partner in partner_type.partners.all %}
+          <div class="slide"><a href="{{partner.website}}"><img src="{{partner.image.url}}" alt="{{partner.name}}"></a></div>
+          {% endfor %}
+        </div>
       </div>
     </div>
   {% endfor %}
 </div>
-<div class="seperator">
-  <div class="lines">
-    <div class="diamond"></div>
-  </div>
-</div>
+<!-- SVG Wave Divider -->
+<svg class="editorial"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 24 150 28"
+     preserveAspectRatio="none">
+  <defs>
+    <path id="gentle-wave"
+      d="M-160 44c30 0
+         58-18 88-18s
+         58 18 88 18
+         58-18 88-18
+         58 18 88 18
+         v44h-352z" />
+  </defs>
+  <g class="parallax1">
+    <use xlink:href="#gentle-wave" x="50" y="3" class="wave-primary"/>
+  </g>
+  <g class="parallax2">
+    <use xlink:href="#gentle-wave" x="50" y="0" class="wave-secondary"/>
+  </g>
+  <g class="parallax3">
+    <use xlink:href="#gentle-wave" x="50" y="9" class="wave-tertiary"/>
+  </g>
+  <g class="parallax4">
+    <use xlink:href="#gentle-wave" x="50" y="6" class="wave-light"/>
+  </g>
+</svg>
 {% if testimonial %}
 <div id="page" class="site">
   <div class="container3">

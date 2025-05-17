@@ -1,0 +1,60 @@
+/**
+ * Modern Dividers CSS
+ * Provides stylish section dividers for the website
+ */
+
+/* Base divider styles */
+.modern-divider {
+  position: relative;
+  padding: 30px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Simple Elegant Divider - Exact match to reference image */
+.elegant-divider {
+  position: relative;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.elegant-divider .line {
+  height: 1px;
+  width: 100%;
+  max-width: 500px;
+  background-color: #e0e0e0;
+  position: relative;
+}
+
+.elegant-divider .diamond {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background-color: #1c4386;
+  border-radius: 0;
+  z-index: 1;
+}
+
+/* Media query to ensure consistent appearance across devices */
+@media (max-width: 768px) {
+  .elegant-divider .line {
+    max-width: 300px;
+  }
+}
+
+/* Ensure the diamond is perfectly centered */
+.elegant-divider::after {
+  content: '';
+  display: block;
+  clear: both;
+}

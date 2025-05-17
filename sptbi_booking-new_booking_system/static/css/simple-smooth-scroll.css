@@ -1,0 +1,213 @@
+/**
+ * Simple Smooth Scroll Styles
+ * Lightweight styles for smooth scrolling
+ */
+
+/* Enable smooth scrolling for the entire page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scroll progress indicator */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background-color: #1c4386;
+  z-index: 9999;
+  transition: width 0.1s linear;
+  pointer-events: none; /* Ensure it doesn't interfere with clicks */
+}
+
+/* Section title animations */
+.section-title {
+  position: relative;
+  display: inline-block;
+}
+
+/* Enhanced animations for About section */
+.about-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.about-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(28, 67, 134, 0.05) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+}
+
+.about-section.revealed::before {
+  opacity: 1;
+}
+
+.about-photo img {
+  transition: transform 1.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+  transform-origin: center center;
+}
+
+.about-photo.revealed img {
+  transform: scale(1.02);
+}
+
+/* Enhanced animations for What We Offer section */
+.offerings {
+  position: relative;
+}
+
+.contents {
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+.contents:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced animations for News & Events section */
+.news figure.snip1208 {
+  overflow: hidden;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+.news figure.snip1208:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Parallax effect for elements with data-parallax attribute */
+[data-parallax] {
+  will-change: transform;
+  transform: translateY(0);
+  transition: transform 0.1s linear;
+}
+
+/* Base styles for reveal animations */
+[data-scroll] {
+  opacity: 0;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+/* Animation variations */
+[data-scroll="fade-in"] {
+  opacity: 0;
+}
+
+[data-scroll="fade-in-up"] {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+[data-scroll="fade-in-down"] {
+  opacity: 0;
+  transform: translateY(-30px);
+}
+
+[data-scroll="fade-in-left"] {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+[data-scroll="fade-in-right"] {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+[data-scroll="zoom-in"] {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+[data-scroll="zoom-out"] {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+/* Revealed state */
+[data-scroll].revealed {
+  opacity: 1;
+  transform: translate(0) scale(1);
+}
+
+/* Staggered animations container */
+[data-stagger] {
+  /* No specific styles needed, just a marker */
+}
+
+/* Staggered child animations */
+[data-stagger] > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Revealed state for staggered animations */
+[data-stagger].revealed > *:nth-child(1) {
+  transition-delay: 0.1s;
+}
+
+[data-stagger].revealed > *:nth-child(2) {
+  transition-delay: 0.2s;
+}
+
+[data-stagger].revealed > *:nth-child(3) {
+  transition-delay: 0.3s;
+}
+
+[data-stagger].revealed > *:nth-child(4) {
+  transition-delay: 0.4s;
+}
+
+[data-stagger].revealed > *:nth-child(5) {
+  transition-delay: 0.5s;
+}
+
+[data-stagger].revealed > *:nth-child(6) {
+  transition-delay: 0.6s;
+}
+
+[data-stagger].revealed > *:nth-child(7) {
+  transition-delay: 0.7s;
+}
+
+[data-stagger].revealed > *:nth-child(8) {
+  transition-delay: 0.8s;
+}
+
+[data-stagger].revealed > *:nth-child(9) {
+  transition-delay: 0.9s;
+}
+
+[data-stagger].revealed > *:nth-child(10) {
+  transition-delay: 1s;
+}
+
+[data-stagger].revealed > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  [data-scroll],
+  [data-parallax],
+  [data-stagger] > * {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+    animation: none !important;
+  }
+}
