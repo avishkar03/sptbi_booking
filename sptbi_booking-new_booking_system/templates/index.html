@@ -251,8 +251,7 @@
     <use xlink:href="#gentle-wave" x="50" y="6" class="wave-light"/>
   </g>
 </svg>
-<!-- News section with horizontal scrolling -->
-<div class="news-section" data-scroll="fade-in" data-duration="1200">
+<div class="news-section scroll-lock-section" data-scroll="fade-in" data-duration="1200">
   <h2 class="news-section-title" data-scroll="zoom-in" data-delay="200">News & Events</h2>
 
   <!-- Navigation arrows -->
@@ -268,7 +267,7 @@
     <!-- Carousel track -->
     <div class="news-carousel-track">
       {% for news in news %}
-      <div class="news-card">
+      <div class="news-card" data-scroll="fade-in-up" data-duration="800">
         <div class="news-card-image">
           <img src="{{news.image.url}}" alt="{{news.title}}" />
           <div class="news-card-date">
@@ -288,8 +287,10 @@
     </div>
   </div>
 
-  <!-- Hidden pagination dots (for accessibility) -->
-  <div class="news-carousel-dots" aria-hidden="true"></div>
+  <!-- Pagination dots -->
+  <div class="news-carousel-dots">
+    <!-- Dots will be populated dynamically by JavaScript -->
+  </div>
 </div>
 <!-- SVG Wave Divider (Inverted) -->
 <svg class="editorial inverted"
