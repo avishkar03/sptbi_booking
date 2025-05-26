@@ -5,9 +5,7 @@
 <link rel="stylesheet" href="{% static 'css/meetingroom.css' %}">
 {% endblock %}
 {% block content %}
-<div class="message">
-  Sorry, your browser does not support CSS Grid. 😅
-</div>
+
 {% for infra in infraFacility %}
 <section class="section">
   <h1>{{infra.name}}</h1>

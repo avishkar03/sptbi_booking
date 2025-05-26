@@ -45,4 +45,24 @@ admin.site.register(IotDevice, SummerNoteAdmin)
 admin.site.register(Iot, SummerNoteAdmin)
 admin.site.register(Sponsor, SummerNoteAdmin)
 admin.site.register(Event, SummerNoteAdmin)
-admin.site.register(About, SummerNoteAdmin)
+
+# Register About with standard ModelAdmin
+@admin.register(About)
+class AboutAdmin(admin.ModelAdmin):
+    pass
+
+# Register the new AboutUsContent model
+@admin.register(AboutUsContent)
+class AboutUsContentAdmin(admin.ModelAdmin):
+    list_display = ('content', 'keywords') # Or whatever fields you want to see in the list view
+    search_fields = ('content', 'keywords')
+    
+    formfield_overrides = {
+        SummernoteTextField: {'widget': SummernoteWidget}
+    }
+
+@admin.register(NewsTicker)
+class NewsTickerAdmin(admin.ModelAdmin):
+    list_display = ('content', 'active', 'created_at')
+    list_filter = ('active', 'created_at')
+    search_fields = ('content',)

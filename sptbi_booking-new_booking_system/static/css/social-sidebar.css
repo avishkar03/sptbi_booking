@@ -1,0 +1,159 @@
+/* Social Media Sidebar Styling */
+.social-sidebar {
+    height: auto;
+}
+
+.social-icons-container {
+    width: 50px;
+    height: 200px; /* Reduced height */
+    cursor: pointer;
+    background-color: #1c4386;
+    border-top-left-radius: 16px;
+    border-bottom-left-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Changed from space-evenly to center */
+    align-items: center;
+    gap: 10px; /* Added gap for more controlled spacing */
+    margin-top: auto;
+    margin-bottom: auto;
+    position: fixed;
+    top: 0%;
+    bottom: 0%;
+    right: 0;
+    padding: 5px 0; /* Reduced padding from 15px to 5px */
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) 0s;
+    z-index: 999;
+    box-sizing: border-box;
+}
+
+.social-icons-container a {
+    padding: 0;
+    color: white;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 25px; /* Reduced height from 30px to 25px */
+    text-align: center;
+    margin: 2px 0; /* Added small vertical margin */
+}
+
+.social-icons-container a:hover {
+    color: white;
+    transform: scale(1.2);
+    transition: transform 0.2s ease-in-out;
+    text-decoration: none;
+}
+
+.side-icons {
+    margin: 0;
+    display: inline-block;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    width: 100%;
+    position: relative;
+    left: -2px;
+}
+
+.drawer-control-x-button {
+    width: 40px;
+    height: 190px;
+    cursor: pointer;
+    background-color: #1c4386;
+    border-top-left-radius: 16px;
+    border-bottom-left-radius: 16px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: auto;
+    margin-bottom: auto;
+    display: none;
+    position: absolute;
+    top: 0%;
+    bottom: 0%;
+    left: -40px;
+    right: auto;
+    padding: 10px;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) 0s;
+}
+
+.drawer-control-x-button i {
+    margin: 10px;
+    margin-right: 1.8rem;
+    rotate: 270deg;
+    display: inline;
+    color: white;
+}
+
+.drawer-control-x-button a {
+    padding: 0.5rem 0;
+}
+
+.drawer-control-x-button a:-webkit-any-link {
+    color: white;
+    text-decoration: none;
+}
+
+.drawer-control-x-button a:-webkit-any-link:hover {
+    color: white;
+    transform: scale(1.3);
+    margin-right: -0.15rem;
+    transition: transform 0.2s ease-in-out;
+    text-decoration: none;
+}
+
+.drawer-control-x-button p {
+    display: inline;
+    color: white;
+    margin: 0;
+}
+
+/* Blackbox overlay for sidebar */
+.blackbox-overlay {
+    right: -424px;
+    transition: all 0.3s ease 0s;
+    position: fixed;
+    top: 0px;
+    height: 100%;
+    width: 424px;
+    z-index: 9999;
+    background-color: rgb(18, 21, 27);
+}
+
+/* Adjust social sidebar when navbar is fixed */
+.social-sidebar-adjusted {
+    top: 50px !important; /* Adjusted to be below fixed navbar */
+}
+
+/* Mobile responsive styles */
+@media (max-width: 980px) {
+    .side-icons {
+        font-size: 18px;
+        left: 0;
+    }
+
+    .social-icons-container {
+        width: 50px;
+        height: 220px;
+        padding: 15px 0;
+    }
+
+    .drawer-control-x-button {
+        height: 370px;
+        width: 35px;
+        margin-left: 15px;
+    }
+
+    .drawer-control-x-button i {
+        line-height: 1.6;
+        margin: auto;
+    }
+
+    .blackbox-overlay {
+        right: -400px;
+        background-color: transparent;
+    }
+}

@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-%v^9)6o^6-1f27x(mtp_^9%a@eqotkck^$*r0a*w3$b%iy%d%^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost','172.16.10.45', 'sptbi.com', 'https://www.sptbi.com', 'www.sptbi.com','testserver']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','172.16.10.45', 'sptbi.com', 'https://www.sptbi.com', 'www.sptbi.com','testserver','192.168.101.14:8000']
 
 CSRF_TRUSTED_ORIGINS = ['https://spbti.com', 'https://www.sptbi.com']
 
@@ -77,6 +77,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'booking.context_processors.floors',
+                'mainsite.context_processors.visitor_counter',
             ],
             'builtins': [
                 'django.contrib.humanize.templatetags.humanize',  # Add this line
@@ -187,3 +188,11 @@ BOOKING_ADMIN_EMAIL = 'avishkar.more@spit.ac.in'  # Added for booking approval e
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SUMMERNOTE_CONFIG = {
+    'summernote': {
+        'fontSizeUnits': ['px'],
+        # Add any other core Summernote configurations you have here
+    }
+    # Add any other top-level Summernote configurations you have here
+}

@@ -8,88 +8,173 @@ const scrollToFooter = () => {
   footer.scrollIntoView({ behavior: "smooth" });
 };
 
-const link = document.querySelector('a[href="#footer"]');
-link.addEventListener("click", scrollToFooter);
+document.addEventListener('DOMContentLoaded', function() {
+  const links = document.querySelectorAll('a[href="#footer"]');
+  links.forEach(link => {
+    link.addEventListener("click", scrollToFooter);
+  });
+});
 
 // No custom ticker initialization needed - using HTML marquee tag
 
-// Enhanced scroll event handler for sticky navbar
-window.addEventListener("scroll", function () {
+// Improved scroll event handler for smooth sticky navbar
+(function() {
+  // Variables for throttling scroll events
+  let lastScrollTop = 0;
+  let ticking = false;
+  let isSticky = false;
+  let stickyTransitionInProgress = false;
+
+  // Get elements once to improve performance
   const header = document.querySelector(".header");
   const navbar = document.querySelector(".navbar");
   const newsTicker = document.querySelector(".news-ticker-container");
   const hamburger = document.querySelector(".menu-container");
-  const scrolled = window.scrollY > header.offsetHeight;
 
-  if (scrolled) {
-    // Hide header
-    header.classList.add("header-hidden");
+  // Function to handle the sticky transition
+  function handleStickyTransition(scrolled) {
+    if (scrolled && !isSticky) {
+      // Prepare for sticky transition
+      if (!stickyTransitionInProgress) {
+        stickyTransitionInProgress = true;
 
-    // Make navbar sticky and visible with smooth transition
-    navbar.classList.add("navbar-visible");
-    navbar.classList.add("sticky");
+        // Hide the original navbar during transition to prevent text compression
+        navbar.style.opacity = "0";
 
-    // Make news ticker sticky if it exists
-    if (newsTicker) {
-      newsTicker.style.position = "fixed";
-      newsTicker.style.top = navbar.offsetHeight + "px";
-      newsTicker.style.left = "0";
-      newsTicker.style.width = "100%";
-      newsTicker.style.zIndex = "9998"; // Just below navbar
-      newsTicker.style.boxShadow = "0 3px 5px rgba(0,0,0,0.2)";
+        // Create a static clone of the navbar that won't change during transition
+        const navbarClone = navbar.cloneNode(true);
+        navbarClone.classList.remove("navbar-visible", "sticky", "sticky-animate", "preparing-sticky");
+        navbarClone.classList.add("navbar-clone");
+        navbarClone.style.position = "fixed";
+        navbarClone.style.top = "0";
+        navbarClone.style.left = "0";
+        navbarClone.style.width = "100%";
+        navbarClone.style.zIndex = "10000";
+        navbarClone.style.opacity = "1";
+        navbarClone.style.pointerEvents = "none";
+        document.body.appendChild(navbarClone);
+
+        // Prepare the real navbar for the final state without intermediate classes
+        // Apply all classes at once in the next frame to avoid intermediate states
+        requestAnimationFrame(() => {
+          // Hide header
+          header.classList.add("header-hidden");
+
+          // Make news ticker sticky if it exists
+          if (newsTicker) {
+            newsTicker.style.position = "fixed";
+            newsTicker.style.top = navbar.offsetHeight + "px";
+            newsTicker.style.left = "0";
+            newsTicker.style.width = "100%";
+            newsTicker.style.zIndex = "9998"; // Just below navbar
+            newsTicker.style.boxShadow = "0 3px 5px rgba(0,0,0,0.2)";
+          }
+
+          // Handle hamburger menu for mobile
+          if (hamburger) {
+            hamburger.classList.add("sticky");
+          }
+
+          // Add padding to body to prevent content jump
+          const totalHeight = navbar.offsetHeight + (newsTicker ? newsTicker.offsetHeight : 0);
+          document.body.style.paddingTop = totalHeight + "px";
+
+          // Apply the final state classes directly
+          navbar.className = "navbar sticky navbar-visible";
+
+          // Fade in the real navbar after a short delay
+          setTimeout(() => {
+            navbar.style.opacity = "1";
+
+            // Remove the clone after the real navbar is visible
+            if (document.querySelector('.navbar-clone')) {
+              document.body.removeChild(document.querySelector('.navbar-clone'));
+            }
+
+            stickyTransitionInProgress = false;
+            isSticky = true;
+          }, 50);
+        });
+      }
+    } else if (!scrolled && isSticky) {
+      // Reset to non-sticky state
+      isSticky = false;
+
+      // Create a static clone of the navbar for the transition back
+      const navbarClone = navbar.cloneNode(true);
+      navbarClone.classList.add("navbar-clone");
+      navbarClone.style.position = "fixed";
+      navbarClone.style.top = "0";
+      navbarClone.style.left = "0";
+      navbarClone.style.width = "100%";
+      navbarClone.style.zIndex = "10000";
+      navbarClone.style.opacity = "1";
+      navbarClone.style.pointerEvents = "none";
+      document.body.appendChild(navbarClone);
+
+      // Hide the real navbar
+      navbar.style.opacity = "0";
+
+      // Show header
+      header.classList.remove("header-hidden");
+
+      // Reset the navbar class in one step
+      navbar.className = "navbar";
+
+      // Reset news ticker position if it exists
+      if (newsTicker) {
+        newsTicker.style.position = "";
+        newsTicker.style.top = "";
+        newsTicker.style.left = "";
+        newsTicker.style.width = "";
+        newsTicker.style.zIndex = "";
+        newsTicker.style.boxShadow = "";
+      }
+
+      // Handle hamburger menu for mobile
+      if (hamburger) {
+        hamburger.classList.remove("sticky");
+      }
+
+      // Reset body padding
+      document.body.style.paddingTop = "0";
+
+      // Fade in the navbar after a short delay
+      setTimeout(() => {
+        navbar.style.opacity = "1";
+
+        // Remove the clone
+        if (document.querySelector('.navbar-clone')) {
+          document.body.removeChild(document.querySelector('.navbar-clone'));
+        }
+      }, 50);
     }
-
-    // Handle hamburger menu for mobile
-    if (hamburger) {
-      hamburger.classList.add("sticky");
-    }
-
-    // Apply inline styles to ensure it works
-    navbar.style.position = "fixed";
-    navbar.style.top = "0";
-    navbar.style.left = "0";
-    navbar.style.width = "100%";
-    navbar.style.zIndex = "9999";
-    navbar.style.opacity = "1";
-
-    // Add padding to body to prevent content jump
-    const totalHeight = navbar.offsetHeight + (newsTicker ? newsTicker.offsetHeight : 0);
-    document.body.style.paddingTop = totalHeight + "px";
-  } else {
-    // Show header
-    header.classList.remove("header-hidden");
-
-    // Remove sticky and visible classes from navbar
-    navbar.classList.remove("navbar-visible");
-    navbar.classList.remove("sticky");
-
-    // Reset news ticker position if it exists
-    if (newsTicker) {
-      newsTicker.style.position = "";
-      newsTicker.style.top = "";
-      newsTicker.style.left = "";
-      newsTicker.style.width = "";
-      newsTicker.style.zIndex = "";
-      newsTicker.style.boxShadow = "";
-    }
-
-    // Handle hamburger menu for mobile
-    if (hamburger) {
-      hamburger.classList.remove("sticky");
-    }
-
-    // Reset inline styles
-    navbar.style.position = "";
-    navbar.style.top = "";
-    navbar.style.left = "";
-    navbar.style.width = "";
-    navbar.style.zIndex = "";
-    navbar.style.opacity = "";
-
-    // Reset body padding
-    document.body.style.paddingTop = "0";
   }
-});
+
+  // Throttled scroll event handler
+  function onScroll() {
+    const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const scrolled = currentScrollTop > header.offsetHeight;
+        handleStickyTransition(scrolled);
+        lastScrollTop = currentScrollTop;
+        ticking = false;
+      });
+
+      ticking = true;
+    }
+  }
+
+  // Add scroll event listener
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // Initial check on page load
+  document.addEventListener("DOMContentLoaded", () => {
+    onScroll();
+  });
+})();
 
 const menuIcon = document.querySelector(".menu-icon");
 const menuItems = document.querySelector(".menu-items");

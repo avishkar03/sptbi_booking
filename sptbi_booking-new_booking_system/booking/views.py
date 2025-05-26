@@ -34,11 +34,7 @@ logger = logging.getLogger(__name__)
 def index(request):
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
     about = About.objects.all()
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     pg = sorted(pg, key=lambda x: x.orderno)
     # list of times from 9am to 9pm in intervals of 30 mins
@@ -95,16 +91,12 @@ def index(request):
     timeslots = aTimeSlot.objects.filter(date=date)
     num = range(24)
     r = range(4)
-    return render(request, 'booking.html', {'about': about, 'timeslots': timeslots, 'num': num, 'r': r, 'date': date, 'times': times, 'status': status, 'pg': pg, 'count': count, 'events': events})
+    return render(request, 'booking.html', {'about': about, 'timeslots': timeslots, 'num': num, 'r': r, 'date': date, 'times': times, 'status': status, 'pg': pg, 'events': events})
 
 
 def delete_slot(request):
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
     events = Event.objects.all()
     # events = sorted(events, key=lambda x: x.orderno)
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     # pg = sorted(pg, key=lambda x: x.orderno)
     times = ["09.00 am", "09.30 am", "10.00 am", "10.30 am", "11.00 am", "11.30 am", "12.00 pm", "12.30 pm", "01.00 pm", "01.30 pm", "02.00 pm", "02.30 pm",
@@ -136,7 +128,7 @@ def delete_slot(request):
     timeslots = aTimeSlot.objects.filter(date=date)
     num = range(24)
     r = range(4)
-    return render(request, 'deletecal.html', {'timeslots': timeslots, 'num': num, 'r': r, 'date': date, 'times': times, 'pg': pg, 'count': count, 'events': events})
+    return render(request, 'deletecal.html', {'timeslots': timeslots, 'num': num, 'r': r, 'date': date, 'times': times, 'pg': pg, 'events': events})
 
 
 @login_required
@@ -274,12 +266,8 @@ def save_cell_content(request):
 @login_required
 def profile(request):
     """User profile view."""
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)            #commented out for now
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     pg = sorted(pg, key=lambda x: x.orderno)                    #commented out for now
     mon = datetime.now().strftime("%Y-%m-%d").split("-")[1]
@@ -343,8 +331,8 @@ def profile(request):
     keyset = Booking.objects.values('booked_by')
     # companies = [key['booked_by'] for key in keyset]
     # companies = list(set(companies))
-    print({'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": active_objs, 'total': total, 'pg': pg, 'count': count, 'events': events, 'companies':companies})
-    return render(request, 'booking/profile.html', {'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": objs, 'total': total, 'pg': pg, 'count': count, 'events': events, 'companies':companies})
+    print({'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": active_objs, 'total': total, 'pg': pg, 'events': events, 'companies':companies})
+    return render(request, 'booking/profile.html', {'logs': logs, 'page_obj': page_obj, 'free_hours': free_hours, 'charges': charges, "objs": objs, 'total': total, 'pg': pg, 'events': events, 'companies':companies})
 
 
 
@@ -423,12 +411,8 @@ def profile(request):
 
 
 def edit_user(request):
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     pg = sorted(pg, key=lambda x: x.orderno)
     email = request.GET.get('email')
@@ -455,16 +439,12 @@ def edit_user(request):
             u.delete()
             a.delete()
             return redirect('profile')
-    return render(request, 'booking/edituser.html', {'x': x, 'us': us, 'pg': pg, 'count': count, 'events': events})
+    return render(request, 'booking/edituser.html', {'x': x, 'us': us, 'pg': pg, 'events': events})
 
 
 def change_password(request):
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     pg = sorted(pg, key=lambda x: x.orderno)
     if request.method == "POST":
@@ -476,21 +456,17 @@ def change_password(request):
             user.save()
             login(request, user)
             return redirect('profile')
-        return render(request, 'booking/changepassword.html', {'error': 'Passwords do not match', 'pg': pg, 'count': count, 'events': events})
-    return render(request, 'booking/changepassword.html', {'pg': pg, 'count': count, 'events':events})
+        return render(request, 'booking/changepassword.html', {'error': 'Passwords do not match', 'pg': pg, 'events': events})
+    return render(request, 'booking/changepassword.html', {'pg': pg, 'events':events})
 
 
 def success(request):
     """Success page after completing an action."""
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     pg = sorted(pg, key=lambda x: x.orderno)
-    return render(request, 'booking/success.html', {'pg': pg, 'count': count, 'events': events})
+    return render(request, 'booking/success.html', {'pg': pg, 'events': events})
 
 
 def download_table_as_excel(request):

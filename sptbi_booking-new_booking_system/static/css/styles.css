@@ -1,10 +1,52 @@
-/* General Body Styling */
+/* Genera/* Z-index hierarchy */g */
 body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
     background-color: #ffffff;
     min-height: 100vh;
+}
+
+/* Z-index hierarchy */
+:root {
+    --z-base: 1;
+    --z-content: 10;
+    --z-header: 1000;
+    --z-navbar: 2000;
+    --z-dropdown: 3000;
+    --z-floating: 9999;
+    --z-modal: 10000;
+}
+
+#floating-ticket-container {
+    position: fixed !important;
+    bottom: 30px !important;
+    right: 30px !important;
+    z-index: var(--z-floating) !important;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: transform;
+    visibility: visible !important;
+    display: block !important;
+    pointer-events: auto !important;
+}
+
+.floating-ticket {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 50% !important;
+    background-color: #1c4386 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    text-decoration: none !important;
+    color: white !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
 }
 
 /* Header Styling */
@@ -19,7 +61,7 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: var(--z-header);
 }
 
 /* Navbar Styling */
@@ -33,7 +75,7 @@ body {
     top: 90px;
     left: 0;
     right: 0;
-    z-index: 999;
+    z-index: var(--z-sticky);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
@@ -83,4 +125,108 @@ body {
     text-align: center;
     padding: 20px;
     margin-top: 40px;
+}
+
+/* Z-index hierarchy */
+:root {
+    --z-base: 1;
+    --z-content: 10;
+    --z-dropdown: 1050;
+    --z-sticky: 2000;
+    --z-header: 3000;
+    --z-floating: 9999;
+    --z-modal: 10000;
+    --z-tooltip: 10100;
+}
+
+/* Floating Ticket Button - Improved */
+#floating-ticket-container {
+    position: fixed !important;
+    bottom: 30px !important;
+    right: 30px !important;
+    z-index: var(--z-floating) !important;
+    width: 60px !important;
+    height: 60px !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.floating-ticket {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    background-color: #1c4386 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    cursor: pointer !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+    will-change: transform !important;
+}
+
+.floating-ticket:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+    background-color: #163a6d;
+}
+
+.floating-ticket:active {
+    transform: translateY(0) scale(0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.floating-ticket svg {
+    width: 28px;
+    height: 28px;
+    transition: transform 0.3s ease;
+}
+
+.floating-ticket:hover svg {
+    transform: scale(1.1);
+}
+
+/* Tooltip styles */
+.floating-ticket::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    z-index: var(--z-tooltip);
+}
+
+.floating-ticket::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: 25px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: var(--z-tooltip);
+}
+
+.floating-ticket:hover::before,
+.floating-ticket:hover::after {
+    opacity: 1;
+    visibility: visible;
 }

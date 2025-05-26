@@ -219,6 +219,35 @@ document.addEventListener('DOMContentLoaded', function() {
   window.addEventListener('load', checkSpecialSections);
   setTimeout(checkSpecialSections, 100);
 
+  // Visitor Counter Digit Animation (Scroll-based)
+  const visitorSection = document.querySelector('.visitor-section');
+  const digitSpans = document.querySelectorAll('.counter-box');
+
+  if (visitorSection && digitSpans.length > 0) {
+    debugLog('Initializing visitor counter animation');
+
+    // Set up a ScrollTrigger for the visitor section
+    ScrollTrigger.create({
+      trigger: visitorSection,
+      start: 'top bottom', // Start the animation when the top of the section enters the viewport
+      end: 'bottom top', // End the animation when the bottom of the section leaves the viewport
+      scrub: true, // Link the animation directly to scroll position
+      onUpdate: self => {
+        // Calculate scroll progress within the visitor section (0 to 1)
+        const scrollProgress = self.progress;
+
+        // Animate each digit span based on scroll progress
+        digitSpans.forEach((span, index) => {
+          // Create a slight delay and variation for each digit
+          const delay = index * 0.05; // Adjust delay as needed
+          const yPos = Math.sin(scrollProgress * Math.PI + delay * Math.PI * 2) * 20; // Adjust amplitude (20)
+
+          span.style.transform = `translateY(${yPos}px)`;
+        });
+      }
+    });
+  }
+
   // Initial check for all animations
   setTimeout(() => {
     checkSectionTitles && checkSectionTitles();

@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Set initial variables
   let cardWidth = cards[0].offsetWidth;
-  let cardGap = 32; // Gap between cards in pixels (matches CSS gap)
+  let cardGap = 24; // Gap between cards in pixels (matches CSS gap of 1.5rem)
   let visibleCards = Math.floor(carouselContainer.clientWidth / (cardWidth + cardGap));
   let isInNewsSection = false;
 
@@ -132,18 +132,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Add hover effects to cards
+  // Add hover effects to cards - using CSS for primary effects
+  // This is just for additional interactive elements
   cards.forEach(card => {
     card.addEventListener('mouseenter', function() {
-      // Add hover effect
-      this.style.transform = 'translateY(-10px)';
-      this.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.15)';
+      // Additional hover effects can be added here if needed
+      // Most effects are now handled by CSS
     });
 
     card.addEventListener('mouseleave', function() {
-      // Remove hover effect
-      this.style.transform = '';
-      this.style.boxShadow = '';
+      // Reset any JS-specific effects
     });
   });
 

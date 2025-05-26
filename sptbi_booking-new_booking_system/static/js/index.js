@@ -664,18 +664,89 @@ function getCookie(name) {
   return cookieValue;
 }
 
+// Card overlay functionality
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("Setting up card overlay functionality");
+
+  // Debug: Check if we can find the learn-more buttons
+  const learnMoreButtons = document.querySelectorAll('.learn-more');
+  console.log("Found " + learnMoreButtons.length + " learn-more buttons");
+
+  // Add click event listeners to all "Learn More" buttons
+  learnMoreButtons.forEach(btn => {
+    console.log("Adding click listener to button:", btn);
+    btn.addEventListener('click', function(e) {
+      console.log("Learn More button clicked");
+      e.preventDefault();
+      // Find the closest modern-card parent and add the show-overlay class
+      const card = this.closest('.modern-card');
+      console.log("Found parent card:", card);
+      card.classList.add('show-overlay');
+      console.log("Added show-overlay class");
+    });
+  });
+
+  // Add click event listeners to all close buttons
+  const closeButtons = document.querySelectorAll('.close-btn');
+  console.log("Found " + closeButtons.length + " close buttons");
+
+  closeButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      console.log("Close button clicked");
+      // Find the closest modern-card parent and remove the show-overlay class
+      const card = this.closest('.modern-card');
+      card.classList.remove('show-overlay');
+      console.log("Removed show-overlay class");
+    });
+  });
+
+  // Close overlay when clicking outside the content (on the overlay itself)
+  document.querySelectorAll('.card-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+      // Only close if the click was directly on the overlay, not on its children
+      if (e.target === this) {
+        console.log("Clicked on overlay background");
+        this.closest('.modern-card').classList.remove('show-overlay');
+      }
+    });
+  });
+
+  // Close overlay with Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      console.log("Escape key pressed");
+      document.querySelectorAll('.modern-card.show-overlay').forEach(card => {
+        card.classList.remove('show-overlay');
+      });
+    }
+  });
+});
+
+// Legacy modal functionality (kept for backward compatibility)
 $(".button").click(function () {
-  // get the content of
+  // Get the content
   var buttonId = $(this).attr("id");
-  console.log(buttonId);
+  console.log("Button clicked: " + buttonId);
+
+  // Get the title from the button element
   var titleid = document.getElementById(buttonId).innerHTML;
-  console.log(titleid);
+  console.log("Title: " + titleid);
+
+  // Get the modal content
   var modalId = "#modaltitle-" + buttonId;
-  console.log(modalId);
+  console.log("Modal ID: " + modalId);
   var modalTitle = document.querySelector(modalId).value;
-  console.log(modalTitle);
-  document.querySelector(".modal").innerHTML = "<h2>" + titleid + "</h2> <hr> <p>" + modalTitle + "</p>";
-  console.log($(".modal").innerHTML);
+  console.log("Modal content: " + modalTitle);
+
+  // Update modal content with enhanced styling
+  document.querySelector(".modal").innerHTML =
+    "<h2 style='color: #1c4386; font-family: Anuphan, sans-serif; margin-bottom: 15px;'>" +
+    titleid +
+    "</h2><hr style='border: 0; height: 2px; background: linear-gradient(to right, transparent, #1c4386, transparent); margin: 15px 0;'><p style='line-height: 1.6; color: #333;'>" +
+    modalTitle +
+    "</p>";
+
+  // Show the modal with animation
   $("#modal-container").removeAttr("class").addClass("five");
   $("body").addClass("modal-active");
 });

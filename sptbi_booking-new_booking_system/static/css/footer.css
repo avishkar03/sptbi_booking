@@ -1,0 +1,451 @@
+.footer {
+    font-family: Poppins;
+    padding: 20px 30px 20px 0;
+    background: #1c4386;
+    margin-top: 4rem;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.footer .container {
+    margin: 0;
+    margin-left: 0;
+    max-width: 1483.2px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.footer-main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 0 30px;
+    margin-left: 0;
+    text-align: left;
+    gap: 15px;
+}
+
+.footer-left {
+    flex: 0 0 55%;
+    padding: 0 20px 0 0;
+    min-width: 400px;
+    max-width: 650px;
+    text-align: left;
+    margin-left: 0;
+}
+
+/* Reduce spacing between sections in footer-left */
+.footer-left h4:not(:first-child) {
+    margin-top: 5px;
+}
+
+.footer-right {
+    flex: 0 0 40%;
+    padding: 0 0 0 20px;
+    min-width: 400px;
+    text-align: center;
+    margin: 0;
+}
+
+.col-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.footer h4 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.35rem;
+    font-weight: normal;
+    color: #fff;
+    margin-bottom: 15px;
+    position: relative;
+    text-align: left;
+    letter-spacing: 0.5px;
+}
+
+/* Center the Find Us heading */
+.footer-right h4 {
+    text-align: left;
+    margin-left: 10px;
+}
+
+.footer h4::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    height: 2px;
+    width: 60px;
+    box-sizing: border-box;
+    background: #e91e63;
+}
+
+/* Adjust the underline for Find Us heading */
+.footer-right h4::before {
+    left: 0;
+    transform: none;
+}
+
+.map-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.footer iframe {
+    width: 100%;
+    height: 180px;
+    border-radius: 8px;
+    margin-top: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border: none;
+}
+
+.footer p {
+    color: #fff;
+    font-weight: 300;
+    display: block;
+    opacity: 0.8;
+    line-height: 1.6;
+    margin-top: 0;
+    text-align: left;
+    font-size: 1.05rem;
+    margin-bottom: 15px;
+    max-width: 100%;
+}
+
+.footer-left p {
+    font-size: 1rem;
+}
+
+.footer-bottom-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 15px auto;
+    padding: 0 30px;
+    width: 100%;
+    max-width: 1483.2px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.visitors-section {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 0;
+    width: 100%;
+    padding-left: 100px;
+    margin: 0 auto;
+}
+
+.visitors-label {
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    text-align: center;
+    font-weight: 500;
+    font-family: Poppins;
+}
+
+.footer-counter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    gap: 5px;
+}
+
+.counter-box {
+    font-family: Poppins;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    font-weight: 500;
+    font-size: 1.2em;
+    min-width: 25px;
+    text-align: center;
+    display: inline-block;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.social-links {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.social-links a {
+    display: inline-block;
+    height: 35px;
+    width: 35px;
+    margin: 0 6px;
+    text-align: center;
+    line-height: 35px;
+    border-radius: 50%;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.25s;
+}
+
+.social-links a:hover {
+    transform: scale(1.15);
+    color: #000; /* Changed hover color to black */
+    background: #fff;
+}
+
+.contact {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+}
+
+.contact-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 25px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.contact-container .contact-item:nth-child(2) {
+    margin-left: 100px; /* Add left margin to move the second item to the right */
+}
+
+.contact-circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 38px;
+    width: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    margin-right: 10px;
+    flex-shrink: 0;
+    transition: all 0.25s; /* Add transition for animation */
+}
+
+.contact-circle i {
+    color: #fff;
+    font-size: 22px;
+    transition: all 0.25s; /* Keep transition for icon color */
+    font-size: 20px; /* Adjust default icon size */
+}
+
+.contact-circle:hover {
+    transform: scale(1.15); /* Match scale of social links */
+    background: #fff; /* Change background to white on hover */
+    border: 1px solid #000; /* Add black border on hover */
+}
+
+.contact-circle:hover i {
+    color: #000; /* Change the icon color to black on hover */
+    font-size: 20px; /* Ensure icon size remains consistent on hover */
+}
+
+.contact-text {
+    font-family: Poppins;
+    font-weight: 300;
+    text-decoration: none;
+    color: #fff;
+    font-size: 16px;
+    line-height: 1.4;
+    padding-top: 3px;
+    white-space: nowrap;
+}
+
+.footer-bottom {
+    margin: 10px 0 0 0;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    width: 100%;
+    padding-left: 10px;
+}
+
+.footer-bottom p {
+    margin: 0;
+    color: white;
+    opacity: 0.6;
+    text-align: center;
+    font-size: 12px;
+    padding: 0;
+    padding-left: 100px;
+    font-family: Poppins;
+}
+
+@media(min-width: 1201px) {
+    .contact-container {
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 60px;
+    }
+
+    .contact-item {
+        flex: 0 0 auto;
+    }
+}
+
+@media(max-width: 1200px) {
+    .footer .container {
+        max-width: 100%;
+        min-height: auto;
+        margin: 0;
+        margin-left: 0;
+    }
+
+    /* Keep Find Us section aligned in responsive view */
+    .footer-right h4 {
+        text-align: left;
+        margin-left: 10px;
+    }
+
+    .footer-main {
+        flex-direction: column;
+    }
+
+    .footer-left {
+        width: 100%;
+        margin-bottom: 30px;
+        max-width: 100%;
+        padding-right: 20px;
+    }
+
+    .footer-right {
+        width: 100%;
+        margin-bottom: 30px;
+        max-width: 100%;
+    }
+
+    .contact-container {
+        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .footer {
+        font-size: 1.2rem;
+        padding: 30px;
+    }
+
+    .footer h4 {
+        font-size: 1.4rem;
+    }
+
+    .map-container {
+        max-width: 500px;
+    }
+
+    .footer iframe {
+        height: 200px;
+    }
+
+    .counter-box {
+        font-size: 1.6em;
+        padding: 7px 11px;
+    }
+
+    .footer-center {
+        margin-top: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-left {
+        padding: 0;
+        padding-right: 15px;
+    }
+
+    .footer-right {
+        padding: 0 15px;
+        text-align: center;
+    }
+
+    /* Keep Find Us section aligned in mobile view */
+    .footer-right h4 {
+        text-align: left;
+        margin-left: 10px;
+        z-index: 3;
+    }
+
+    .footer-right h4::before {
+        left: 0;
+        transform: none;
+    }
+
+    .map-container {
+        max-width: 100%;
+    }
+
+    .footer iframe {
+        height: 180px;
+    }
+
+    .footer {
+        padding: 20px 20px 20px 0;
+    }
+
+    .contact-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .contact-item {
+        margin-bottom: 0;
+    }
+
+    .social-links a,
+    .center-info i {
+        height: 40px;
+        width: 40px;
+        font-size: 18px;
+    }
+
+    .footer p {
+        font-size: 1rem;
+    }
+
+    .counter-box {
+        font-size: 1.5em;
+        padding: 6px 10px;
+        min-width: 35px;
+    }
+
+    .visitors-label {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+
+    .footer-center {
+        margin-top: 10px;
+    }
+}

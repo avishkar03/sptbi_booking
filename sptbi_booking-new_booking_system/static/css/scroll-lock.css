@@ -84,38 +84,42 @@ body {
 /* Scroll indicator removed */
 
 /* Carousel navigation buttons - enhanced styling */
-.news-carousel-nav {
+.news-carousel-prev,
+.news-carousel-next {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   background: rgba(28, 67, 134, 0.9);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   cursor: pointer;
-  z-index: 10;
+  z-index: 100; /* Increased z-index to ensure visibility */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
-  opacity: 0.8;
+  opacity: 0.9;
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-.news-carousel-nav:hover {
-  background: #1c4386;
-  transform: translateY(-50%) scale(1.1);
-  opacity: 1;
+.news-carousel-prev:hover,
+.news-carousel-next:hover {
+  background: rgba(28, 67, 134, 1);
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  color: #ffffff;
 }
 
 .news-carousel-prev {
-  left: 20px;
+  left: 30px; /* Position left arrow 30px from the left edge */
 }
 
 .news-carousel-next {
-  right: 20px;
+  right: 30px; /* Position right arrow 30px from the right edge */
 }
 
 /* Pagination dots - enhanced styling */
@@ -187,18 +191,19 @@ body {
 
   /* Scroll indicator styles removed */
 
-  .news-carousel-nav {
+  .news-carousel-prev,
+  .news-carousel-next {
     width: 40px;
     height: 40px;
     font-size: 1.4rem;
   }
 
   .news-carousel-prev {
-    left: 10px;
+    left: 20px; /* Adjusted for tablet screens */
   }
 
   .news-carousel-next {
-    right: 10px;
+    right: 20px; /* Adjusted for tablet screens */
   }
 }
 
@@ -207,9 +212,18 @@ body {
     width: 260px;
   }
 
-  .news-carousel-nav {
+  .news-carousel-prev,
+  .news-carousel-next {
     width: 35px;
     height: 35px;
     font-size: 1.2rem;
+  }
+
+  .news-carousel-prev {
+    left: 15px; /* Adjusted for mobile screens */
+  }
+
+  .news-carousel-next {
+    right: 15px; /* Adjusted for mobile screens */
   }
 }

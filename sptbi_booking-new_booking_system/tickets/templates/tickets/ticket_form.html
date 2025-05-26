@@ -45,6 +45,7 @@
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --light-bg: #f1f5f9;
 }
 
 /* Prevent horizontal scrolling */
@@ -235,6 +236,37 @@ body {
   margin: 0;
   font-size: 0.85rem;
   line-height: 1.3;
+}
+
+.form-header-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-header-meta p {
+  margin: 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  background: var(--light-bg);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+}
+
+.user-info i {
+  color: var(--primary-color);
+  opacity: 0.8;
+}
+
+.user-info strong {
+  color: var(--text-color);
+  font-weight: 600;
 }
 
 .form-container {
@@ -461,6 +493,36 @@ textarea.form-input {
 .status-badge i {
   margin-right: 0.35rem;
   font-size: 0.8rem;
+}
+
+/* Admin Panel Icon Styles */
+.admin-panel-icon {
+  margin-left: auto;
+  margin-right: 1rem;
+}
+
+.admin-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  border-radius: 50%;
+  color: white;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+  transition: all 0.3s ease;
+}
+
+.admin-link:hover {
+  transform: translateY(-2px) rotate(45deg);
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.4);
+  color: white;
+}
+
+.admin-link:active {
+  transform: translateY(0) rotate(45deg);
 }
 
 /* Responsive adjustments */
@@ -948,8 +1010,21 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         <div class="form-header-text">
           <h2>Create Support Ticket</h2>
-          <p>Submit a new ticket to get help from our support team</p>
+          <div class="form-header-meta">
+            <p>Submit a new ticket to get help from our support team</p>
+            <div class="user-info">
+              <i class="fas fa-user"></i>
+              Submitting as: <strong>{{ user_full_name }}</strong>
+            </div>
+          </div>
         </div>
+        {% if user.is_staff %}
+        <div class="admin-panel-icon">
+          <a href="{% url 'tickets:ticket_manage_list' %}" title="Manage Support Tickets" class="admin-link">
+            <i class="fas fa-cog"></i>
+          </a>
+        </div>
+        {% endif %}
       </div>
 
       <!-- Ticket form -->

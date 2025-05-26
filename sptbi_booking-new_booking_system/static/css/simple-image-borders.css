@@ -1,0 +1,50 @@
+/* Simple Modern Image Borders CSS */
+
+/* Enhanced styling for About Us section images */
+.about-photo .card-left,
+.about-photo .card-right {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  margin-bottom: 20px;
+  opacity: 1 !important; /* Ensure images are always visible */
+  visibility: visible !important; /* Ensure images are always visible */
+}
+
+/* Hover effect for image cards */
+.about-photo .card-left:hover,
+.about-photo .card-right:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(28, 67, 134, 0.15);
+}
+
+/* Inner container for images */
+.about-photo .reveal-image {
+  overflow: hidden;
+  border-radius: 16px;
+  position: relative;
+}
+
+/* Image styling */
+.about-photo img {
+  width: 100%;
+  display: block;
+  transition: transform 0.5s ease;
+  opacity: 1 !important; /* Ensure images are always visible */
+  visibility: visible !important; /* Ensure images are always visible */
+}
+
+/* Image hover effect */
+.about-photo .reveal-image:hover img {
+  transform: scale(1.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .about-photo .card-left,
+  .about-photo .card-right {
+    margin-bottom: 15px;
+  }
+}

@@ -12,22 +12,7 @@ User = get_user_model()
 
 # Create your views here.
 def index(request):
-    about = About.objects.all()
-    try:
-        visit_counter = Count.objects.get(name="Actual")
-    except Count.DoesNotExist:
-        visit_counter = Count(name="Actual", count=0)
-        visit_counter.save()
-
-    try:
-        visit_add = Count.objects.get(name="Extra")
-    except Count.DoesNotExist:
-        visit_add = Count(name="Extra", count=0)
-        visit_add.save()
-    visit_counter.count += 1
-    visit_counter.save()
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
+    about_content = AboutUsContent.objects.first()
     pg = Programme.objects.all()
     # pg = sorted(pg, key=lambda x: x.orderno)
     events = Event.objects.all()
@@ -39,6 +24,7 @@ def index(request):
     stats = Stat.objects.all()
     news = News.objects.all()
     testimonial = Testimonial.objects.all()
+    ticker = NewsTicker.objects.filter(active=True).first()
     if request.method == 'POST':
         segment_index = request.POST.get('segmentIndex')
         # Implement your logic to decide the URL to redirect to based on segment_index
@@ -47,31 +33,30 @@ def index(request):
         # Redirect to the desired URL
         # Replace 'desired_url' with the URL you want to redirect to
         # return JsonResponse({'redirect_url': 'desired_url'})
-    return render(request, 'index.html', {'about': about, 'objs': objs, 'vm': vm, 'Partner_types': Partner_types, 'stats': stats, 'news': news, 'testimonial': testimonial, 'pg': pg, 'banners': banners, 'count': count, 'events': events})
+    return render(request, 'index.html', {
+        'about_content': about_content,
+        'objs': objs,
+        'vm': vm,
+        'Partner_types': Partner_types,
+        'stats': stats,
+        'news': news,
+        'testimonial': testimonial,
+        'pg': pg,
+        'banners': banners,
+        'events': events,
+        'ticker': ticker
+    })
 
 def incubation(request):
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    try:
-        visit_counter = Count.objects.get(name="Actual")
-    except Count.DoesNotExist:
-        visit_counter = Count(name="Actual", count=0)
-        visit_counter.save()
-
-    visit_add = Count.objects.get(name="Extra")
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     # pg = sorted(pg, key=lambda x: x.orderno)
-    return render(request,'incubation.html', {'pg': pg, 'count': count, 'events' : events})
+    return render(request,'incubation.html', {'pg': pg, 'events' : events})
 
 def currentincubatee(request):
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     choices = [
         'Aerospace',
         'SAAS',
@@ -111,7 +96,7 @@ def currentincubatee(request):
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         objs = page_obj.object_list
-        return render(request, 'currentincubatee.html', {'page_obj': page_obj, 'paginator': paginator, 'objs': objs, 'pg': pg, 'count': count, 'choices': choices, 'events' : events})
+        return render(request, 'currentincubatee.html', {'page_obj': page_obj, 'paginator': paginator, 'objs': objs, 'pg': pg, 'choices': choices, 'events' : events})
 
     objects_list = User.objects.filter(is_superuser=False, current_status='Current')
     # Number of objects to show per page
@@ -121,16 +106,12 @@ def currentincubatee(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     objs = page_obj.object_list
-    return render(request,'currentincubatee.html', {'page_obj': page_obj, 'paginator': paginator, 'objs': objs, 'pg': pg, 'count': count, 'choices': choices, 'events' : events})
+    return render(request,'currentincubatee.html', {'page_obj': page_obj, 'paginator': paginator, 'objs': objs, 'pg': pg, 'choices': choices, 'events' : events})
 
 
 def graduatedincubatee(request):
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     choices = [
         'Aerospace',
         'SAAS',
@@ -170,7 +151,7 @@ def graduatedincubatee(request):
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         objs = page_obj.object_list
-        return render(request, 'graduatedincubatee.html', {'page_obj': page_obj, 'paginator': paginator, 'objs': objs, 'pg': pg, 'count': count, 'choices': choices, 'events' : events})
+        return render(request, 'graduatedincubatee.html', {'page_obj': page_obj, 'paginator': paginator, 'objs': objs, 'pg': pg, 'choices': choices, 'events' : events})
     objects_list = User.objects.filter(
         is_superuser=False, current_status='Graduated')
     # Number of objects to show per page
@@ -180,15 +161,11 @@ def graduatedincubatee(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     objs = page_obj.object_list
-    return render(request, 'graduatedincubatee.html', {'page_obj': page_obj, 'paginator': paginator, 'objs': objs, 'pg': pg, 'count': count, 'choices': choices, 'events' : events})
+    return render(request, 'graduatedincubatee.html', {'page_obj': page_obj, 'paginator': paginator, 'objs': objs, 'pg': pg, 'choices': choices, 'events' : events})
 
 def pgtemplate(request, page_slug):
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     # pg = sorted(pg, key=lambda x: x.orderno)
     try:
@@ -234,15 +211,11 @@ def pgtemplate(request, page_slug):
         benefits = []
         years = []
         projects=[]
-    return render(request, 'pgtemp.html', {'projects':projects, 'page_template': page_template, 'pg': pg, 'objectives_list': objectives_list, 'eligibility_list': eligibility_list, 'noteligible_list': noteligible_list, 'broadcovered_list': broadcovered_list, 'broadnotcovered_list': broadnotcovered_list, 'guidelines': guidelines, 'benefits': benefits, 'count': count, 'years': years, 'events' : events})
+    return render(request, 'pgtemp.html', {'projects':projects, 'page_template': page_template, 'pg': pg, 'objectives_list': objectives_list, 'eligibility_list': eligibility_list, 'noteligible_list': noteligible_list, 'broadcovered_list': broadcovered_list, 'broadnotcovered_list': broadnotcovered_list, 'guidelines': guidelines, 'benefits': benefits, 'years': years, 'events' : events})
 
 def events(request, page_slug):
     events = Event.objects.all()
     # events = sorted(events, key=lambda x: x.orderno)
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     # pg = sorted(pg, key=lambda x: x.orderno)
     try:
@@ -252,7 +225,7 @@ def events(request, page_slug):
                 '\n') if page_template.timeline else []
             timeline =[i.split(":") for i in timeline_list]
         else:
-            timeline = [] 
+            timeline = []
         takeaways = page_template.takeaways.split(
             '\n') if page_template.takeaways else []
         targetgrp = page_template.targetgrp.split(
@@ -273,84 +246,56 @@ def events(request, page_slug):
         targetgrp = []
         others = []
         conditions = False
-    return render(request, 'events.html', {'page_template': page_template, 'pg': pg, 'timeline': timeline, 'takeaways': takeaways, 'targetgrp': targetgrp, 'count': count, 'events' : events, 'conditions': conditions, 'others': others})
+    return render(request, 'events.html', {'page_template': page_template, 'pg': pg, 'timeline': timeline, 'takeaways': takeaways, 'targetgrp': targetgrp, 'events' : events, 'conditions': conditions, 'others': others})
 
 def virtualincubation(request):
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     # pg = sorted(pg, key=lambda x: x.orderno)
-    return render(request,'virtualincubation.html', {'pg': pg, 'count': count, 'events' : events})
+    return render(request,'virtualincubation.html', {'pg': pg, 'events' : events})
 
 def team(request):
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     # pg = sorted(pg, key=lambda x: x.orderno)
     team = Team.objects.all().order_by("orderno")
-    return render(request,'team.html',{'team':team, 'pg': pg, 'count': count, 'events' : events})
+    return render(request,'team.html',{'team':team, 'pg': pg, 'events' : events})
 
 def facilities(request):
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     # pg = sorted(pg, key=lambda x: x.orderno)
     infraFacility = InfraFacility.objects.all()
-    return render(request,'meetingroom.html', {'pg': pg, 'count': count, 'infraFacility': infraFacility, 'events' : events})
+    return render(request,'meetingroom.html', {'pg': pg, 'infraFacility': infraFacility, 'events' : events})
 
 def my_custom_error_view(request, exception=None):
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     # pg = sorted(pg, key=lambda x: x.orderno)
-    return render(request,'404.html', {'pg': pg, 'count': count, 'events' : events})
+    return render(request,'404.html', {'pg': pg, 'events' : events})
 
 def mentors(request):
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     # pg = sorted(pg, key=lambda x: x.orderno)
     mentor_type = Mentor_type.objects.all()
-    return render(request,'mentors.html', {'mentor_type': mentor_type, 'pg': pg, 'count': count, 'events' : events})
+    return render(request,'mentors.html', {'mentor_type': mentor_type, 'pg': pg, 'events' : events})
 
 def cabinspace(request):
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     # pg = sorted(pg, key=lambda x: x.orderno)
-    return render(request,'cabinspace.html', {'pg': pg, 'count': count, 'events' : events})
+    return render(request,'cabinspace.html', {'pg': pg, 'events' : events})
 
 def iot(request):
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     types = Iot.objects.all()
     choices = []
     devices = IotDevice.objects.all()
@@ -373,18 +318,14 @@ def iot(request):
         else:
             types = Iot.objects.all()
 
-    return render(request,'iot.html', {'pg': pg,'types':types, 'count': count, 'devices': devices, 'events' : events, 'specs': specs, 'choices':choices})    
+    return render(request,'iot.html', {'pg': pg,'types':types, 'devices': devices, 'events' : events, 'specs': specs, 'choices':choices})
 
 def labs(request):
     events = Event.objects.all()
     events = sorted(events, key=lambda x: x.orderno)
-    visit_counter = Count.objects.get(name="Actual")
-    visit_add = Count.objects.get(name="Extra")
-    count_list = str(visit_counter.count + visit_add.count)
-    count = list(count_list)
     pg = Programme.objects.all()
     # pg = sorted(pg, key=lambda x: x.orderno)
-    return render(request,'labs.html', {'pg': pg, 'count': count, 'events' : events})
+    return render(request,'labs.html', {'pg': pg, 'events' : events})
 
 def loginuser(request):
     events = Event.objects.all()

@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('ticket.js: DOMContentLoaded');
     const ticketForm = document.querySelector('#ticketForm');
     const titleInput = document.querySelector('#id_title');
     const descriptionInput = document.querySelector('#id_description');
@@ -56,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (ticketForm) {
         // Client-side validation before submission
         ticketForm.addEventListener('submit', function(e) {
+            console.log('ticket.js: Form submit attempted');
             e.preventDefault();
 
             // Basic validation
@@ -133,18 +135,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const formInputs = document.querySelectorAll('.form-input');
         formInputs.forEach(input => {
             input.addEventListener('focus', () => {
+                console.log('ticket.js: Input focused', input.id);
                 input.parentElement.classList.add('focused');
             });
 
             input.addEventListener('blur', () => {
+                console.log('ticket.js: Input blurred', input.id, 'value:', input.value.trim());
                 input.parentElement.classList.remove('focused');
-
-                // Validate on blur
-                if (input.hasAttribute('required') && !input.value.trim()) {
-                    showInputError(input, `Please enter a ${input.getAttribute('placeholder').toLowerCase()}`);
-                } else {
-                    clearInputError(input);
-                }
+                // Keep only focus/blur visual effects, remove blur validation
             });
         });
     }
@@ -152,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Helper function to show input error
 function showInputError(input, message) {
+    console.log('ticket.js: Showing input error for', input.id, 'message:', message);
     clearInputError(input);
 
     const errorMessage = document.createElement('div');
@@ -179,13 +178,11 @@ function showInputError(input, message) {
         duration: 300,
         easing: 'ease-in-out'
     });
-
-    // Focus the input
-    input.focus();
 }
 
 // Helper function to clear input error
 function clearInputError(input) {
+    console.log('ticket.js: Clearing input error for', input.id);
     const errorMessage = input.parentElement.querySelector('.input-error');
     if (errorMessage) {
         errorMessage.remove();

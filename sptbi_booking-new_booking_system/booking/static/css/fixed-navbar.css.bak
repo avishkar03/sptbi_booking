@@ -1,0 +1,92 @@
+/*
+ * Fixed Navbar Styles for Booking Page
+ */
+
+.navbar-fixed {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 9999 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    background-color: #0b3c7c !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.navbar-fixed .logo {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+}
+
+.navbar-fixed .logo img {
+    display: block !important;
+    height: 25px !important;
+    margin: 0 15px !important;
+}
+
+.navbar-fixed .menu {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    margin-right: 15px !important;
+}
+
+.navbar-fixed .menu li a {
+    padding: 0 12px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.navbar-fixed .submenu {
+    top: 40px !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.menu-fixed {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    background-color: #0b3c7c !important;
+}
+
+.social-sidebar-adjusted {
+    top: 50px !important;
+}
+
+body.has-fixed-navbar {
+    padding-top: 40px !important;
+    margin-top: 0 !important;
+}
+
+body.has-fixed-navbar .header {
+    display: none !important;
+}
+
+body.has-fixed-navbar .booking-container,
+body.has-fixed-navbar .container-fluid {
+    margin-top: 0 !important;
+}
+
+@media (max-width: 914px) {
+    .navbar-fixed {
+        display: none !important;
+    }
+
+    .menu-fixed {
+        height: auto !important;
+    }
+
+    body.has-fixed-navbar {
+        padding-top: 50px !important;
+    }
+}
+

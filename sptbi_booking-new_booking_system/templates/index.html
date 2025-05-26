@@ -1,7 +1,8 @@
-{% extends 'base.html' %} {% load static %}
+{% extends 'base.html' %} {% load static %} {% load custom_filters %} {% load about_filters %}
 {% block Title %} Home {% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/index.css' %}" />
+<link rel="stylesheet" href="{% static 'css/simple-image-borders.css' %}" />
 <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
@@ -62,20 +63,31 @@
 <div class="about-section parallax-section" data-scroll="fade-in" data-duration="1200" data-speed="0.1">
   <div class="container">
     <div class="about-content" data-stagger=".stagger-item" data-stagger-delay="200">
-      <div class="about-photo stagger-item" data-scroll="fade-in-left">
-        <img src="{% static 'assets/office.png'%}" alt="About Photo" />
+      <div class="about-photo stagger-item">
+        <div class="about-photo-gallery">
+          <div class="row">
+            <div class="card-left">
+              <div class="reveal-image">
+                <img src="{% static 'assets/office.png' %}" alt="Office Photo" />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="card-right">
+              <div class="reveal-image">
+                <img src="{% static 'assets/images/20230617_121830_6jFlpTE.jpg' %}" alt="Facility Photo" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="about-text stagger-item" data-scroll="fade-in-right">
         <h2 class="section-title" data-scroll="fade-in">About Us</h2>
-        <p class="stagger-item" data-scroll="fade-in">
-          Science and Technology Park - Technology Business Incubator <span class="highlight">(SP-TBI)</span> is a premier incubation center established to nurture innovative startups and foster entrepreneurship in the technology sector.
-        </p>
-        <p class="stagger-item" data-scroll="fade-in">
-          Located at Bhavan's Campus, Andheri (West), we provide state-of-the-art infrastructure and comprehensive support to help transform innovative ideas into successful business ventures. Our focus spans across various technological domains including IoT, AI/ML, Robotics, Clean Energy, and Healthcare.
-        </p>
-        <p class="stagger-item" data-scroll="fade-in">
-          With a track record of incubating over <span class="highlight">50+ successful startups</span>, our ecosystem offers entrepreneurs access to cutting-edge laboratories, dedicated workspace, expert mentorship, funding opportunities, and invaluable industry connections. We are committed to fostering innovation and contributing to India's startup ecosystem.
-        </p>
+        {% if about_content %}
+          {{ about_content.content|highlight_keywords:about_content.keywords|safe }}
+        {% else %}
+          <p>About Us content not available.</p>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -199,6 +211,7 @@
     <h1 class="section-title" data-scroll="zoom-in" data-delay="400">What We Offer</h1>
   </div>
   <div class="facilities" data-scroll="fade-in" data-delay="600">
+    <!-- Modal Container -->
     <div id="modal-container">
       <div class="modal-background">
         <div class="modal">
@@ -210,13 +223,43 @@
         </div>
       </div>
     </div>
-    <div class="container-wrapper" data-stagger=".contents" data-stagger-delay="200">
+
+    <!-- Modern Card Grid -->
+    <div class="modern-card-grid">
       {% for obj in objs %}
-      <div class="contents" data-scroll="zoom-in" data-duration="800">
-        <input type=hidden value="{{obj.description}}" id="modaltitle-{{forloop.counter}}" />
-        <img src="{{obj.image.url}}" data-scroll="fade-in" data-delay="200" />
-        <div class="buttons" data-scroll="fade-in-up" data-delay="400">
-          <div id="{{forloop.counter}}" class="button">{{obj.title}}</div>
+      <div class="modern-card" data-scroll="fade-in-up" data-duration="800" data-delay="{{ forloop.counter|add:'-1' }}00">
+        <div class="modern-card-inner">
+          <div class="modern-card-icon">
+            <div class="bootstrap-icon-wrapper">
+              {% if obj.image %}
+                <img src="{{ obj.image.url }}" alt="{{ obj.title }}" class="feature-image">
+              {% else %}
+                <i class="bi bi-{{obj.title|feature_icon}} feature-icon"></i>
+              {% endif %}
+            </div>
+          </div>
+          <div class="modern-card-content">
+            <h3 class="modern-card-title">{{obj.title}}</h3>
+            <p class="modern-card-description">{{obj.description|striptags|truncatechars:80}}</p>
+            <button type="button" class="modern-card-button learn-more">Learn More</button>
+          </div>
+
+          <!-- Card Overlay with Custom Sidebar -->
+          <div class="card-overlay">
+            <button type="button" class="close-btn"><i class="bi bi-x-lg"></i></button>
+            <div class="overlay-content">
+              <h3 class="overlay-title">{{obj.title}}</h3>
+              <p>{{obj.description|safe}}</p>
+              {% if obj.bullets %}
+                <ul class="feature-bullets">
+                  {% for bullet in obj.bullets_list %}
+                    <li>{{ bullet|safe }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+
+          </div>
         </div>
       </div>
       {% endfor %}
@@ -280,16 +323,13 @@
           <p class="news-card-description">
             {{news.description | safe}}
           </p>
-          <a href="{{news.link}}" class="news-card-button">Read More</a>
+          <a href="{{news.link}}" class="news-card-button">
+            <span>&nbsp;Read &nbsp;More<span class="arrow">→</span></span>
+          </a>
         </div>
       </div>
       {% endfor %}
     </div>
-  </div>
-
-  <!-- Pagination dots -->
-  <div class="news-carousel-dots">
-    <!-- Dots will be populated dynamically by JavaScript -->
   </div>
 </div>
 <!-- SVG Wave Divider (Inverted) -->
@@ -336,6 +376,7 @@
         </div>
       </div>
     </div>
+  </div>
   {% endfor %}
 </div>
 <!-- SVG Wave Divider -->
@@ -407,6 +448,31 @@
 <script src="https://cdn.jsdelivr.net/npm/micro-slider@1.0.9/dist/micro-slider.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
 <script src="{% static 'js/index.js' %}"></script>
+<script src="{% static 'js/about-animations.js' %}"></script>
+
+<!-- Inline script for card overlay functionality -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add click event listeners to all "Learn More" buttons
+    document.querySelectorAll('.learn-more').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.modern-card').classList.add('show-overlay');
+      });
+    });
+
+    // Add click event listeners to all close buttons
+    document.querySelectorAll('.close-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.modern-card').classList.remove('show-overlay');
+      });
+    });
+
+    // About section animations moved to about-animations.js
+  });
+</script>
 {% endblock %}
 

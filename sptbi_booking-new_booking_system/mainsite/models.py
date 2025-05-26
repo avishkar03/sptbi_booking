@@ -3,6 +3,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import AbstractUser
 from .manager import UserManager
 from django.utils.text import slugify
+from django_summernote.fields import SummernoteTextField
 # Create your models here.
 
 
@@ -284,9 +285,28 @@ class Event(models.Model):
     def __str__(self):
         return self.title
 
-class About(models.Model):
-    about = models.TextField()
+class AboutUsContent(models.Model):
+    content = SummernoteTextField("About Us Text")
+    keywords = models.TextField("Highlight Keywords (comma-separated)", blank=True, null=True)
 
     def __str__(self):
-        return self.about[:50]  # Return first 50 characters as string representation
+        return "About Us Content"
+
+class About(models.Model):
+    about = SummernoteTextField("About Us Text")
+    keywords = models.TextField("Highlight Keywords (comma-separated)", blank=True, null=True)
+
+    def __str__(self):
+        return "About Us Content"
+
+class NewsTicker(models.Model):
+    content = models.TextField("Ticker Content")
+    active = models.BooleanField(default=True, help_text="Show this ticker on the site?")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.content[:50]
 
